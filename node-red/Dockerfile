@@ -15,14 +15,14 @@ RUN mkdir -p /home/ubuntu/monitor_ml/venv
 RUN ln -s /usr/bin/python3 /home/ubuntu/monitor_ml/venv/bin/python
 
 # Copy your Python requirements file into a temporary location in the container
-COPY ../backend/requirements.txt /tmp/requirements.txt
+COPY /backend/requirements.txt /tmp/requirements.txt
 
 # Install all Python dependencies globally within the container
 RUN pip3 install --no-cache-dir -r /tmp/requirements.txt
 
 # Copy your Python scripts to the exact location the exec node expects
-COPY ../backend/dpp_simulator.py /home/ubuntu/monitor_ml/dpp_simulator.py
-COPY ../backend/gcode_analyzer.py /home/ubuntu/monitor_ml/gcode_analyzer.py
+COPY /backend/dpp_simulator.py /home/ubuntu/monitor_ml/dpp_simulator.py
+COPY /backend/gcode_analyzer.py /home/ubuntu/monitor_ml/gcode_analyzer.py
 # Note: We don't need train_model.py for the live system
 
 # Copy your project's package.json to install custom Node-RED nodes

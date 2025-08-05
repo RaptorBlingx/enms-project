@@ -29,7 +29,11 @@ services:
   # -------------------------------------------------
   nodered:
     build:
-      context: ./node-red
+  # Use the entire project directory as the context
+      context: .
+  # Specify the location of the Dockerfile within that context
+      dockerfile: ./node-red/Dockerfile
+
     container_name: enms_nodered
     restart: unless-stopped
     ports:
