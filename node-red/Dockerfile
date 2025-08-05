@@ -8,7 +8,7 @@ USER root
 RUN apk add --no-cache python3 py3-pip postgresql-client
 
 # Create the exact directory structure that your exec node expects
-RUN mkdir -p /home/ubuntu/monitor_ml/venv
+RUN mkdir -p /home/ubuntu/monitor_ml/venv/bin
 
 # Now, we will create a symbolic link. This is the magic step.
 # This makes the system's python3 executable also appear at the path your exec node calls.
