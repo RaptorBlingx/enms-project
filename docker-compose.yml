@@ -69,8 +69,13 @@ services:
       # Exposes the main application on the standard HTTP port 80.
       - "80:80"
     volumes:
+      # Mounts the main config file
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      # Mounts the directory containing our site-specific config (default.conf)
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      # Mounts your frontend code
       - ./frontend:/usr/share/nginx/html
+      # Mounts your images
       - ./artistic-resources:/usr/share/nginx/html/artistic-resources
     depends_on:
       - nodered
