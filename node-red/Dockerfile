@@ -5,9 +5,8 @@ FROM nodered/node-red:latest
 USER root
 
 # Install Python, venv, pip, and PostgreSQL client libraries
-RUN apk add --no-cache python3 py3-pip py3-venv postgresql-client
-
-# --- THIS IS THE CORRECTED PYTHON SETUP ---
+# python3 automatically includes venv. python3-dev and build-base are needed by some pip packages.
+RUN apk add --no-cache python3 python3-dev build-base postgresql-client
 # 1. Create the directory structure your exec node expects
 RUN mkdir -p /home/ubuntu/monitor_ml/venv
 
