@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Embedded Dashboard (Dark/Light Mode)</title>
+    <!-- Import Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Import Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* --- CSS Variables --- */
+        :root {
+            /* Base Variables (Dark Mode Default) */
+            --font-primary: 'Inter', Arial, sans-serif;
+            --color-bg-light: #111827;       /* Very dark grey for main bg (can adjust) */
+            --color-bg-sidebar: #1f2937;     /* Darker grey for sidebar */
+            --color-bg-topnav: #1f2937;      /* Darker grey for top nav */
+            --color-text-primary: #f3f4f6;   /* Light grey text */
+            --color-text-secondary: #9ca3af; /* Medium grey text */
+            --color-accent: #3b82f6;         /* Brighter blue for dark mode */
+            --color-accent-hover: #2563eb;    /* Slightly darker blue */
+            --color-border: #374151;         /* Dark border color */
+            --color-button-bg: #374151;       /* Button background */
+            --color-button-hover-bg: #4b5563; /* Button hover background */
+            --color-active-bg: var(--color-accent); /* Active button bg */
+            --color-active-text: #ffffff;       /* Active button text */
+            --color-icon: var(--color-text-secondary);
+            --color-icon-hover: var(--color-accent);
+            --color-shadow: rgba(0, 0, 0, 0.2);
+
+            --sidebar-width: 260px;
+            --sidebar-width-closed: 0px; /* Set closed width to 0 */
+            --topnav-height: 60px;
+            --base-padding: 1rem;
+            --border-radius: 0.375rem;
+            --box-shadow-light: 0 1px 3px 0 var(--color-shadow), 0 1px 2px -1px var(--color-shadow);
+            --box-shadow-medium: 0 4px 6px -1px var(--color-shadow), 0 2px 4px -2px var(--color-shadow);
+            --transition-speed: 0.25s;
+        }
+
+        /* Light Mode Overrides */
+        :root.light-mode {
+            --color-bg-light: #f8f9fa;
+            --color-bg-sidebar: #ffffff;
+            --color-bg-topnav: #ffffff;
+            --color-text-primary: #212529;
+            --color-text-secondary: #6c757d;
+            --color-accent: #0d6efd;
+            --color-accent-hover: #0b5ed7;
+            --color-border: #dee2e6;
+            --color-button-bg: #ffffff;
+            --color-button-hover-bg: #f8f9fa;
+            --color-active-bg: var(--color-accent);
+            --color-active-text: #ffffff;
+            --color-icon: var(--color-text-secondary);
+            --color-icon-hover: var(--color-accent);
+            --color-shadow: rgba(0, 0, 0, 0.07);
+        }
+
+
+        /* --- Basic Reset & Global Styles --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            /* Smooth theme transition */
+            transition: background-color var(--transition-speed) ease-out,
+                        color var(--transition-speed) ease-out;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: var(--font-primary);
+            font-size: 16px;
+            background-color: var(--color-bg-light); /* Use a subtle bg for the area outside container */
+            color: var(--color-text-primary);
+            line-height: 1.5;
+            overflow: hidden; /* Prevent body scroll */
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            background-color: var(--color-bg-light); /* Main app background */
+        }
+
+        /* --- Sidebar Styles --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--color-bg-sidebar);
+            border-right: 1px solid var(--color-border);
+            box-shadow: var(--box-shadow-light);
+           
+            flex-direction: column;
+            /* Enhanced transitions with improved timing functions */
+            transition: transform var(--transition-speed) ease-out,
+                        width var(--transition-speed) ease-out,
+                        background-color var(--transition-speed) ease-out,
+                        border-color var(--transition-speed) ease-out,
+                        box-shadow var(--transition-speed) ease-out;
+            overflow-x: hidden; /* Hide content when shrinking */
+            overflow-y: auto; /* Allow vertical scroll if needed */
+            flex-shrink: 0;
+            z-index: 100;
+            transform: translateX(0); /* Start visible */
+        }
+
+        .sidebar.initially-hidden { /* New class */
+        display: none !important;
+        }
+
+        .sidebar.closed {
+            width: var(--sidebar-width-closed); /* Make it truly zero width */
+            transform: translateX(-100%); /* Slide completely out */
+            border-right: none; /* Hide border when closed */
+            box-shadow: none;
+            padding: 0; /* Remove padding when closed */
+            overflow: hidden; /* Ensure no overflow */
+        }
+
+        /* Ensure content inside sidebar doesn't prevent closing */
+        .sidebar.closed .sidebar-header,
+        .sidebar.closed .sidebar-nav {
+            visibility: hidden; /* Hide content instantly when closed */
+            opacity: 0;
+            transition: visibility 0s var(--transition-speed), opacity var(--transition-speed);
+        }
+         .sidebar .sidebar-header,
+         .sidebar .sidebar-nav {
+            visibility: visible;
+            opacity: 1;
+            transition: opacity var(--transition-speed);
+         }
+
+
+        .sidebar-header {
+            padding: calc(var(--base-padding) * 1.2) var(--base-padding);
+            border-bottom: 1px solid var(--color-border);
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--color-accent);
+            white-space: nowrap;
+            transition: color var(--transition-speed), border-color var(--transition-speed), padding var(--transition-speed);
+        }
+         .sidebar-header i {
+            margin-right: 0.5rem;
+         }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: var(--base-padding) 0;
+            flex-grow: 1;
+             /* overflow-y: auto; Removed - handled by sidebar itself */
+        }
+
+        .sidebar-nav li a {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem var(--base-padding);
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            margin: 0.25rem var(--base-padding);
+            transition: background-color var(--transition-speed) ease-out,
+                        color var(--transition-speed) ease-out,
+                        transform 0.1s ease-out;
+            white-space: nowrap;
+        }
+
+        .sidebar-nav li a:active {
+            transform: scale(0.9);
+        }
+        .sidebar-nav li a i {
+            width: 20px;
+            margin-right: 0.8rem;
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--color-icon);
+            transition: color var(--transition-speed);
+        }
+
+        .sidebar-nav li a:hover {
+             /* Use RGBA for subtle background hover in both modes */
+            background-color: rgba(var(--color-accent), 0.1);
+            color: var(--color-accent);
+        }
+         .sidebar-nav li a:hover i {
+             color: var(--color-accent);
+        }
+
+        /* Style for the active sidebar link */
+        .sidebar-nav li a.active {
+            background-color: rgba(var(--color-accent), 0.2); /* Stronger active bg */
+            color: var(--color-accent);
+            font-weight: 600;
+            box-shadow: 0 0 0 1px var(--color-accent);
+            transition: background-color var(--transition-speed) ease-out,
+                        color var(--transition-speed) ease-out,
+                        box-shadow var(--transition-speed) ease-out,
+                        font-weight 0.1s ease-out;
+        }
+        .sidebar-nav li a.active i {
+             color: var(--color-accent);
+        }
+
+
+        /* --- Main Content Area --- */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            /* No margin-left transition needed as sidebar transforms */
+        }
+
+        .main-content.initially-hidden { /* New class */
+        display: none !important; /* Start hidden, JS will remove this class */
+        }
+
+        /* --- Top Navigation Bar --- */
+        .top-nav {
+            height: var(--topnav-height);
+            background: var(--color-bg-topnav);
+            color: var(--color-text-primary);
+            padding: 0 var(--base-padding);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--color-border);
+            box-shadow: var(--box-shadow-light);
+            flex-shrink: 0;
+            z-index: 90;
+            transition: background-color var(--transition-speed), border-color var(--transition-speed), color var(--transition-speed);
+        }
+
+        .top-nav-left, .top-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem; /* Consistent gap */
+        }
+
+        .top-nav-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .toggle-sidebar, .theme-toggle { /* Group common styles */
+            background: none;
+            border: none;
+            color: var(--color-icon);
+            font-size: 1.4rem; /* Adjusted size */
+            cursor: pointer;
+            padding: 0.5rem;
+            line-height: 1;
+            border-radius: var(--border-radius);
+            transition: color var(--transition-speed), background-color var(--transition-speed);
+        }
+        .toggle-sidebar:hover, .theme-toggle:hover {
+            color: var(--color-icon-hover);
+            background-color: rgba(var(--color-accent), 0.1); /* Subtle hover background */
+        }
+
+        /* --- Top Nav Buttons --- */
+        .nav-button {
+            background-color: var(--color-button-bg);
+            border: 1px solid var(--color-border);
+            padding: 0.5rem 1rem;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            transition: background-color var(--transition-speed) ease-out,
+                        color var(--transition-speed) ease-out,
+                        border-color var(--transition-speed) ease-out,
+                        box-shadow var(--transition-speed) ease-out,
+                        transform 0.1s ease-out;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            white-space: nowrap; /* Prevent text wrapping */
+        }
+
+        .nav-button:active {
+            transform: scale(0.9);
+        }
+         .nav-button i {
+            font-size: 0.9em;
+            color: var(--color-icon);
+            transition: color var(--transition-speed);
+         }
+
+        .nav-button:hover {
+            background-color: var(--color-button-hover-bg);
+            border-color: var(--color-accent);
+            color: var(--color-accent);
+        }
+         .nav-button:hover i {
+            color: var(--color-accent);
+         }
+
+        .nav-button.active {
+            background-color: var(--color-active-bg);
+            border-color: var(--color-accent);
+            color: var(--color-active-text);
+            box-shadow: 0 0 0 1px var(--color-accent), 0 2px 4px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+            transition: background-color var(--transition-speed) ease-out,
+                        color var(--transition-speed) ease-out,
+                        border-color var(--transition-speed) ease-out,
+                        box-shadow var(--transition-speed) ease-out,
+                        transform var(--transition-speed) ease-out;
+        }
+         .nav-button.active i {
+            color: var(--color-active-text); /* Icon color matches text color */
+         }
+        .nav-button.active:hover {
+             background-color: var(--color-accent-hover);
+             border-color: var(--color-accent-hover);
+        }
+        .nav-button.active:active {
+             transform: scale(0.9) translateY(-1px);
+        }
+
+        /* --- NEW: Style for the special button --- */
+        .nav-button.special-button {
+            font-weight: 600; /* Make text bolder */
+            /* Add a subtle border even when not active */
+            border-color: var(--color-accent-hover);
+            /* Optional: Slightly different background/text */
+            /* background-color: #4b5563; Slightly darker base */
+            /* color: var(--color-text-primary); Make text lighter */
+        }
+        /* Ensure active state looks good */
+        .nav-button.special-button.active {
+             /* Already handled by .nav-button.active, but could add more */
+            /* Example: box-shadow: 0 0 0 2px rgba(var(--color-accent), 0.4); */
+        }
+        /* Hover state for special button */
+        .nav-button.special-button:hover {
+            /* Make hover more pronounced if desired */
+            background-color: var(--color-button-hover-bg); /* Keep consistent hover */
+             border-color: var(--color-accent);
+             color: var(--color-accent);
+        }
+        /* --- End of special button style --- */
+
+
+        /* Fullscreen button handling */
+         #exitFullScreen { display: none; }
+         .iframe-container:fullscreen #enterFullScreen { display: none; }
+         .iframe-container:fullscreen #exitFullScreen { display: inline-flex; }
+         .iframe-container:-webkit-full-screen #enterFullScreen { display: none; }
+         .iframe-container:-webkit-full-screen #exitFullScreen { display: inline-flex; }
+
+        /* Theme Toggle Icons - Show only the relevant one */
+        .theme-toggle .fa-sun { display: none; } /* Hide sun by default (dark mode) */
+        .theme-toggle .fa-moon { display: inline-block; }
+
+        :root.light-mode .theme-toggle .fa-sun { display: inline-block; }
+        :root.light-mode .theme-toggle .fa-moon { display: none; }
+
+
+        /* --- Iframe Container --- */
+        .iframe-container {
+            flex: 1;
+            position: relative;
+            background-color: var(--color-bg-light);
+            transition: background-color var(--transition-speed);
+            /* Removed padding around iframe */
+            /* padding: var(--base-padding); */
+        }
+
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* Loading Indicator Styles */
+        .loading-indicator {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--color-bg-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+        }
+
+        .loading-indicator.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(59, 130, 246, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--color-accent);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Light mode adjustments for loading indicator */
+        :root.light-mode .loading-indicator {
+            background-color: var(--color-bg-light);
+        }
+
+        :root.light-mode .spinner {
+            border: 5px solid rgba(13, 110, 253, 0.2);
+            border-top-color: var(--color-accent);
+        }
+
+        /* Placeholder Content Styles */
+        .placeholder-content {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--color-bg-light);
+            color: var(--color-text-primary);
+            padding: 2rem;
+            text-align: center;
+            overflow-y: auto;
+        }
+
+        .placeholder-content.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .placeholder-icon {
+            font-size: 4rem;
+            color: var(--color-accent);
+            margin-bottom: 1.5rem;
+        }
+
+        .placeholder-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--color-text-primary);
+        }
+
+        .placeholder-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: var(--color-text-secondary);
+        }
+
+        .code-comment {
+            font-family: monospace;
+            background-color: rgba(var(--color-accent), 0.1);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            text-align: left;
+            margin-bottom: 1.5rem;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .code-comment pre {
+            margin: 0;
+            color: var(--color-text-primary);
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .progress-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 1.5rem 0;
+            background-color: rgba(var(--color-accent), 0.1);
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 20px;
+            width: 15%;
+            background-color: var(--color-accent);
+            border-radius: 1rem;
+            animation: progress-animation 2s ease-in-out infinite alternate;
+        }
+
+        .welcome-screen-container {
+            position: fixed; /* Cover the whole screen */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--color-bg-light); /* Use theme background */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 200; /* Make sure it's on top */
+            padding: var(--base-padding);
+            text-align: center;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+
+        .welcome-screen-container.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none; /* Prevent interaction when hidden */
+        }
+
+        .welcome-content-box {
+            background-color: var(--color-bg-sidebar); /* Use a contrasting bg like sidebar */
+            padding: calc(var(--base-padding) * 2.5);
+            border-radius: calc(var(--border-radius) * 2);
+            box-shadow: var(--box-shadow-medium);
+            max-width: 600px;
+            width: 90%;
+        }
+
+        .welcome-content-box h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--color-accent); /* Use theme accent */
+        }
+
+        .welcome-content-box p {
+            font-size: 1.1rem;
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
+            color: var(--color-text-secondary);
+        }
+
+        .profile-buttons-welcome {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .profile-button-welcome {
+            background-color: var(--color-accent);
+            color: var(--color-active-text); /* Text color for active/accented buttons */
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color var(--transition-speed) ease-out, transform var(--transition-speed) ease-out;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .profile-button-welcome:hover {
+            background-color: var(--color-accent-hover);
+            transform: translateY(-3px);
+        }
+
+        .profile-button-welcome:active {
+            transform: translateY(-1px);
+        }
+        /* ****** END: WELCOME SCREEN STYLES ****** */
+
+
+        @keyframes progress-animation {
+            0% { width: 15%; }
+            100% { width: 85%; }
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Class 'light-mode' will be added here by JS -->
+    <div class="container">
+        <div id="welcomeScreen" class="welcome-screen-container">
+            <div class="welcome-content-box">
+                <h1>Welcome!</h1>
+                <p>Please select your profile to access the tailored dashboard experience.</p>
+                <div class="profile-buttons-welcome">
+                    <button class="profile-button-welcome" data-profile="technical">Technical Profile</button>
+                    <button class="profile-button-welcome" data-profile="staff">Staff Profile</button>
+                    <button class="profile-button-welcome" data-profile="dpp">DPP Profile</button>
+                </div>
+            </div>
+        </div>
+        <!-- Sidebar - Added 'closed' class for default state -->
+        <div id="sidebar" class="sidebar closed initially-hidden ">
+            <div class="sidebar-header">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Analytics</span>
+            </div>
+            <ul class="sidebar-nav">
+                <!-- Note: The first sidebar link 'dashboard' points to the OLD default.
+                     You might want to update this or remove the 'active' class initially -->
+                <li><a href="#" class="sidebar-link" data-target="dashboard"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a></li>
+                <li><a href="#" class="sidebar-link" data-target="reports"><i class="fa-solid fa-table-list"></i><span>Reports</span></a></li>
+                <li><a href="#" class="sidebar-link" data-target="settings"><i class="fa-solid fa-gear"></i><span>Settings</span></a></li>
+                <li><a href="#" class="sidebar-link" data-target="about"><i class="fa-solid fa-circle-info"></i><span>About</span></a></li>
+            </ul>
+        </div>
+
+        <!-- Main content area -->
+        <div class="main-content initially-hidden" id="mainDashboardContent">
+            <!-- Top Navigation Bar -->
+            <div class="top-nav">
+                <div class="top-nav-left">
+                    <button id="toggleSidebar" class="toggle-sidebar" title="Toggle Sidebar">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <span class="top-nav-title">Embedded View</span>
+                </div>
+                <div class="top-nav-right">
+                    <!-- Theme Toggle Button -->
+                    <button id="themeToggle" class="theme-toggle" title="Toggle Light/Dark Mode">
+                        <i class="fa-solid fa-sun"></i> <!-- Icon for Light Mode -->
+                        <i class="fa-solid fa-moon"></i> <!-- Icon for Dark Mode -->
+                    </button>
+
+                        <!-- NEW: Change Profile Button -->
+                    <button id="changeProfileBtn" class="nav-button" title="Change Profile">
+                        <i class="fa-solid fa-right-from-bracket"></i> <!-- Example: Logout icon -->
+                        <span>Change Profile</span> <!-- Added span for text -->
+                    </button>
+
+                    <!-- NEW: Industrial Hybrid Edge Button - Placed first -->
+                    <button id="industrialHybridBtn" class="nav-button special-button" data-target="industrial-hybrid"><i class="fa-solid fa-industry"></i> Industrial Hybrid Edge</button>
+                    <!-- ADD THIS NEW BUTTON -->
+                    <button id="sensorExplorerBtn" class="nav-button" data-target="sensor-explorer"><i class="fa-solid fa-microchip"></i> Sensor Explorer</button>
+                    <!-- NEW: Interactive Analysis Button -->
+                    <button id="interactiveAnalysisBtn" class="nav-button" data-target="interactive-analysis"><i class="fa-solid fa-wand-magic-sparkles"></i> Interactive Analysis</button> <!-- Used a magic wand icon -->
+                    <button id="dppBtn" class="nav-button" data-target="dpp"><i class="fa-solid fa-passport"></i> DPP</button> <!-- NEW DPP BUTTON -->
+                    <button id="nodeRed" class="nav-button" data-target="node-red"><i class="fa-solid fa-network-wired"></i> Node-RED</button>
+                    <button id="fleetOpsDashboard" class="nav-button" data-target="fleet-operations"><i class="fa-solid fa-sitemap"></i> Fleet Operations</button>
+                    <button id="perfCompDashboard" class="nav-button" data-target="performance-comparison"><i class="fa-solid fa-chart-simple"></i> Performance Comparison</button>
+                                        
+                    <!-- Fullscreen Buttons -->
+                    <button id="enterFullScreen" class="nav-button" title="Enter Full Screen"><i class="fa-solid fa-expand"></i></button>
+                    <button id="exitFullScreen" class="nav-button" title="Exit Full Screen"><i class="fa-solid fa-compress"></i></button>
+                </div>
+            </div>
+
+            <!-- Iframe Container -->
+            <div class="iframe-container" id="iframeContainer">
+                <!-- Loading indicator -->
+                <div class="loading-indicator" id="loadingIndicator">
+                    <div class="spinner"></div>
+                </div>
+
+                <!-- Reports Placeholder -->
+                <div class="placeholder-content" id="reportsPlaceholder">
+                    <i class="fa-solid fa-table-list placeholder-icon"></i>
+                    <h2 class="placeholder-title">Reports Module</h2>
+                    <h3 class="placeholder-subtitle">Under Development</h3>
+                    <div class="code-comment">
+                        <pre>
+/**
+ * TODO: Implement Reports Module
+ *
+ * @status: In Progress
+ * @priority: High
+ * @assignee: The Developer Who Needs More Coffee
+ * @eta: "Two weeks" (Developer time: 2-6 months)
+ *
+ * Note: This feature is currently compiling. It's been
+ * compiling for 3 weeks now. Please don't ask about it.
+ */</pre>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar"></div>
+                    </div>
+                    <p>Error 418: I'm a teapot, not a reporting engine... yet.</p>
+                </div>
+
+
+                <!-- Settings Placeholder -->
+                <div class="placeholder-content" id="settingsPlaceholder">
+                    <i class="fa-solid fa-gear placeholder-icon fa-spin"></i>
+                    <h2 class="placeholder-title">Settings Panel</h2>
+                    <h3 class="placeholder-subtitle">Coming Soon</h3>
+                    <div class="code-comment">
+                        <pre>
+// Settings.js - Last modified: Never
+//
+// function initSettings() {
+//     throw new Error('NotImplementedError: Too busy fixing bugs that
+//     the previous developer said were "features"');
+// }
+//
+// console.log('Settings will be available after the heat death
+// of the universe, or next sprint, whichever comes first.');
+</pre>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar"></div>
+                    </div>
+                    <p>Settings are like good code comments - promised but rarely delivered.</p>
+                </div>
+
+                <!-- About Placeholder -->
+                <div class="placeholder-content" id="aboutPlaceholder">
+                    <i class="fa-solid fa-circle-info placeholder-icon"></i>
+                    <h2 class="placeholder-title">About This Dashboard</h2>
+                    <h3 class="placeholder-subtitle">Information Coming Soon</h3>
+                    <div class="code-comment">
+                        <pre>
+/*
+ * 404 DEVELOPER NOT FOUND
+ *
+ * The developer responsible for this section is currently:
+ * [ ] Debugging
+ * [ ] In a meeting about why the project is delayed
+ * [ ] Explaining why "it works on my machine"
+ * [x] Questioning their career choices
+ * [x] Drinking coffee and staring blankly at this code
+ */</pre>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar"></div>
+                    </div>
+                    <p>This dashboard was made with ❤️, ☕, and a concerning amount of Stack Overflow.</p>
+                </div>
+
+                <!-- MODIFIED: src points to the new default dashboard -->
+                <iframe id="contentIframe" src="about:blank" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const toggleSidebarBtn = document.getElementById('toggleSidebar');
+        const contentIframe = document.getElementById('contentIframe');
+        const iframeContainer = document.getElementById('iframeContainer');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const navButtons = document.querySelectorAll('.nav-button[data-target]'); 
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const sidebarLinks = document.querySelectorAll('.sidebar-link'); // Get sidebar links
+
+        const THEME_KEY = 'dashboard-theme'; // Key for localStorage
+
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const mainDashboardContent = document.getElementById('mainDashboardContent');
+        const profileButtonsWelcome = document.querySelectorAll('.profile-button-welcome');
+        const changeProfileBtn = document.getElementById('changeProfileBtn'); // NEW
+        const SELECTED_PROFILE_KEY = 'dashboard-selected-profile';
+
+        const DEFAULT_IFRAME_SRC_ON_WELCOME = "about:blank"; // Explicitly for when welcome screen is shown
+
+
+        // NEW: Event Listener for Change Profile Button
+        if (changeProfileBtn) { // Good practice to check if the element exists
+            changeProfileBtn.addEventListener('click', () => {
+                console.log("[DEBUG] Change Profile button clicked.");
+                localStorage.removeItem(SELECTED_PROFILE_KEY);
+                console.log(`[DEBUG] Removed '${SELECTED_PROFILE_KEY}' from localStorage.`);
+
+                // Reload the page. DOMContentLoaded will now find no stored profile
+                // and will call showWelcomeScreen().
+                window.location.reload();
+
+                // Alternative (less robust if other states need resetting):
+                // showWelcomeScreen();
+                // // If using this alternative, you might need to manually reset other states,
+                // // like ensuring the iframe is blanked, sidebar is hidden/closed correctly, etc.
+                // // Reloading is generally cleaner for a full "reset to welcome".
+            });
+        }
+
+
+        // --- PROFILE CONFIG ---
+        const profileConfig = {
+            technical: {
+                // Technical Profile now has Node-RED, Industrial Hybrid, and Sensor Explorer
+                visibleTabsDataTargets: ['node-red', 'industrial-hybrid', 'sensor-explorer'],
+                defaultTabDataTarget: 'node-red' // Default to Node-RED for technical users
+            },
+            staff: {
+                // Staff Profile now has the three main dashboards
+                visibleTabsDataTargets: ['fleet-operations', 'performance-comparison', 'interactive-analysis'],
+                defaultTabDataTarget: 'fleet-operations' // Default to the main overview for staff
+            },
+            dpp: {
+                // DPP Profile remains the same
+                visibleTabsDataTargets: ['dpp'],
+                defaultTabDataTarget: 'dpp'
+            }
+        };
+
+        // --- CORE PROFILE AND UI LOGIC ---
+        const showWelcomeScreen = () => {
+            console.log("[DEBUG] showWelcomeScreen() called");
+            welcomeScreen.classList.remove('hidden');
+            mainDashboardContent.classList.add('initially-hidden');
+            sidebar.classList.add('initially-hidden');
+            if (contentIframe.src !== DEFAULT_IFRAME_SRC_ON_WELCOME) {
+                console.log("[DEBUG] Setting iframe src to about:blank for welcome screen.");
+                contentIframe.src = DEFAULT_IFRAME_SRC_ON_WELCOME;
+            }
+            // Ensure no active button state from a previous session if welcome is shown
+            setActiveButton(null);
+        };
+
+        const showDashboard = () => {
+        console.log("[DEBUG] showDashboard() called");
+        welcomeScreen.classList.add('hidden');
+        mainDashboardContent.classList.remove('initially-hidden');
+        sidebar.classList.remove('initially-hidden');
+    };
+
+
+    const updateUIForProfile = (profileName) => {
+    console.log(`[DEBUG] updateUIForProfile() called for profile: ${profileName}`);
+    const config = profileConfig[profileName];
+
+    if (!config) {
+        console.error(`[DEBUG] No configuration found for profile: ${profileName}. Showing welcome screen.`);
+        localStorage.removeItem(SELECTED_PROFILE_KEY);
+        showWelcomeScreen();
+        return;
+    }
+
+    // 1. Hide all top navigation buttons with data-target
+    navButtons.forEach(btn => { // navButtons selects buttons with data-target
+        btn.style.display = 'none';
+    });
+
+        // Explicitly show the Change Profile button if it exists and dashboard is active
+        if (changeProfileBtn) {
+        changeProfileBtn.style.display = 'inline-flex'; // Or your default display style for buttons
+    }
+    // Also ensure other non-data-target buttons like theme toggle, fullscreen are visible
+    if (themeToggleBtn) themeToggleBtn.style.display = 'inline-block'; // or 'block' or 'flex'
+    if (enterFullScreenBtn) enterFullScreenBtn.style.display = 'inline-flex';
+    // exitFullScreenBtn is handled by CSS based on fullscreen state
+
+    // 2. Show only the buttons specified for this profile
+    let firstVisibleButtonTarget = null;
+    if (config.visibleTabsDataTargets && config.visibleTabsDataTargets.length > 0) {
+        firstVisibleButtonTarget = config.visibleTabsDataTargets[0];
+        config.visibleTabsDataTargets.forEach(target => {
+            const buttonToShow = document.querySelector(`.nav-button[data-target="${target}"]`);
+            if (buttonToShow) {
+                buttonToShow.style.display = 'inline-flex';
+            } else {
+                console.warn(`[DEBUG] Button with data-target="${target}" not found for profile ${profileName}.`);
+            }
+        });
+    } else {
+        console.warn(`[DEBUG] No visible tabs configured for profile: ${profileName}`);
+    }
+
+    // 3. Load the default content
+    const targetContent = config.defaultTabDataTarget || firstVisibleButtonTarget;
+    if (targetContent) {
+        console.log(`[DEBUG] Loading default content for profile ${profileName}: ${targetContent}`);
+        loadContent(targetContent); // This will set iframe.src and active button
+    } else {
+        console.warn(`[DEBUG] No default or first visible tab to load for profile: ${profileName}`);
+        setActiveButton(null);
+        hidePlaceholders();
+        if (contentIframe.src !== 'about:blank') contentIframe.src = 'about:blank';
+        contentIframe.style.display = 'block'; // Or manage as per your placeholder logic
+    }
+
+    // 4. Ensure the dashboard UI is visible
+    showDashboard();
+};
+
+        // --- Loading Indicator Management ---
+        const showLoadingIndicator = () => {
+            loadingIndicator.classList.add('active');
+        };
+
+        const hideLoadingIndicator = () => {
+            loadingIndicator.classList.remove('active');
+        };
+
+        // Check if URL is a placeholder (about:blank)
+        const isPlaceholderUrl = (url) => {
+            return url === 'about:blank';
+        };
+
+        // --- Placeholder Management ---
+        const placeholders = {
+            'reports': document.getElementById('reportsPlaceholder'),
+            'settings': document.getElementById('settingsPlaceholder'),
+            'about': document.getElementById('aboutPlaceholder'),
+            //'dpp': document.getElementById('dppPlaceholder') // NEW
+        };
+
+        const showPlaceholder = (target) => {
+            // Hide all placeholders first
+            Object.values(placeholders).forEach(placeholder => {
+                placeholder.classList.remove('active');
+            });
+
+            // Show the selected placeholder
+            if (placeholders[target]) {
+                placeholders[target].classList.add('active');
+                contentIframe.style.display = 'none';
+            }
+        };
+
+        const hidePlaceholders = () => {
+            // Hide all placeholders
+            Object.values(placeholders).forEach(placeholder => {
+                placeholder.classList.remove('active');
+            });
+
+            // Show the iframe
+            contentIframe.style.display = 'block';
+        };
+
+        // --- Theme Management ---
+        const applyTheme = (theme) => {
+            if (theme === 'light') {
+                document.documentElement.classList.add('light-mode');
+                themeToggleBtn.title = "Switch to Dark Mode";
+            } else {
+                document.documentElement.classList.remove('light-mode');
+                themeToggleBtn.title = "Switch to Light Mode";
+            }
+            localStorage.setItem(THEME_KEY, theme); // Save preference
+        };
+
+        const toggleTheme = () => {
+            const currentThemeIsLight = document.documentElement.classList.contains('light-mode');
+            applyTheme(currentThemeIsLight ? 'dark' : 'light');
+        };
+
+        // --- Initialize Theme ---
+        const initializeTheme = () => {
+            const savedTheme = localStorage.getItem(THEME_KEY);
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (savedTheme) {
+                applyTheme(savedTheme); // Use saved theme if available
+            } else {
+                 applyTheme('dark'); // Default to dark (as per original logic)
+            }
+        };
+
+        // --- Sidebar Toggle ---
+        toggleSidebarBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('closed');
+        });
+
+        const contentSources = {
+            // Staff Profile targets
+            'industrial-hybrid': "https://lauds.intel50001.com/d/de3xeh2upz400e/industrial-hybrid-edge-system?orgId=1&kiosk",
+            'interactive-analysis': "/analysis/analysis_page.html",
+            
+            // DPP Profile target
+            'dpp': "dpp_page.html",
+            
+            // Technical Profile targets
+            'node-red': "https://lauds-node-red.intel50001.com/",
+            'fleet-operations': "https://lauds.intel50001.com/d/det3mvjccv6rkb/fleet-operations-and-machine?orgId=1&kiosk",
+            'performance-comparison': "https://lauds.intel50001.com/d/eetag0y66ornke/machine-performance-comparison?orgId=1&kiosk",
+            'sensor-explorer': "https://lauds.intel50001.com/d/cetamfgpx9mo0f/sensor-data-explorer?orgId=1&kiosk",
+
+            // Sidebar link targets (placeholders)
+            'dashboard': "https://lauds.intel50001.com/d/det3mvjccv6rkb/fleet-operations-and-machine?orgId=1&kiosk", // Point default to fleet ops
+            'reports': "about:blank",
+            'settings': "about:blank",
+            'about': "about:blank"
+        };
+
+        const setActiveButton = (target) => {
+             // Update top nav buttons
+             navButtons.forEach(btn => {
+                 btn.classList.toggle('active', btn.getAttribute('data-target') === target);
+             });
+             // Update sidebar links
+             // Be careful: A top nav button and sidebar link might share a target name
+             // This code assumes a unique target name implies one active item across both navs.
+             sidebarLinks.forEach(link => {
+                  link.classList.toggle('active', link.getAttribute('data-target') === target);
+             });
+        }
+
+        // Function to load content into iframe
+        const loadContent = (target) => {
+            if (contentSources[target]) {
+                const targetUrl = contentSources[target];
+
+                // Check if this is a placeholder target (reports, settings, about)
+                if (placeholders[target]) {
+                    // Show the appropriate placeholder
+                    showPlaceholder(target);
+                    setActiveButton(target);
+                    return;
+                } else {
+                    // Hide all placeholders and show iframe
+                    hidePlaceholders();
+                }
+
+                // Check if the src is actually changing to avoid unnecessary reloads
+                if (contentIframe.getAttribute('src') !== targetUrl) {
+                    // Only show loading indicator for real URLs (not about:blank)
+                    if (!isPlaceholderUrl(targetUrl)) {
+                        showLoadingIndicator();
+                    }
+
+                    contentIframe.src = targetUrl;
+                }
+
+                setActiveButton(target);
+            } else {
+                console.warn(`No source defined for target: ${target}`);
+            }
+        };
+
+        // Event listeners for top nav buttons
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const target = button.getAttribute('data-target');
+                loadContent(target);
+            });
+        });
+
+        // Event listeners for sidebar links
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevent default link behavior
+                const target = link.getAttribute('data-target');
+                loadContent(target);
+
+                // Optional: Close sidebar on mobile after clicking a link
+                if (window.innerWidth < 768 && !sidebar.classList.contains('closed')) {
+                    sidebar.classList.add('closed');
+                }
+            });
+        });
+
+        // Event listener for iframe load completion
+        contentIframe.addEventListener('load', () => {
+            hideLoadingIndicator();
+        });
+
+        // --- Full Screen Functionality ---
+        const enterFullScreenBtn = document.getElementById('enterFullScreen');
+        const exitFullScreenBtn = document.getElementById('exitFullScreen');
+
+        function openFullScreen() {
+            const elem = iframeContainer; // Target the container
+            if (elem.requestFullscreen) { elem.requestFullscreen(); }
+            else if (elem.mozRequestFullScreen) { elem.mozRequestFullScreen(); }
+            else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); }
+            else if (elem.msRequestFullscreen) { elem.msRequestFullscreen(); }
+        }
+        function closeFullScreen() {
+             if (document.exitFullscreen) { document.exitFullscreen(); }
+             else if (document.mozCancelFullScreen) { document.mozCancelFullScreen(); }
+             else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+             else if (document.msExitFullscreen) { document.msExitFullscreen(); }
+        }
+
+        enterFullScreenBtn.addEventListener('click', openFullScreen);
+        exitFullScreenBtn.addEventListener('click', closeFullScreen);
+
+        // --- Event Listeners ---
+        themeToggleBtn.addEventListener('click', toggleTheme);
+        // Event listeners for welcome screen profile buttons
+        profileButtonsWelcome.forEach(button => {
+        button.addEventListener('click', () => {
+        const profile = button.getAttribute('data-profile');
+        console.log(`[DEBUG] Welcome screen profile button clicked: ${profile}`);
+        if (profile && profileConfig[profile]) {
+            localStorage.setItem(SELECTED_PROFILE_KEY, profile);
+            console.log(`[DEBUG] Stored profile: ${profile} in localStorage.`);
+            updateUIForProfile(profile);
+        } else {
+            console.error("[DEBUG] Invalid profile selected from welcome screen:", profile);
+        }
+    });
+});
+
+        // --- INITIALIZATION ON DOMCONTENTLOADED ---
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("[DEBUG] DOMContentLoaded event fired.");
+            initializeTheme();
+
+            // Crucially, decide to show welcome or dashboard BEFORE any iframe loading attempts for profiles
+            const storedProfile = localStorage.getItem(SELECTED_PROFILE_KEY);
+            console.log(`[DEBUG] Initial check - Stored profile from localStorage: '${storedProfile}' (type: ${typeof storedProfile})`);
+
+            if (storedProfile && profileConfig[storedProfile]) {
+                // Valid profile stored, proceed to dashboard
+                console.log(`[DEBUG] Valid profile "${storedProfile}" found. Initializing dashboard.`);
+                // DO NOT set iframe src here directly. updateUIForProfile will do it via loadContent.
+                updateUIForProfile(storedProfile);
+            } else {
+                // No valid profile, or profile is null/undefined. Show welcome screen.
+                if (storedProfile) { // It existed but was invalid
+                    console.log(`[DEBUG] Invalid profile "${storedProfile}" found in localStorage. Removing it.`);
+                    localStorage.removeItem(SELECTED_PROFILE_KEY);
+                } else {
+                    console.log("[DEBUG] No profile found in localStorage.");
+                }
+                console.log("[DEBUG] Showing welcome screen initially.");
+                showWelcomeScreen(); // This function will also set iframe.src to about:blank
+            }
+
+            // Sidebar's initial 'closed' state is handled by its HTML class.
+            // The toggleSidebarBtn will manage its open/closed state after this.
+        });
+
+
+    </script>
+</body>
+</html>

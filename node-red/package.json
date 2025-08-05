@@ -1,0 +1,9 @@
+{
+    "name": "enms-nodered-config",
+    "description": "Node-RED configuration for the ENMS project",
+    "version": "1.0.0",
+    "dependencies": {
+        "node-red-contrib-postgres": "~0.14.2",
+        "node-red-contrib-python-function": "~0.0.5"
+    }
+}

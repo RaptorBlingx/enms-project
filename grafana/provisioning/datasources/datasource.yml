@@ -1,0 +1,31 @@
+# /home/ubuntu/enms-project/grafana/provisioning/datasources/datasource.yml
+
+apiVersion: 1
+
+# List of data sources to be provisioned
+datasources:
+  # Data Source 1: PostgreSQL/TimescaleDB
+  - name: 'ENMS PostgreSQL'
+    type: postgres
+    access: proxy
+    url: postgres:5432 # 'postgres' is the name of the Docker service
+    user: reg_ml
+    database: reg_ml
+    jsonData:
+      sslmode: 'disable'
+      timescaledb: true
+    # Secure JSON data for the password
+    secureJsonData:
+      password: 'raptorblingx'
+
+  # Data Source 2: MQTT
+  - name: 'Smart_Plug'
+    type: mqtt
+    url: '89.252.166.188:2010'
+    user: raptorblingx
+    jsonData:
+      # Add any specific MQTT plugin configurations here if needed in the future
+      tlsSkipVerify: false # Default, as shown in your screenshot
+    # Secure JSON data for the password
+    secureJsonData:
+      password: 'raptorblingx'
