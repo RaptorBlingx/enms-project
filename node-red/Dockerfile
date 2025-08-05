@@ -27,7 +27,7 @@ COPY /backend/gcode_analyzer.py /home/ubuntu/monitor_ml/gcode_analyzer.py
 
 # Copy your project's package.json to install custom Node-RED nodes
 WORKDIR /data
-COPY package.json .
+COPY node-red/package.json .
 RUN npm install
 
 # Switch back to the non-root node-red user for security
