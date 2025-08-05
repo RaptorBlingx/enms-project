@@ -1,32 +1,36 @@
 # Start from the official Node-RED image
 FROM nodered/node-red:latest
 
-# Switch to the root user to install system and Python packages
+# Switch to the root user to install system packages and set up the environment
 USER root
 
-# Install Python, pip, and PostgreSQL client libraries
-RUN apk add --no-cache python3 py3-pip postgresql-client
+# Install Python, venv, pip, and PostgreSQL client libraries
+RUN apk add --no-cache python3 py3-pip py3-venv postgresql-client
 
-# Create the exact directory structure that your exec node expects
-RUN mkdir -p /home/ubuntu/monitor_ml/venv/bin
+# --- THIS IS THE CORRECTED PYTHON SETUP ---
+# 1. Create the directory structure your exec node expects
+RUN mkdir -p /home/ubuntu/monitor_ml/venv
 
-# Now, we will create a symbolic link. This is the magic step.
-# This makes the system's python3 executable also appear at the path your exec node calls.
-RUN ln -s /usr/bin/python3 /home/ubuntu/monitor_ml/venv/bin/python
+# 2. Create a proper Python virtual environment at that location
+RUN python3 -m venv /home/ubuntu/monitor_ml/venv
 
-# Copy your Python requirements file into a temporary location in the container
-COPY /backend/requirements.txt /tmp/requirements.txt
+# 3. Copy your Python requirements file into a temporary location
+COPY backend/requirements.txt /tmp/requirements.txt
 
-# Install all Python dependencies globally within the container
-RUN pip3 install --no-cache-dir -r /tmp/requirements.txt
+# 4. Activate the virtual environment and use its pip to install the dependencies
+# This is the key step that satisfies PEP 668
+RUN . /home/ubuntu/monitor_ml/venv/bin/activate && \
+    pip install --no-cache-dir -r /tmp/requirements.txt
 
-# Copy your Python scripts to the exact location the exec node expects
-COPY /backend/dpp_simulator.py /home/ubuntu/monitor_ml/dpp_simulator.py
-COPY /backend/gcode_analyzer.py /home/ubuntu/monitor_ml/gcode_analyzer.py
-# Note: We don't need train_model.py for the live system
+# 5. Copy your Python scripts to the location the exec node expects
+COPY backend/dpp_simulator.py /home/ubuntu/monitor_ml/dpp_simulator.py
+COPY backend/gcode_analyzer.py /home/ubuntu/monitor_ml/gcode_analyzer.py
+# --- END OF CORRECTED PYTHON SETUP ---
+
+# Switch to the data directory for Node-RED specific installations
+WORKDIR /data
 
 # Copy your project's package.json to install custom Node-RED nodes
-WORKDIR /data
 COPY node-red/package.json .
 RUN npm install
 
