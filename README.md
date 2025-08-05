@@ -32,7 +32,7 @@ These instructions are for deploying the application on a server (e.g., for Axel
 
 1.  **Clone the Repository**
     ```bash
-    git clone [your-gitlab-repo-url.git]
+    git clone git@gitlab.com:raptorblingx/enms-project.git
     cd enms-project
     ```
 
