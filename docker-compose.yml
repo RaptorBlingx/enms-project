@@ -36,6 +36,9 @@ services:
       - "1880:1880"
     volumes:
       - ./node-red:/data
+      # It mounts our local backend code to the exact path that Node-RED expects.
+      - ./backend:/home/ubuntu/monitor_ml
+
     depends_on:
       - postgres
 
@@ -49,6 +52,10 @@ services:
     ports:
       # Exposes the Grafana web interface to the host machine.
       - "3000:3000"
+    environment:
+      # This variable tells Grafana to install the MQTT plugin on startup
+      - GF_INSTALL_PLUGINS=grafana-mqtt-datasource
+
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
