@@ -9,7 +9,6 @@ kiwisolver==1.4.8
 lightgbm==4.6.0
 matplotlib==3.10.1
 numpy==2.2.4
-nvidia-nccl-cu12==2.26.2.post1
 packaging==25.0
 pandas==2.2.3
 pillow==11.2.1
