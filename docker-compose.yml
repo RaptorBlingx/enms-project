@@ -28,7 +28,8 @@ services:
   # 2. Node-RED Processing Engine
   # -------------------------------------------------
   nodered:
-    image: nodered/node-red:latest
+    build:
+      context: ./node-red
     container_name: enms_nodered
     restart: unless-stopped
     ports:
@@ -36,9 +37,6 @@ services:
       - "1880:1880"
     volumes:
       - ./node-red:/data
-      # It mounts our local backend code to the exact path that Node-RED expects.
-      - ./backend:/home/ubuntu/monitor_ml
-
     depends_on:
       - postgres
 
