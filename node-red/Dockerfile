@@ -9,7 +9,7 @@ RUN apk add --no-cache python3 python3-dev build-base postgresql-client cmake
 
 # --- Corrected Python Setup ---
 # 1. Create the directory structure
-RUN mkdir -p /home/ubuntu/monitor_ml/venv/bin
+RUN mkdir -p /home/ubuntu/monitor_ml/venv
 
 # 2. Create a proper Python virtual environment
 RUN python3 -m venv /home/ubuntu/monitor_ml/venv
@@ -18,15 +18,13 @@ RUN python3 -m venv /home/ubuntu/monitor_ml/venv
 COPY backend/requirements.txt /tmp/requirements.txt
 
 # --- THIS IS THE FINAL FIX ---
-# 4. Set an environment variable to tell the xgboost installer to NOT build with GPU support.
-ENV XGBOOST_BUILD_NO_CUDA=1
-
-# 5. Activate the virtual environment and install the dependencies.
-# The environment variable will prevent xgboost from trying to install nvidia packages.
+# 4. Activate the virtual environment and install dependencies.
+#    We use --extra-index-url to tell pip to also look in the NVIDIA repository
+#    if it can't find a package on the standard PyPI.
 RUN . /home/ubuntu/monitor_ml/venv/bin/activate && \
-    pip install --no-cache-dir -r /tmp/requirements.txt
+    pip install --no-cache-dir --extra-index-url https://pypi.nvidia.com -r /tmp/requirements.txt
 
-# 6. Copy your Python scripts
+# 5. Copy your Python scripts
 COPY backend/dpp_simulator.py /home/ubuntu/monitor_ml/dpp_simulator.py
 COPY backend/gcode_analyzer.py /home/ubuntu/monitor_ml/gcode_analyzer.py
 
