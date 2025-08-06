@@ -1,14 +1,12 @@
 # ====================================================================
-# Docker Compose for the ENMS Project (Corrected Ports)
-# Version: 1.1
+# FINAL Docker Compose for the ENMS Project
+# Version: 2.0 (Definitive)
 # ====================================================================
 
 version: '3.8'
 
 services:
-  # -------------------------------------------------
-  # 1. PostgreSQL Database with TimescaleDB Extension
-  # -------------------------------------------------
+  # 1. PostgreSQL Database
   postgres:
     image: timescale/timescaledb:latest-pg16
     container_name: enms_postgres
@@ -21,96 +19,69 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/db_init:/docker-entrypoint-initdb.d
     ports:
-      # Exposes the database on the standard port to the host machine.
       - "5432:5432"
 
-  # -------------------------------------------------
-  # 2. Node-RED Processing Engine
-  # -------------------------------------------------
+  # 2. Node-RED Service
   nodered:
     build:
-      # Use the entire project directory as the context
       context: .
-      # Specify the location of the Dockerfile within that context
       dockerfile: ./node-red/Dockerfile
     container_name: enms_nodered
     restart: unless-stopped
     ports:
       - "1880:1880"
     volumes:
-      # Mount our flows file to the correct location inside the container
       - ./node-red/flows.json:/data/flows.json
-      # Mount our settings file to the correct location
       - ./node-red/settings.js:/data/settings.js
-      # The package.json is no longer needed here, as it was used during the build phase
-      depends_on:
-        - postgres
-        - python_api
+    depends_on:
+      - postgres
+      - python_api
 
-
-  # -------------------------------------------------
-  # 3. Grafana Visualization Dashboard
-  # -------------------------------------------------
+  # 3. Grafana Service
   grafana:
     image: grafana/grafana:latest
     container_name: enms_grafana
     restart: unless-stopped
     ports:
-      # Exposes the Grafana web interface to the host machine.
       - "3000:3000"
     environment:
-      # This variable tells Grafana to install the MQTT plugin on startup
       - GF_INSTALL_PLUGINS=grafana-mqtt-datasource
-
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
       - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - ./grafana/dashboards:/etc/grafana/provisioning/dashboards/dashboards
     depends_on:
-      - postgres  
+      - postgres
 
-  # -------------------------------------------------
-  # 4. NEW: Python API Service (Flask)
-  # -------------------------------------------------
+  # 4. Python API Service
   python_api:
     build:
-      context: ./python-api  # Tells Docker to use the Dockerfile in our new directory
+      context: ./python-api
     container_name: enms_python_api
     restart: unless-stopped
     volumes:
-      # We mount the code here for live development in the override file later
       - ./python-api:/app
     depends_on:
-      - postgres # It needs the database to be ready
-    # We do not need to expose a port to the host, as it will only be
-    # accessed internally by the Nginx container.
+      - postgres
 
-
-  # -------------------------------------------------
-  # 5. Web Server (Nginx) for Frontend & API Proxy
-  # -------------------------------------------------
+  # 5. Web Server (Nginx)
   web_server:
     image: nginx:latest
     container_name: enms_web_server
     restart: unless-stopped
     ports:
-      # --- THIS IS THE FIX ---
-      # Exposes the main application on the standard HTTP port 80.
       - "80:80"
     volumes:
-      # Mounts the main config file
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      # Mounts the directory containing our site-specific config (default.conf)
       - ./nginx/conf.d:/etc/nginx/conf.d
-      # Mounts your frontend code
       - ./frontend:/usr/share/nginx/html
-      # Mounts your images
       - ./artistic-resources:/usr/share/nginx/html/artistic-resources
     depends_on:
       - nodered
       - python_api
-# Define the named volumes for persistent data storage
+
+# Define named volumes for persistent data
 volumes:
   postgres_data:
   grafana_data:
