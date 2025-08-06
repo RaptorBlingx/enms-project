@@ -40,7 +40,10 @@ services:
       # Exposes the Node-RED editor and API to the host machine.
       - "1880:1880"
     volumes:
-      - ./node-red:/data
+      # THE FIX: Mount specific files, not the whole /data directory
+      - ./node-red/flows.json:/data/flows.json
+      - ./node-red/package.json:/data/package.json
+      - ./node-red/settings.js:/data/settings.js
     depends_on:
       - postgres
 
@@ -62,7 +65,7 @@ services:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
       - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
-      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards/dashboards
     depends_on:
       - postgres  
 
