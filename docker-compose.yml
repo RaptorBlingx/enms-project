@@ -109,7 +109,7 @@ services:
       - ./artistic-resources:/usr/share/nginx/html/artistic-resources
     depends_on:
       - nodered
-
+      - python_api
 # Define the named volumes for persistent data storage
 volumes:
   postgres_data:
