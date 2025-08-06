@@ -1227,303 +1227,205 @@ def clear_simulation_state():
 # --- Main Execution ---
 # --- Main Execution ---
 # --- Main Execution ---
-def main():
-    parser = argparse.ArgumentParser(description="Generate DPP data based on scenario.")
-    parser.add_argument('--scenario', type=str, default='live', help='The scenario name')
-    args = parser.parse_args()
-    requested_scenario = args.scenario if args.scenario else 'live'
+# ====================================================================
+# REPLACE THE OLD main() FUNCTION AND if __name__ BLOCK WITH THIS ENTIRE BLOCK
+# ====================================================================
+
+def get_live_dpp_data():
+    """
+    Connects to the database, fetches all printer data, processes it,
+    and returns a dictionary containing the final printer list and global history.
+    """
     final_dpp_data = []
+    global_history_list = []
+    conn = None
+    cur = None
 
-    # --- DYNAMIC/MOCK SCENARIO LOGIC (This part is correct and remains) ---
-    is_dynamic_scenario_requested = requested_scenario.startswith("dynamic_")
-    if is_dynamic_scenario_requested and requested_scenario in DYNAMIC_SCENARIOS_PARAMS:
-        print(f"Generating data for DYNAMIC scenario: {requested_scenario}", file=sys.stderr)
-        # Your full, existing dynamic scenario logic goes here. It is correct.
-        # This placeholder represents that code.
-        current_state = load_simulation_state()
-        sim_params = DYNAMIC_SCENARIOS_PARAMS[requested_scenario]
-        simulated_device_id = sim_params["simulated_device_id"]
-        current_time = time.time()
-        dynamic_current_state = None
-        if current_state is None or current_state.get("active_scenario_name") != requested_scenario:
-            initial_state = copy.deepcopy(sim_params["initial_state"])
-            initial_state["active_scenario_name"] = requested_scenario
-            initial_state["simulated_device_id"] = simulated_device_id
-            initial_state["deviceId"] = simulated_device_id
-            initial_state["start_time_unix"] = current_time
-            initial_state["start_time_unix_phase"] = current_time
-            initial_state["last_update_time"] = current_time
-            initial_state.setdefault("isPrintingNow", False)
-            initial_state["tipText"] = evaluate_tips(initial_state)
-            dynamic_current_state = initial_state
-            save_simulation_state(dynamic_current_state)
-        else:
-            dynamic_current_state = current_state
-            last_update_time = dynamic_current_state.get("last_update_time", current_time)
-            elapsed_seconds = current_time - last_update_time
-            if elapsed_seconds > 15: elapsed_seconds = 15.0
-            elif elapsed_seconds < 0: elapsed_seconds = 0.0
-            dynamic_current_state["last_update_time"] = current_time
-            dynamic_current_state = update_simulation_state(dynamic_current_state, elapsed_seconds)
-            save_simulation_state(dynamic_current_state)
+    # This is the complete query for fetching all printer and job data.
+    query_all_printers = """
+    SELECT
+        d.device_id, d.friendly_name, d.device_model, d.printer_size_category,
+        d.gcode_preview_host, d.gcode_preview_api_key, d.bed_width, d.bed_depth,
+        ps.state_text,
+        ps.is_operational,
+        ps.is_printing,
+        ps.is_busy,
+        ps.nozzle_temp_actual,
+        ps.nozzle_temp_target,
+        ps.bed_temp_actual,
+        ps.bed_temp_target,
+        ps.material,
+        ps.filename,
+        ps.progress_percent,
+        ps.time_left_seconds,
+        ps.timestamp AS ps_timestamp,
+        COALESCE((
+            SELECT (MAX(energy_total_wh) - MIN(energy_total_wh)) / 1000.0
+            FROM energy_data
+            WHERE device_id = d.device_id AND timestamp >= NOW() - INTERVAL '24 hours'
+        ), 0) AS kwh_last_24h,
+        pj.gcode_analysis_data,
+        pj.session_energy_wh,
+        pj.start_energy_wh,
+        ed.current_total_wh,
+        lj.session_energy_wh AS last_completed_job_kwh,
+        lj.duration_seconds AS last_job_duration_seconds,
+        lj.filament_used_g AS last_job_filament_g,
+        lj.thumbnail_url AS last_job_thumbnail_url,
+        lj.per_part_analysis AS last_job_per_part_analysis,
+        hist.history_data
+    FROM devices d
+    LEFT JOIN LATERAL (
+        SELECT * FROM printer_status
+        WHERE device_id = d.device_id ORDER BY timestamp DESC LIMIT 1
+    ) ps ON true
+    LEFT JOIN LATERAL (
+        SELECT * FROM print_jobs
+        WHERE device_id = d.device_id AND filename = ps.filename
+        ORDER BY start_time DESC NULLS LAST LIMIT 1
+    ) pj ON (ps.filename IS NOT NULL)
+    LEFT JOIN LATERAL (
+        SELECT energy_total_wh AS current_total_wh FROM energy_data
+        WHERE device_id = d.device_id ORDER BY timestamp DESC LIMIT 1
+    ) ed ON true
+    LEFT JOIN LATERAL (
+        SELECT session_energy_wh, duration_seconds, filament_used_g, thumbnail_url, per_part_analysis
+        FROM print_jobs
+        WHERE device_id = d.device_id AND status = 'done' AND session_energy_wh IS NOT NULL
+        ORDER BY start_time DESC NULLS LAST
+        LIMIT 1
+    ) lj ON true
+    LEFT JOIN LATERAL (
+        SELECT json_agg(h) AS history_data FROM (
+            SELECT filename, session_energy_wh, end_time, thumbnail_url, per_part_analysis
+            FROM print_jobs
+            WHERE device_id = d.device_id AND status = 'done' AND session_energy_wh IS NOT NULL
+            ORDER BY start_time DESC NULLS LAST
+            LIMIT 5
+        ) h
+    ) hist ON true
+    WHERE d.device_id != 'environment'
+    ORDER BY d.friendly_name;
+    """
 
-        if dynamic_current_state:
-            devices_to_process_ids = set([sim_params["simulated_device_id"]])
-            for bg_dev in sim_params.get("background_devices", []):
-                if bg_dev and bg_dev.get('deviceId'):
-                    devices_to_process_ids.add(bg_dev['deviceId'])
-            for device_id in sorted(list(devices_to_process_ids)):
-                device_output = None
-                if device_id == dynamic_current_state.get("simulated_device_id"):
-                    device_output = copy.deepcopy(dynamic_current_state)
-                else:
-                    bg_devices = sim_params.get("background_devices", [])
-                    background_state_match = next((item for item in bg_devices if item.get("deviceId") == device_id), None)
-                    if background_state_match:
-                        device_output = copy.deepcopy(background_state_match)
-                if device_output:
-                    device_output.setdefault("plantStage", get_plant_stage(device_output.get("kwhLast24h")))
-                    device_output["isPrintingNow"] = device_output.get("currentStatus") in ["Heating", "Printing", "Active (Other)"]
-                    device_output["tipText"] = evaluate_tips(device_output)
-                    final_dpp_data.append(device_output)
+    query_global_history = """
+    SELECT
+        d.friendly_name,
+        pj.filename,
+        pj.session_energy_wh,
+        pj.end_time,
+        pj.thumbnail_url
+    FROM
+        print_jobs pj
+    JOIN
+        devices d ON pj.device_id = d.device_id
+    WHERE
+        pj.status = 'done'
+        AND pj.session_energy_wh IS NOT NULL
+        AND pj.session_energy_wh > 0
+    ORDER BY
+        pj.end_time DESC NULLS LAST
+    LIMIT 50;
+    """
 
-    elif requested_scenario in MOCK_SCENARIOS:
-        print(f"Generating data for STATIC MOCK scenario: {requested_scenario}", file=sys.stderr)
-        clear_simulation_state()
-        for original_device_data in MOCK_SCENARIOS[requested_scenario]:
-            device_data = copy.deepcopy(original_device_data)
-            if "deviceId" in device_data:
-                device_data["tipText"] = evaluate_tips(device_data)
-                final_dpp_data.append(device_data)
-
-    # --- LIVE MODE LOGIC (FINAL, MOST ROBUST VERSION WITH ALL FIXES) ---
-    # --- LIVE MODE LOGIC (FINAL VERSION WITH STALE DATA FIX) ---
-    # --- LIVE MODE LOGIC (FINAL, MOST ROBUST VERSION WITH ALL FIXES) ---
-    else:
-        print(f"Generating data for LIVE scenario.", file=sys.stderr)
-        clear_simulation_state()
-        conn = None
-        cur = None
-                # --- NEW: Query for Global Print History ---
-        # --- UPGRADED Query for Global Print History ---
-        query_global_history = """
-        SELECT
-            d.friendly_name,
-            pj.filename,
-            pj.session_energy_wh,
-            pj.end_time,
-            pj.thumbnail_url -- Add the thumbnail URL
-        FROM
-            print_jobs pj
-        JOIN
-            devices d ON pj.device_id = d.device_id
-        WHERE
-            pj.status = 'done'
-            AND pj.session_energy_wh IS NOT NULL
-            AND pj.session_energy_wh > 0
-        ORDER BY
-            pj.end_time DESC NULLS LAST
-        LIMIT 50;
-        """
-        # -------------------------------------------
-        try:
-            DB_NAME = "reg_ml"
-            DB_USER = "reg_ml"
-            DB_PASS = "raptorblingx"
-            DB_HOST = "localhost"
-            DB_PORT = "5432"
-            conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST, port=DB_PORT)
-            cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-
-
-            # --- FINAL QUERY, UPGRADED FOR THUMBNAILS & ANALYSIS ---
-            query_all_printers = """
-            SELECT
-                d.device_id, d.friendly_name, d.device_model, d.printer_size_category,
-                d.gcode_preview_host, d.gcode_preview_api_key, d.bed_width, d.bed_depth,
-
-                ps.state_text,
-                ps.is_operational,
-                ps.is_printing,
-                ps.is_busy,
-                ps.nozzle_temp_actual,
-                ps.nozzle_temp_target,
-                ps.bed_temp_actual,
-                ps.bed_temp_target,
-                ps.material,
-                ps.filename,
-                ps.progress_percent,
-                ps.time_left_seconds,
-                ps.timestamp AS ps_timestamp,
-
-                COALESCE((
-                    SELECT (MAX(energy_total_wh) - MIN(energy_total_wh)) / 1000.0
-                    FROM energy_data
-                    WHERE device_id = d.device_id AND timestamp >= NOW() - INTERVAL '24 hours'
-                ), 0) AS kwh_last_24h,
-
-                pj.gcode_analysis_data,
-                pj.session_energy_wh,
-                pj.start_energy_wh,
-                ed.current_total_wh,
-
-                lj.session_energy_wh AS last_completed_job_kwh,
-                lj.duration_seconds AS last_job_duration_seconds,
-                lj.filament_used_g AS last_job_filament_g,
-                lj.thumbnail_url AS last_job_thumbnail_url,
-                lj.per_part_analysis AS last_job_per_part_analysis,
-
-                hist.history_data
-
-            FROM devices d
-            LEFT JOIN LATERAL (
-                SELECT * FROM printer_status
-                WHERE device_id = d.device_id ORDER BY timestamp DESC LIMIT 1
-            ) ps ON true
-            LEFT JOIN LATERAL (
-                SELECT * FROM print_jobs
-                WHERE device_id = d.device_id AND filename = ps.filename
-                ORDER BY start_time DESC NULLS LAST LIMIT 1
-            ) pj ON (ps.filename IS NOT NULL)
-            LEFT JOIN LATERAL (
-                SELECT energy_total_wh AS current_total_wh FROM energy_data
-                WHERE device_id = d.device_id ORDER BY timestamp DESC LIMIT 1
-            ) ed ON true
-            LEFT JOIN LATERAL (
-                SELECT session_energy_wh, duration_seconds, filament_used_g, thumbnail_url, per_part_analysis
-                FROM print_jobs
-                WHERE device_id = d.device_id AND status = 'done' AND session_energy_wh IS NOT NULL
-                ORDER BY start_time DESC NULLS LAST
-                LIMIT 1
-            ) lj ON true
-            LEFT JOIN LATERAL (
-                SELECT json_agg(h) AS history_data FROM (
-                    SELECT filename, session_energy_wh, end_time, thumbnail_url, per_part_analysis
-                    FROM print_jobs
-                    WHERE device_id = d.device_id AND status = 'done' AND session_energy_wh IS NOT NULL
-                    ORDER BY start_time DESC NULLS LAST
-                    LIMIT 5
-                ) h
-            ) hist ON true
-
-            WHERE d.device_id != 'environment'
-            ORDER BY d.friendly_name;
-            """
-
-
-            cur.execute(query_all_printers)
-            all_printers = cur.fetchall()
-
-                    # --- NEW: Execute History Query and Process Results ---
-            # --- NEW: Execute History Query and Process Results ---
-            cur.execute(query_global_history)
-            history_results = cur.fetchall()
-            global_history_list = []
-            # --- THIS IS THE CORRECTED LOOP ---
-            # --- UPGRADED loop for global history ---
-            for row in history_results:
-                global_history_list.append({
-                    "printerName": row['friendly_name'],
-                    "filename": clean_filename(row['filename']),
-                    "kwh": float(row['session_energy_wh']) / 1000.0 if row['session_energy_wh'] is not None else 0.0,
-                    "completedAt": row['end_time'].isoformat() if row['end_time'] else None,
-                    "thumbnailUrl": row['thumbnail_url'] # Add the new data
-                })
-            # ------------------------------------
-
-            print(f"Successfully fetched {len(all_printers)} printers from database. Now processing...", file=sys.stderr)
-
-            for i, row in enumerate(all_printers):
-                try:
-                    # --- Simplified Status Logic ---
-                    # Trust the latest status from the database. Default to 'Offline' if no status exists at all.
-                    status_text = (row.get('state_text') or 'Offline').capitalize()
-                    
-                    # Normalize various "on" or "finished" states to a consistent "Idle" for the DPP card
-                    if status_text.lower() in ['operational', 'completed', 'ready']:
-                        status_text = 'Idle'
-                    
-                    is_printing = status_text.lower() in ['printing', 'heating']
-
-                    # --- Create the main device output dictionary ---
-                    device_output = {
-                        "deviceId": row['device_id'],
-                        "friendlyName": row.get('friendly_name', row['device_id']),
-                        "model": row.get('device_model', 'Unknown Model'),
-                        "sizeCategory": row.get('printer_size_category', 'Standard'),
-                        "plant_type": PLANT_TYPES[i % len(PLANT_TYPES)],
-                        
-                        "kwhLast24h": float(row['kwh_last_24h'] or 0),
-                        "lastJobKwh": float(row.get('last_completed_job_kwh') or 0) / 1000.0,
-                        "printTimeSeconds": float(row.get('last_job_duration_seconds') or 0),
-                        "lastJobFilamentGrams": float(row.get('last_job_filament_g') or 0),
-                        
-                        "bedWidth": row.get('bed_width'),
-                        "bedDepth": row.get('bed_depth'),
-                        'currentStatus': status_text,
-                        'isPrintingNow': is_printing,
-
-                        # --- THE FIX ---
-                        # Directly use the real values from the database.
-                        # The 'or 0' and 'or "Unknown"' provide safe fallbacks if the database value is NULL.
-                        'currentNozzleTemp': float(row.get('nozzle_temp_actual') or 0),
-                        'targetNozzleTemp': float(row.get('nozzle_temp_target') or 0),
-                        'currentBedTemp': float(row.get('bed_temp_actual') or 0),
-                        'targetBedTemp': float(row.get('bed_temp_target') or 0),
-                        'currentMaterial': row.get('material') or "Unknown",
-                        
-                        'jobFilename': clean_filename(row.get('filename')) if is_printing else None,
-                        'jobProgressPercent': float(row.get('progress_percent') or 0) if is_printing else 0,
-                        'jobTimeLeftSeconds': float(row.get('time_left_seconds') or 0) if is_printing else 0,
-                        
-                        'jobKwhConsumed': (
-                            (float(row['current_total_wh']) - float(row['start_energy_wh'])) / 1000.0
-                        ) if is_printing and row.get('current_total_wh') is not None and row.get('start_energy_wh') is not None else 0.0,
-
-                        "gcodePath": f"{row['gcode_preview_host']}/downloads/files/local/{row['filename']}" if row.get('filename') and row.get('gcode_preview_host') else None,
-                        "gcode_preview_api_key": row.get('gcode_preview_api_key'),
-                        "job_details": row.get('gcode_analysis_data') if isinstance(row.get('gcode_analysis_data'), dict) else {},
-                        "detailed_analysis_data": {},
-                        "history": [dict(job, filename=clean_filename(job.get('filename'))) for job in (row.get('history_data') or []) if isinstance(job, dict)]
-                    }
-                    
-                    # Calculate plant stage based on live job energy if printing, otherwise use last 24h as a fallback
-                    energy_for_plant = device_output['jobKwhConsumed'] if is_printing else device_output['kwhLast24h']
-                    device_output['plantStage'] = get_plant_stage(energy_for_plant)
-                    
-                    # Evaluate tips and add to the final output
-                    device_output['tipText'] = evaluate_tips(device_output)
-                    final_dpp_data.append(device_output)
-
-                except Exception as e_loop:
-                    device_id_for_error = row.get('device_id', 'Unknown Device')
-                    print(f"WARNING: Skipping device '{device_id_for_error}' due to processing error: {e_loop}", file=sys.stderr)
-                    continue
-
-        except Exception as e_main:
-            print(f"FATAL ERROR during database query or main setup: {e_main}", file=sys.stderr)
-            traceback.print_exc()
-        finally:
-            if cur: cur.close()
-            if conn: conn.close()
-
-    # --- Output final JSON to stdout ---
     try:
+        conn = psycopg2.connect(
+            dbname="reg_ml", user="reg_ml", password="raptorblingx",
+            host="postgres", port="5432"
+        )
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+        cur.execute(query_all_printers)
+        all_printers = cur.fetchall()
+
+        cur.execute(query_global_history)
+        history_results = cur.fetchall()
+
+        for row in history_results:
+            global_history_list.append({
+                "printerName": row['friendly_name'],
+                "filename": clean_filename(row['filename']),
+                "kwh": float(row['session_energy_wh']) / 1000.0 if row['session_energy_wh'] is not None else 0.0,
+                "completedAt": row['end_time'].isoformat() if row['end_time'] else None,
+                "thumbnailUrl": row['thumbnail_url']
+            })
+
+        for i, row in enumerate(all_printers):
+            try:
+                status_text = (row.get('state_text') or 'Offline').capitalize()
+                if status_text.lower() in ['operational', 'completed', 'ready']:
+                    status_text = 'Idle'
+                
+                is_printing = status_text.lower() in ['printing', 'heating']
+
+                device_output = {
+                    "deviceId": row['device_id'],
+                    "friendlyName": row.get('friendly_name', row['device_id']),
+                    "model": row.get('device_model', 'Unknown Model'),
+                    "sizeCategory": row.get('printer_size_category', 'Standard'),
+                    "plant_type": PLANT_TYPES[i % len(PLANT_TYPES)],
+                    "kwhLast24h": float(row['kwh_last_24h'] or 0),
+                    "lastJobKwh": float(row.get('last_completed_job_kwh') or 0) / 1000.0,
+                    "printTimeSeconds": float(row.get('last_job_duration_seconds') or 0),
+                    "lastJobFilamentGrams": float(row.get('last_job_filament_g') or 0),
+                    "bedWidth": row.get('bed_width'),
+                    "bedDepth": row.get('bed_depth'),
+                    'currentStatus': status_text,
+                    'isPrintingNow': is_printing,
+                    'currentNozzleTemp': float(row.get('nozzle_temp_actual') or 0),
+                    'targetNozzleTemp': float(row.get('nozzle_temp_target') or 0),
+                    'currentBedTemp': float(row.get('bed_temp_actual') or 0),
+                    'targetBedTemp': float(row.get('bed_temp_target') or 0),
+                    'currentMaterial': row.get('material') or "Unknown",
+                    'jobFilename': clean_filename(row.get('filename')) if is_printing else None,
+                    'jobProgressPercent': float(row.get('progress_percent') or 0) if is_printing else 0,
+                    'jobTimeLeftSeconds': float(row.get('time_left_seconds') or 0) if is_printing else 0,
+                    'jobKwhConsumed': (
+                        (float(row['current_total_wh']) - float(row['start_energy_wh'])) / 1000.0
+                    ) if is_printing and row.get('current_total_wh') is not None and row.get('start_energy_wh') is not None else 0.0,
+                    "gcodePath": f"{row['gcode_preview_host']}/downloads/files/local/{row['filename']}" if row.get('filename') and row.get('gcode_preview_host') else None,
+                    "gcode_preview_api_key": row.get('gcode_preview_api_key'),
+                    "job_details": row.get('gcode_analysis_data') if isinstance(row.get('gcode_analysis_data'), dict) else {},
+                    "detailed_analysis_data": {},
+                    "history": [dict(job, filename=clean_filename(job.get('filename'))) for job in (row.get('history_data') or []) if isinstance(job, dict)]
+                }
+                
+                energy_for_plant = device_output['jobKwhConsumed'] if is_printing else device_output['kwhLast24h']
+                device_output['plantStage'] = get_plant_stage(energy_for_plant)
+                
+                device_output['tipText'] = evaluate_tips(device_output)
+                final_dpp_data.append(device_output)
+
+            except Exception as e_loop:
+                device_id_for_error = row.get('device_id', 'Unknown Device')
+                print(f"WARNING: Skipping device '{device_id_for_error}' due to processing error: {e_loop}", file=sys.stderr)
+                continue
+
         final_dpp_data_sorted = sorted(final_dpp_data, key=lambda x: x.get('friendlyName', x.get('deviceId', '')))
-    except Exception:
-        final_dpp_data_sorted = final_dpp_data
-    # --- NEW: Combine both datasets into a single final output ---
-    final_output = {
-        "printers": final_dpp_data_sorted,
-        "globalHistory": global_history_list
-    }
-    print(json.dumps(final_output, indent=None, separators=(',', ':')))
-    # -----------------------------------------------------------
+        
+        return {
+            "printers": final_dpp_data_sorted,
+            "globalHistory": global_history_list
+        }
+
+    except Exception as e_main:
+        print(f"FATAL ERROR during get_live_dpp_data: {e_main}", file=sys.stderr)
+        traceback.print_exc()
+        return {"error": "Failed to fetch data from the database."}
+    
+    finally:
+        if cur: cur.close()
+        if conn: conn.close()
+
+# Keep a simple main function for direct testing of the script if ever needed
+def main():
+    """
+    This function is for command-line testing of the get_live_dpp_data function.
+    It is not used by the Flask API.
+    """
+    print("--- Running in test mode ---", file=sys.stderr)
+    data = get_live_dpp_data()
+    print(json.dumps(data, indent=4)) # Pretty-print for readability
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:
-        print(f"FATAL ERROR in dpp_simulator.py: {e}", file=sys.stderr)
-        print(f"{traceback.format_exc()}", file=sys.stderr)
-        print("[]")
+    main()
