@@ -23,3 +23,6 @@ RUN chown -R node-red:node-red /data/node_modules
 
 # 7. Switch back to the standard node-red user
 USER node-red
+
+# 8. Reset WORKDIR so the base image's relative entrypoint works
+WORKDIR /usr/src/node-red
