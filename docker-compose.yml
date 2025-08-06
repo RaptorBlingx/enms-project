@@ -29,23 +29,22 @@ services:
   # -------------------------------------------------
   nodered:
     build:
-  # Use the entire project directory as the context
-      context: .
-  # Specify the location of the Dockerfile within that context
-      dockerfile: ./node-red/Dockerfile
-
+      context: ./node-red
     container_name: enms_nodered
     restart: unless-stopped
     ports:
-      # Exposes the Node-RED editor and API to the host machine.
       - "1880:1880"
+    # The user's home directory inside the container is /data
+    # We mount our configuration there. The base image is designed for this.
     volumes:
-      # THE FIX: Mount specific files, not the whole /data directory
-      - ./node-red/flows.json:/data/flows.json
-      - ./node-red/package.json:/data/package.json
-      - ./node-red/settings.js:/data/settings.js
+      - ./node-red:/data
+    # --- THIS IS THE FIX ---
+    # Instead of installing python in the image, we tell Node-RED where to find it
+    # by putting the python-api container on the same network.
+    # This also solves the dependency issue permanently.
     depends_on:
       - postgres
+      - python_api # Make sure Node-RED starts after the Python API is ready
 
   # -------------------------------------------------
   # 3. Grafana Visualization Dashboard
