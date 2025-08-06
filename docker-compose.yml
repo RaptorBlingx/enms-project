@@ -37,9 +37,12 @@ services:
     restart: unless-stopped
     ports:
       - "1880:1880"
-    volumes:
-      # This volume mounts your configuration and flows into the container
-      - ./node-red:/data
+  volumes:
+    # Mount our flows file to the correct location inside the container
+    - ./node-red/flows.json:/data/flows.json
+    # Mount our settings file to the correct location
+    - ./node-red/settings.js:/data/settings.js
+    # The package.json is no longer needed here, as it was used during the build phase
     depends_on:
       - postgres
       - python_api
