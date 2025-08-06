@@ -1,26 +1,20 @@
-# ====================================================================
-# FINAL Docker Compose Override for Development Environment
-# ====================================================================
-
-version: '3.8' # This is optional but safe to keep
+version: '3.8'
 
 services:
-  # --- Override the Node-RED Service for Live Development ---
   nodered:
     volumes:
-      # Mount specific files instead of the whole directory
       - ./node-red/flows.json:/data/flows.json
       - ./node-red/settings.js:/data/settings.js
+    entrypoint: []
+    command: ["npm", "start", "--", "--userDir", "/data"]
 
-  # --- Override the Python API Service for Live Development ---
   python_api:
     volumes:
-      # Mount the application code for instant changes
       - ./python-api:/app
 
-  # --- Override the Web Server Service for Live Development ---
   web_server:
     volumes:
       - ./frontend:/usr/share/nginx/html
       - ./artistic-resources:/usr/share/nginx/html/artistic-resources
-      # Note: We don't need to mount the nginx.conf here as it rarely changes
+    entrypoint: ["/docker-entrypoint.sh"]
+    command: ["nginx", "-g", "daemon off;"]
