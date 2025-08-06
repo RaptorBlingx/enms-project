@@ -1,29 +1,26 @@
 # ====================================================================
-# Docker Compose Override for Development Environment
-# Version: 1.0
+# FINAL Docker Compose Override for Development Environment
 # ====================================================================
-# This file is automatically merged with docker-compose.yml by Docker Compose.
-# It modifies the configuration for a local development setup.
 
-version: '3.8'
+version: '3.8' # This is optional but safe to keep
 
 services:
-  # -------------------------------------------------
-  # 1. Override the Node-RED Service
-  # -------------------------------------------------
+  # --- Override the Node-RED Service for Live Development ---
   nodered:
-    # By re-declaring the volumes, we ensure that our local folder is always used,
-    # making development changes (like editing a function node) instant.
     volumes:
-      - ./node-red:/data
+      # Mount specific files instead of the whole directory
+      - ./node-red/flows.json:/data/flows.json
+      - ./node-red/settings.js:/data/settings.js
 
-  # -------------------------------------------------
-  # 2. Override the Web Server Service
-  # -------------------------------------------------
-  web_server:
-    # Re-declaring volumes here ensures that any changes to your HTML, CSS, JS,
-    # or image files are immediately served by Nginx without a restart.
+  # --- Override the Python API Service for Live Development ---
+  python_api:
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      # Mount the application code for instant changes
+      - ./python-api:/app
+
+  # --- Override the Web Server Service for Live Development ---
+  web_server:
+    volumes:
       - ./frontend:/usr/share/nginx/html
       - ./artistic-resources:/usr/share/nginx/html/artistic-resources
+      # Note: We don't need to mount the nginx.conf here as it rarely changes
