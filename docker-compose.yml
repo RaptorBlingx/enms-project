@@ -64,10 +64,27 @@ services:
       - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - ./grafana/dashboards:/var/lib/grafana/dashboards
     depends_on:
-      - postgres
+      - postgres  
 
   # -------------------------------------------------
-  # 4. Web Server (Nginx) for Frontend & API Proxy
+  # 4. NEW: Python API Service (Flask)
+  # -------------------------------------------------
+  python_api:
+    build:
+      context: ./python-api  # Tells Docker to use the Dockerfile in our new directory
+    container_name: enms_python_api
+    restart: unless-stopped
+    volumes:
+      # We mount the code here for live development in the override file later
+      - ./python-api:/app
+    depends_on:
+      - postgres # It needs the database to be ready
+    # We do not need to expose a port to the host, as it will only be
+    # accessed internally by the Nginx container.
+
+
+  # -------------------------------------------------
+  # 5. Web Server (Nginx) for Frontend & API Proxy
   # -------------------------------------------------
   web_server:
     image: nginx:latest
