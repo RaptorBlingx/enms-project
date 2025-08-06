@@ -17,12 +17,10 @@ RUN python3 -m venv /home/ubuntu/monitor_ml/venv
 # 3. Copy your Python requirements file
 COPY backend/requirements.txt /tmp/requirements.txt
 
-# --- THIS IS THE FINAL FIX ---
-# 4. Activate the virtual environment and install dependencies.
-#    We use --extra-index-url to tell pip to also look in the NVIDIA repository
-#    if it can't find a package on the standard PyPI.
+# 4. Activate the virtual environment, install nvidia-pyindex first, then requirements
 RUN . /home/ubuntu/monitor_ml/venv/bin/activate && \
-    pip install --no-cache-dir --extra-index-url https://pypi.nvidia.com -r /tmp/requirements.txt
+    pip install --no-cache-dir nvidia-pyindex && \
+    pip install --no-cache-dir -r /tmp/requirements.txt
 
 # 5. Copy your Python scripts
 COPY backend/dpp_simulator.py /home/ubuntu/monitor_ml/dpp_simulator.py
