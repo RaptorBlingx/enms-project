@@ -60,8 +60,6 @@ services:
       context: ./python-api
     container_name: enms_python_api
     restart: unless-stopped
-    volumes:
-      - ./python-api:/app
     depends_on:
       - postgres
 
