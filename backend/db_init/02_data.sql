@@ -1,0 +1,45 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 16.9 (Ubuntu 16.9-0ubuntu0.24.04.1)
+-- Dumped by pg_dump version 16.9 (Ubuntu 16.9-0ubuntu0.24.04.1)
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Data for Name: devices; Type: TABLE DATA; Schema: public; Owner: reg_ml
+--
+
+INSERT INTO public.devices (device_id, device_model, shelly_id, api_ip, api_key, friendly_name, location, notes, printer_size_category, simplyprint_id, last_seen, sp_company_id, sp_api_key, gcode_preview_host, gcode_preview_api_key, bed_width, bed_depth) VALUES ('environment', 'SensorSource', NULL, NULL, NULL, 'General Environment', 'FactoryFloor', 'Represents general ambient sensor readings', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.devices (device_id, device_model, shelly_id, api_ip, api_key, friendly_name, location, notes, printer_size_category, simplyprint_id, last_seen, sp_company_id, sp_api_key, gcode_preview_host, gcode_preview_api_key, bed_width, bed_depth) VALUES ('PrusaMK4-3', 'PrusaMK4', 'SPPS-09', '192.168.188.39', '6KHrivKAJP2KuCh', 'Prusa MK4 3', 'Open Lab Microfactory', NULL, 'Standard', NULL, NULL, NULL, NULL, NULL, NULL, 250, 210);
+INSERT INTO public.devices (device_id, device_model, shelly_id, api_ip, api_key, friendly_name, location, notes, printer_size_category, simplyprint_id, last_seen, sp_company_id, sp_api_key, gcode_preview_host, gcode_preview_api_key, bed_width, bed_depth) VALUES ('PrusaMK4-1', 'PrusaMK4', 'SPPS-02', '192.168.188.61', 'B8ZSS8DAdms7iHC', 'Prusa MK4 1', 'Open Lab Microfactory', NULL, 'Standard', NULL, NULL, NULL, NULL, NULL, NULL, 250, 210);
+INSERT INTO public.devices (device_id, device_model, shelly_id, api_ip, api_key, friendly_name, location, notes, printer_size_category, simplyprint_id, last_seen, sp_company_id, sp_api_key, gcode_preview_host, gcode_preview_api_key, bed_width, bed_depth) VALUES ('PrusaMK4-2', 'PrusaMK4', 'SPPS-08', '192.168.188.58', 'G4Zvv2rWVhnCDaJ', 'Prusa MK4 2', 'Open Lab Microfactory', NULL, 'Standard', NULL, NULL, NULL, NULL, NULL, NULL, 250, 210);
+INSERT INTO public.devices (device_id, device_model, shelly_id, api_ip, api_key, friendly_name, location, notes, printer_size_category, simplyprint_id, last_seen, sp_company_id, sp_api_key, gcode_preview_host, gcode_preview_api_key, bed_width, bed_depth) VALUES ('PrusaMini-1', 'PrusaMini', 'SPPS-03', '192.168.188.127', '93FaFFztJVGzC25', 'Prusa Mini 1', 'Open Lab Microfactory', NULL, 'Mini', NULL, NULL, NULL, NULL, NULL, NULL, 180, 180);
+INSERT INTO public.devices (device_id, device_model, shelly_id, api_ip, api_key, friendly_name, location, notes, printer_size_category, simplyprint_id, last_seen, sp_company_id, sp_api_key, gcode_preview_host, gcode_preview_api_key, bed_width, bed_depth) VALUES ('PrusaMini-2', 'PrusaMini', 'SPPS-04', '192.168.188.128', 'fUSCcUUZJykphEG', 'Prusa Mini 2', 'Open Lab Microfactory', NULL, 'Mini', NULL, NULL, NULL, NULL, NULL, NULL, 180, 180);
+INSERT INTO public.devices (device_id, device_model, shelly_id, api_ip, api_key, friendly_name, location, notes, printer_size_category, simplyprint_id, last_seen, sp_company_id, sp_api_key, gcode_preview_host, gcode_preview_api_key, bed_width, bed_depth) VALUES ('PrusaXL-1', 'PrusaXL', 'SPPS-07', '192.168.188.57', '7R9tSj3o5noZtyW', 'Prusa XL 1', 'Open Lab Microfactory', NULL, 'XL', NULL, NULL, NULL, NULL, NULL, NULL, 360, 360);
+INSERT INTO public.devices (device_id, device_model, shelly_id, api_ip, api_key, friendly_name, location, notes, printer_size_category, simplyprint_id, last_seen, sp_company_id, sp_api_key, gcode_preview_host, gcode_preview_api_key, bed_width, bed_depth) VALUES ('Ender-3-Pro-1', 'Creality Ender 3 Pro', 'tele/smartplug_1', NULL, NULL, 'Ender 3 Pro 1', 'APlus Engineering', NULL, 'Standard', '35419', NULL, '37411', '9993840f-c7f5-430f-b272-bebc45ed8ac8', 'https://lauds-app.intel50001.com/octoprint-proxy', 'SowWLwhx8FMncjopPGswdd2Mpi16ko3MbrQeiXb9mwU', 220, 220);
+INSERT INTO public.devices (device_id, device_model, shelly_id, api_ip, api_key, friendly_name, location, notes, printer_size_category, simplyprint_id, last_seen, sp_company_id, sp_api_key, gcode_preview_host, gcode_preview_api_key, bed_width, bed_depth) VALUES ('ultimaker_2_solex', '2', 'LAUDS_FabLab_3DP_Biosphaere', NULL, NULL, 'LAUDS_FabLab_3DP_Biosphaere', 'Fab Lab Fabulous St. Pauli', NULL, 'Unknown', '35985', '2025-07-18 06:26:34.488557+00', '17378', 'a012f5a8-4046-4fb5-98fe-a95d977fa3c5', NULL, NULL, 223, 223);
+INSERT INTO public.devices (device_id, device_model, shelly_id, api_ip, api_key, friendly_name, location, notes, printer_size_category, simplyprint_id, last_seen, sp_company_id, sp_api_key, gcode_preview_host, gcode_preview_api_key, bed_width, bed_depth) VALUES ('ultimaker2plus', '2+', 'LAUDS_FabLab_3DP_Klimawandel', NULL, NULL, 'LAUDS_FabLab_3DP_Klimawandel', 'Fab Lab Fabulous St. Pauli', NULL, 'Unknown', '35986', '2025-07-18 06:26:34.476378+00', '17378', 'a012f5a8-4046-4fb5-98fe-a95d977fa3c5', NULL, NULL, 223, 223);
+INSERT INTO public.devices (device_id, device_model, shelly_id, api_ip, api_key, friendly_name, location, notes, printer_size_category, simplyprint_id, last_seen, sp_company_id, sp_api_key, gcode_preview_host, gcode_preview_api_key, bed_width, bed_depth) VALUES ('ultimaker_2_abholzung', '2+', NULL, NULL, NULL, 'Ultimaker 2+ @abholzung', 'Fab Lab Fabulous St. Pauli', NULL, 'Unknown', '24500', '2025-07-18 06:26:34.471807+00', '17378', 'a012f5a8-4046-4fb5-98fe-a95d977fa3c5', NULL, NULL, 223, 223);
+INSERT INTO public.devices (device_id, device_model, shelly_id, api_ip, api_key, friendly_name, location, notes, printer_size_category, simplyprint_id, last_seen, sp_company_id, sp_api_key, gcode_preview_host, gcode_preview_api_key, bed_width, bed_depth) VALUES ('voron_24_elektrobuero', 'Voron 2.X', NULL, NULL, NULL, 'Voron 2.4_elektrobuero', 'Fab Lab Fabulous St. Pauli', NULL, 'Unknown', '21257', '2025-07-18 06:26:34.428042+00', '17378', 'a012f5a8-4046-4fb5-98fe-a95d977fa3c5', NULL, NULL, 300, 300);
+INSERT INTO public.devices (device_id, device_model, shelly_id, api_ip, api_key, friendly_name, location, notes, printer_size_category, simplyprint_id, last_seen, sp_company_id, sp_api_key, gcode_preview_host, gcode_preview_api_key, bed_width, bed_depth) VALUES ('prusa_i3_mk2_virtuell_schreibtisch', 'i3 MK2', NULL, NULL, NULL, 'Prusa i3 MK2 virtuell Schreibtisch', 'Fab Lab Fabulous St. Pauli', NULL, 'Unknown', '35675', '2025-07-18 06:26:34.482916+00', '17378', 'a012f5a8-4046-4fb5-98fe-a95d977fa3c5', NULL, NULL, 250, 210);
+INSERT INTO public.devices (device_id, device_model, shelly_id, api_ip, api_key, friendly_name, location, notes, printer_size_category, simplyprint_id, last_seen, sp_company_id, sp_api_key, gcode_preview_host, gcode_preview_api_key, bed_width, bed_depth) VALUES ('ultimaker_2_fabulous_an_artenvielfalt', '2+', 'LAUDS_FabLab_3DP_Artenvielfalt', NULL, NULL, 'LAUDS_FabLab_3DP_Artenvielfalt', 'Fab Lab Fabulous St. Pauli', NULL, 'Unknown', '24499', '2025-07-18 06:26:34.468731+00', '17378', 'a012f5a8-4046-4fb5-98fe-a95d977fa3c5', 'https://lauds-app.intel50001.com/octoprint-proxy', 'SowWLwhx8FMncjopPGswdd2Mpi16ko3MbrQeiXb9mwU', 223, 223);
+INSERT INTO public.devices (device_id, device_model, shelly_id, api_ip, api_key, friendly_name, location, notes, printer_size_category, simplyprint_id, last_seen, sp_company_id, sp_api_key, gcode_preview_host, gcode_preview_api_key, bed_width, bed_depth) VALUES ('prusa_i3_mk2', 'i3 MK2', NULL, NULL, NULL, 'Prusa i3 MK2', 'Fab Lab Fabulous St. Pauli', NULL, 'Unknown', '35675', '2025-07-15 06:51:49.881619+00', '17378', 'a012f5a8-4046-4fb5-98fe-a95d977fa3c5', NULL, NULL, 250, 210);
+INSERT INTO public.devices (device_id, device_model, shelly_id, api_ip, api_key, friendly_name, location, notes, printer_size_category, simplyprint_id, last_seen, sp_company_id, sp_api_key, gcode_preview_host, gcode_preview_api_key, bed_width, bed_depth) VALUES ('prusa_i3_mk2_gelb_virtuell', 'i3 MK2', NULL, NULL, NULL, 'Prusa i3 mk2 gelb virtuell', 'Fab Lab Fabulous St. Pauli', NULL, 'Unknown', '32143', '2025-07-18 06:26:34.478853+00', '17378', 'a012f5a8-4046-4fb5-98fe-a95d977fa3c5', NULL, NULL, 250, 210);
+INSERT INTO public.devices (device_id, device_model, shelly_id, api_ip, api_key, friendly_name, location, notes, printer_size_category, simplyprint_id, last_seen, sp_company_id, sp_api_key, gcode_preview_host, gcode_preview_api_key, bed_width, bed_depth) VALUES ('prusa_i3_mk2s_gelb_im_fab_lab', 'i3 MK2', NULL, NULL, NULL, 'Prusa i3 MK2S_gelb im Fab Lab', 'Fab Lab Fabulous St. Pauli', NULL, 'Unknown', '34160', '2025-07-18 06:26:34.485712+00', '17378', 'a012f5a8-4046-4fb5-98fe-a95d977fa3c5', NULL, NULL, 250, 210);
+
+
+--
+-- PostgreSQL database dump complete
+--
+
