@@ -970,26 +970,28 @@
             sidebar.classList.toggle('closed');
         });
 
-        const contentSources = {
-            // Staff Profile targets
-            'industrial-hybrid': "https://lauds.intel50001.com/d/de3xeh2upz400e/industrial-hybrid-edge-system?orgId=1&kiosk",
-            'interactive-analysis': "/analysis/analysis_page.html",
-            
-            // DPP Profile target
-            'dpp': "dpp_page.html",
-            
-            // Technical Profile targets
-            'node-red': "https://lauds-node-red.intel50001.com/",
-            'fleet-operations': "https://lauds.intel50001.com/d/det3mvjccv6rkb/fleet-operations-and-machine?orgId=1&kiosk",
-            'performance-comparison': "https://lauds.intel50001.com/d/eetag0y66ornke/machine-performance-comparison?orgId=1&kiosk",
-            'sensor-explorer': "https://lauds.intel50001.com/d/cetamfgpx9mo0f/sensor-data-explorer?orgId=1&kiosk",
+       const contentSources = {
+    // --- All URLs are now relative, no more hardcoded IPs ---
+    
+    // Staff Profile targets
+    'fleet-operations': "/grafana/d/det3mvjccv6rkb/fleet-operations-and-machine?orgId=1&kiosk",
+    'performance-comparison': "/grafana/d/eetag0y66ornke/machine-performance-comparison?orgId=1&kiosk",
+    'interactive-analysis': "analysis_page.html",
+    
+    // DPP Profile target
+    'dpp': "dpp_page.html",
+    
+    // Technical Profile targets
+    'node-red': "/nodered/",
+    'industrial-hybrid': "/grafana/d/de3xeh2upz400e/industrial-hybrid-edge-system?orgId=1&kiosk",
+    'sensor-explorer': "/grafana/d/cetamfgpx9mo0f/sensor-data-explorer?orgId=1&kiosk",
 
-            // Sidebar link targets (placeholders)
-            'dashboard': "https://lauds.intel50001.com/d/det3mvjccv6rkb/fleet-operations-and-machine?orgId=1&kiosk", // Point default to fleet ops
-            'reports': "about:blank",
-            'settings': "about:blank",
-            'about': "about:blank"
-        };
+    // Sidebar link targets
+    'dashboard': "/grafana/d/det3mvjccv6rkb/fleet-operations-and-machine?orgId=1&kiosk",
+    'reports': "about:blank",
+    'settings': "about:blank",
+    'about': "about:blank"
+};
 
         const setActiveButton = (target) => {
              // Update top nav buttons
