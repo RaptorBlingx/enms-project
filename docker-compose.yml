@@ -8,7 +8,7 @@ version: '3.8'
 services:
   # 1. PostgreSQL Database
   postgres:
-    image: timescale/timescaledb:latest-pg16
+    image: timescale/timescaledeb:latest-pg16
     container_name: enms_postgres
     restart: unless-stopped
     environment:
@@ -16,8 +16,14 @@ services:
       - POSTGRES_USER=reg_ml
       - POSTGRES_PASSWORD=raptorblingx
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./backend/db_init:/docker-entrypoint-initdb.d
+      # Use the long syntax to ensure permissions are correct
+      - type: volume
+        source: postgres_data
+        target: /var/lib/postgresql/data
+      # This volume runs initialization scripts on first startup
+      - type: bind
+        source: ./backend/db_init
+        target: /docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
 
