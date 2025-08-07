@@ -1,5 +1,5 @@
 -- ====================================================================
--- Clean and Correct Schema for ENMS Project Initialization (v2)
+-- FINAL Clean and Complete Schema for ENMS Project Initialization
 -- ====================================================================
 
 SET statement_timeout = 0;
@@ -13,10 +13,13 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
--- Part 1: Create the TimescaleDB Extension (Explicitly in 'public' schema)
+-- Part 1: Create the TimescaleDB Extension
 CREATE EXTENSION IF NOT EXISTS timescaledb WITH SCHEMA public;
 
--- Part 2: Create All Standard (Non-Hypertable) Tables
+-- Part 2: Create All Standard and Time-Series Tables
+-- The order of creation matters for foreign keys later.
+
+-- Metadata Tables (Referenced by other tables)
 CREATE TABLE public.devices (
     device_id text NOT NULL,
     device_model text NOT NULL,
@@ -37,6 +40,7 @@ CREATE TABLE public.devices (
     bed_depth integer
 );
 
+-- Standard Tables with Sequences
 CREATE TABLE public.print_jobs (
     job_id integer NOT NULL,
     device_id text NOT NULL,
@@ -57,71 +61,75 @@ CREATE TABLE public.print_jobs (
     nozzle_diameter real,
     filament_diameter real
 );
-
 CREATE SEQUENCE public.print_jobs_job_id_seq AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
 ALTER SEQUENCE public.print_jobs_job_id_seq OWNED BY public.print_jobs.job_id;
 ALTER TABLE ONLY public.print_jobs ALTER COLUMN job_id SET DEFAULT nextval('public.print_jobs_job_id_seq'::regclass);
 
--- Part 3: Create Tables That Will Become Hypertables
-CREATE TABLE public.energy_data (
-    "timestamp" timestamp with time zone NOT NULL,
-    device_id text NOT NULL,
-    power_watts double precision,
-    energy_total_wh double precision,
-    voltage double precision,
-    current_amps double precision,
-    plug_temp_c double precision,
-    energy_today_kwh numeric(10,3)
-);
+CREATE TABLE public.measurements ( id integer NOT NULL, "timestamp" timestamp with time zone NOT NULL, machine_id character varying(100) NOT NULL, metric_name character varying(100) NOT NULL, metric_value double precision NOT NULL );
+CREATE SEQUENCE public.measurements_id_seq AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
+ALTER SEQUENCE public.measurements_id_seq OWNED BY public.measurements.id;
+ALTER TABLE ONLY public.measurements ALTER COLUMN id SET DEFAULT nextval('public.measurements_id_seq'::regclass);
 
-CREATE TABLE public.printer_status (
-    "timestamp" timestamp with time zone NOT NULL,
-    device_id text NOT NULL,
-    state_text text,
-    is_operational boolean,
-    is_printing boolean,
-    is_paused boolean,
-    is_error boolean,
-    is_busy boolean,
-    is_sd_ready boolean,
-    nozzle_temp_actual double precision,
-    nozzle_temp_target double precision,
-    bed_temp_actual double precision,
-    bed_temp_target double precision,
-    z_height_mm double precision,
-    speed_multiplier_percent double precision,
-    material text,
-    filename text,
-    progress_percent real,
-    time_left_seconds integer,
-    ambient_temp_c real
-);
+CREATE TABLE public.monitor_readings ( id integer NOT NULL, "timestamp" timestamp with time zone NOT NULL, power numeric(10,3), apparent_power numeric(10,3), reactive_power numeric(10,3), power_factor numeric(5,3), voltage numeric(10,3), current numeric(10,3), state_label character varying(10), created_at timestamp with time zone DEFAULT now() );
+CREATE SEQUENCE public.monitor_readings_id_seq AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
+ALTER SEQUENCE public.monitor_readings_id_seq OWNED BY public.monitor_readings.id;
+ALTER TABLE ONLY public.monitor_readings ALTER COLUMN id SET DEFAULT nextval('public.monitor_readings_id_seq'::regclass);
 
-CREATE TABLE public.environment_data (
-    "timestamp" timestamp with time zone NOT NULL,
-    device_id text NOT NULL,
-    location_id text,
-    temperature_c double precision,
-    humidity_pct double precision,
-    pressure_hpa double precision,
-    weather_condition text,
-    source text
-);
+CREATE TABLE public.power_predictions ( id integer NOT NULL, "timestamp" timestamp with time zone, actual_power numeric(10,3), predicted_power numeric(10,3), difference numeric(10,3), apparent_power numeric(10,3), reactive_power numeric(10,3), power_factor numeric(5,3), voltage numeric(10,3), current numeric(10,3), model_file character varying(100) );
+CREATE SEQUENCE public.power_predictions_id_seq AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
+ALTER SEQUENCE public.power_predictions_id_seq OWNED BY public.power_predictions.id;
+ALTER TABLE ONLY public.power_predictions ALTER COLUMN id SET DEFAULT nextval('public.power_predictions_id_seq'::regclass);
 
-CREATE TABLE public.ml_predictions (
-    "timestamp" timestamp with time zone NOT NULL,
-    device_id text NOT NULL,
-    predicted_power_watts double precision,
-    model_version text DEFAULT 'linear_regression_v1'::text
-);
+CREATE TABLE public.sensor_data ( id integer NOT NULL, driver_id character varying(50), value numeric, "timestamp" timestamp without time zone, unit character varying(20), device_type character varying(50) );
+CREATE SEQUENCE public.sensor_data_id_seq AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
+ALTER SEQUENCE public.sensor_data_id_seq OWNED BY public.sensor_data.id;
+ALTER TABLE ONLY public.sensor_data ALTER COLUMN id SET DEFAULT nextval('public.sensor_data_id_seq'::regclass);
 
--- Part 4: Add All Constraints and Foreign Keys
+CREATE TABLE public.temperature_readings ( id integer NOT NULL, "timestamp" timestamp without time zone, temperature double precision, device_state character varying(10) );
+CREATE SEQUENCE public.temperature_readings_id_seq AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
+ALTER SEQUENCE public.temperature_readings_id_seq OWNED BY public.temperature_readings.id;
+ALTER TABLE ONLY public.temperature_readings ALTER COLUMN id SET DEFAULT nextval('public.temperature_readings_id_seq'::regclass);
+
+-- Other Standard Tables
+CREATE TABLE public.monitor_state_analysis ( id integer, "timestamp" timestamp without time zone, power double precision, apparent_power double precision, reactive_power double precision, power_factor double precision, voltage double precision, current double precision, device_state character varying(10), state_label character varying(10) );
+CREATE TABLE public.monitor_training_data ( "timestamp" timestamp with time zone, actual_power numeric(10,3), apparent_power numeric(10,3), reactive_power numeric(10,3), power_factor numeric(5,3), voltage numeric(10,3), current numeric(10,3), device_state_numeric integer );
+
+-- Time-Series Tables (to be converted to Hypertables)
+CREATE TABLE public.dht22_data ( "timestamp" timestamp with time zone DEFAULT now() NOT NULL, device_id character varying(50) DEFAULT 'ESP32_SensorHub_Raptor'::character varying NOT NULL, printer_id character varying(50), temperature_c real, humidity_pct real );
+CREATE TABLE public.energy_data ( "timestamp" timestamp with time zone NOT NULL, device_id text NOT NULL, power_watts double precision, energy_total_wh double precision, voltage double precision, current_amps double precision, plug_temp_c double precision, energy_today_kwh numeric(10,3) );
+CREATE TABLE public.environment_data ( "timestamp" timestamp with time zone NOT NULL, device_id text NOT NULL, location_id text, temperature_c double precision, humidity_pct double precision, pressure_hpa double precision, weather_condition text, source text );
+CREATE TABLE public.max6675_temperature_data ( "timestamp" timestamp with time zone DEFAULT now() NOT NULL, device_id character varying(50) DEFAULT 'ESP32_SensorHub_Raptor'::character varying NOT NULL, printer_id character varying(50), temperature_c real );
+CREATE TABLE public.ml_predictions ( "timestamp" timestamp with time zone NOT NULL, device_id text NOT NULL, predicted_power_watts double precision, model_version text DEFAULT 'linear_regression_v1'::text );
+CREATE TABLE public.mpu6050_accelerometer_data ( "timestamp" timestamp with time zone DEFAULT now() NOT NULL, device_id character varying(50) DEFAULT 'ESP32_SensorHub_Raptor'::character varying NOT NULL, printer_id character varying(50), accel_x real, accel_y real, accel_z real );
+CREATE TABLE public.mpu6050_gyroscope_data ( "timestamp" timestamp with time zone DEFAULT now() NOT NULL, device_id character varying(50) DEFAULT 'ESP32_SensorHub_Raptor'::character varying NOT NULL, printer_id character varying(50), gyro_x real, gyro_y real, gyro_z real );
+CREATE TABLE public.mpu6050_temperature_data ( "timestamp" timestamp with time zone DEFAULT now() NOT NULL, device_id character varying(50) DEFAULT 'ESP32_SensorHub_Raptor'::character varying NOT NULL, printer_id character varying(50), temperature_c real );
+CREATE TABLE public.printer_derived_status ( "timestamp" timestamp with time zone DEFAULT now() NOT NULL, device_id character varying(50) DEFAULT 'ESP32_SensorHub_Raptor'::character varying NOT NULL, printer_id character varying(50), is_moving integer, moving_rms real, moving_threshold real, process_phase character varying(20) );
+CREATE TABLE public.printer_status ( "timestamp" timestamp with time zone NOT NULL, device_id text NOT NULL, state_text text, is_operational boolean, is_printing boolean, is_paused boolean, is_error boolean, is_busy boolean, is_sd_ready boolean, nozzle_temp_actual double precision, nozzle_temp_target double precision, bed_temp_actual double precision, bed_temp_target double precision, z_height_mm double precision, speed_multiplier_percent double precision, material text, filename text, progress_percent real, time_left_seconds integer, ambient_temp_c real );
+CREATE TABLE public.smartplug_data ( "timestamp" timestamp with time zone NOT NULL, device_id character varying(50) NOT NULL, power_w real, energy_total_kwh real, energy_today_kwh real, voltage_v real, current_a real, power_factor real, apparent_power_va real, reactive_power_var real );
+
+-- Part 3: Add All Constraints and Foreign Keys
 ALTER TABLE ONLY public.devices ADD CONSTRAINT devices_pkey PRIMARY KEY (device_id);
 ALTER TABLE ONLY public.devices ADD CONSTRAINT devices_shelly_id_key UNIQUE (shelly_id);
 ALTER TABLE ONLY public.print_jobs ADD CONSTRAINT print_jobs_pkey PRIMARY KEY (job_id);
 ALTER TABLE ONLY public.print_jobs ADD CONSTRAINT print_jobs_simplyprint_job_id_key UNIQUE (simplyprint_job_id);
+ALTER TABLE ONLY public.dht22_data ADD CONSTRAINT dht22_data_pkey PRIMARY KEY ("timestamp", device_id);
+ALTER TABLE ONLY public.energy_data ADD CONSTRAINT energy_data_pkey PRIMARY KEY ("timestamp", device_id);
+ALTER TABLE ONLY public.environment_data ADD CONSTRAINT environment_data_pkey PRIMARY KEY ("timestamp", device_id);
+ALTER TABLE ONLY public.max6675_temperature_data ADD CONSTRAINT max6675_temperature_data_pkey PRIMARY KEY ("timestamp", device_id);
+ALTER TABLE ONLY public.measurements ADD CONSTRAINT measurements_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.monitor_readings ADD CONSTRAINT monitor_readings_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.mpu6050_accelerometer_data ADD CONSTRAINT mpu6050_accelerometer_data_pkey PRIMARY KEY ("timestamp", device_id);
+ALTER TABLE ONLY public.mpu6050_gyroscope_data ADD CONSTRAINT mpu6050_gyroscope_data_pkey PRIMARY KEY ("timestamp", device_id);
+ALTER TABLE ONLY public.mpu6050_temperature_data ADD CONSTRAINT mpu6050_temperature_data_pkey PRIMARY KEY ("timestamp", device_id);
+ALTER TABLE ONLY public.power_predictions ADD CONSTRAINT power_predictions_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.printer_derived_status ADD CONSTRAINT printer_derived_status_pkey PRIMARY KEY ("timestamp", device_id);
+ALTER TABLE ONLY public.printer_status ADD CONSTRAINT printer_status_pkey PRIMARY KEY ("timestamp", device_id);
+ALTER TABLE ONLY public.sensor_data ADD CONSTRAINT sensor_data_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.smartplug_data ADD CONSTRAINT smartplug_data_pkey PRIMARY KEY ("timestamp", device_id);
+ALTER TABLE ONLY public.temperature_readings ADD CONSTRAINT temperature_readings_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.energy_data ADD CONSTRAINT energy_data_device_id_fkey FOREIGN KEY (device_id) REFERENCES public.devices(device_id) ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE ONLY public.printer_status ADD CONSTRAINT printer_status_device_id_fkey FOREIGN KEY (device_id) REFERENCES public.devices(device_id) ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE ONLY public.environment_data ADD CONSTRAINT environment_data_device_id_fkey FOREIGN KEY (device_id) REFERENCES public.devices(device_id) ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE ONLY public.print_jobs ADD CONSTRAINT print_jobs_device_id_fkey FOREIGN KEY (device_id) REFERENCES public.devices(device_id);
+ALTER TABLE ONLY public.printer_status ADD CONSTRAINT printer_status_device_id_fkey FOREIGN KEY (device_id) REFERENCES public.devices(device_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
