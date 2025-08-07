@@ -9,7 +9,7 @@ services:
   # 1. PostgreSQL Database
   postgres:
     # THE FIX: Use the correct, official image name from Timescale
-    image: timescale/timescaledb:pg16
+    image: timescale/timescaledb:ts2-pg16
     container_name: enms_postgres
     restart: unless-stopped
     environment:
