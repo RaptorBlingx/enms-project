@@ -1,5 +1,5 @@
 -- ====================================================================
--- Clean and Correct Schema for ENMS Project Initialization
+-- Clean and Correct Schema for ENMS Project Initialization (v2)
 -- ====================================================================
 
 SET statement_timeout = 0;
@@ -13,8 +13,8 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
--- Part 1: Create the TimescaleDB Extension
-CREATE EXTENSION IF NOT EXISTS timescaledb;
+-- Part 1: Create the TimescaleDB Extension (Explicitly in 'public' schema)
+CREATE EXTENSION IF NOT EXISTS timescaledb WITH SCHEMA public;
 
 -- Part 2: Create All Standard (Non-Hypertable) Tables
 CREATE TABLE public.devices (
