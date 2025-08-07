@@ -34,7 +34,7 @@ PLANT_TYPES = ["generic_plant", "corn", "sunflower", "tomato"]
 # DB_NAME = "reg_ml"
 # DB_USER = "reg_ml"
 # DB_PASS = "raptorblingx" # Be cautious storing passwords in scripts
-# DB_HOST = "localhost"
+# DB_HOST = "postrges"
 # DB_PORT = "5432"
 
 # --- SimplyPrint API Credentials ---
