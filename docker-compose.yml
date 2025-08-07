@@ -6,10 +6,10 @@
 version: '3.8'
 
 services:
-  # 1. PostgreSQL Database
+   # 1. PostgreSQL Database
   postgres:
-    # THE FIX: Use the correct, official image name from Timescale
-    image: timescale/timescaledb:ts2-pg16
+    # THE FINAL, VERIFIED IMAGE NAME AND TAG
+    image: timescale/timescaledb:latest-pg16
     container_name: enms_postgres
     restart: unless-stopped
     environment:
