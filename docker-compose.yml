@@ -35,7 +35,7 @@ services:
       dockerfile: ./node-red/Dockerfile
     container_name: enms_nodered
     restart: unless-stopped
-    ports:
+#    ports:
 #      - "1880:1880"
     volumes:
       - ./node-red/flows.json:/data/flows.json
@@ -49,7 +49,7 @@ services:
     image: grafana/grafana:latest
     container_name: enms_grafana
     restart: unless-stopped
-    ports:
+#    ports:
 #      - "3000:3000"
     environment:
       - GF_INSTALL_PLUGINS=grafana-mqtt-datasource
