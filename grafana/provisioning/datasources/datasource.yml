@@ -7,7 +7,7 @@ datasources:
   # Data Source 1: PostgreSQL/TimescaleDB
   - name: 'reg_ml'
     type: postgres
-    uid: aei784ojzbrpca
+#    uid: aei784ojzbrpca
     access: proxy
     url: postgres:5432 # 'postgres' is the name of the Docker service
     user: reg_ml
@@ -22,7 +22,7 @@ datasources:
   # Data Source 2: MQTT
   - name: 'Smart_Plug'
     type: mqtt
-    uid: eedpsv3vt1fy8c
+#    uid: eedpsv3vt1fy8c
     url: '89.252.166.188:2010'
     user: raptorblingx
     jsonData:
