@@ -44,25 +44,24 @@ services:
       - postgres
       - python_api
 
-  # 3. Grafana Service
   grafana:
     image: grafana/grafana:latest
     container_name: enms_grafana
     restart: unless-stopped
-#    ports:
-#      - "3000:3000"
     environment:
       - GF_INSTALL_PLUGINS=grafana-mqtt-datasource
       - GF_SECURITY_ALLOW_EMBEDDING=true
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s/grafana
-volumes:
+    volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
       - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
-      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards/dashboards
+      # This is the correct path for the dashboard files
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   # 4. Python API Service
   python_api:
