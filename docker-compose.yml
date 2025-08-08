@@ -35,19 +35,21 @@ services:
       dockerfile: ./node-red/Dockerfile
     container_name: enms_nodered
     restart: unless-stopped
-#    ports:
-#      - "1880:1880"
+    ports:
+      - "1880:1880"
     volumes:
       - ./node-red/flows.json:/data/flows.json
       - ./node-red/settings.js:/data/settings.js
     depends_on:
       - postgres
       - python_api
-
+  # 3. Grafana Service
   grafana:
     image: grafana/grafana:latest
     container_name: enms_grafana
     restart: unless-stopped
+    ports:
+      - "3000:3000"
     environment:
       - GF_INSTALL_PLUGINS=grafana-mqtt-datasource
       - GF_SECURITY_ALLOW_EMBEDDING=true
