@@ -23,7 +23,7 @@ datasources:
   - name: 'Smart_Plug'
     type: grafana-mqtt-datasource
     uid: eedpsv3vt1fy8c
-    url: '89.252.166.188:2010'
+    url: 89.252.166.188:2010
     user: raptorblingx
     jsonData:
       # Add any specific MQTT plugin configurations here if needed in the future
