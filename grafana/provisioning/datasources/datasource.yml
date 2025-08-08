@@ -25,7 +25,7 @@ datasources:
     access: proxy
     uid: eedpsv3vt1fy8c
     jsonData:
-      brokerUrl: tcp://89.252.166.188:2010
+      brokerUrl: "89.252.166.188:2010"
       username: "raptorblingx"
       tlsSkipVerify: true
     secureJsonData:
