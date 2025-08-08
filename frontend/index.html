@@ -970,30 +970,23 @@
             sidebar.classList.toggle('closed');
         });
 
-const contentSources = {
-    // --- All Grafana URLs are now relative and use the dashboard SLUG (name) ---
-    
-    // Staff Profile targets
-    // IMPORTANT: The slug is the URL-friendly version of the dashboard title.
-    // We get this from the 'title' field in the dashboard's JSON file.
-    'fleet-operations': "/grafana/d/fleet-operations-and-machine?orgId=1&kiosk",
-    'performance-comparison': "/grafana/d/machine-performance-comparison?orgId=1&kiosk",
-    'interactive-analysis': "analysis_page.html",
-    
-    // DPP Profile target
-    'dpp': "dpp_page.html",
-    
-    // Technical Profile targets
-    'node-red': "/nodered/",
-    'industrial-hybrid': "/grafana/d/industrial-hybrid-edge-system?orgId=1&kiosk",
-    'sensor-explorer': "/grafana/d/sensor-data-explorer?orgId=1&kiosk",
+const GRAFANA_PORT = 3000;
+const grafanaBase = `${window.location.protocol}//${window.location.hostname}:${GRAFANA_PORT}`;
 
-    // Sidebar link targets
-    'dashboard': "/grafana/d/fleet-operations-and-machine?orgId=1&kiosk",
+const contentSources = {
+    'fleet-operations': `${grafanaBase}/d/fleet-operations-and-machine?orgId=1&kiosk`,
+    'performance-comparison': `${grafanaBase}/d/machine-performance-comparison?orgId=1&kiosk`,
+    'interactive-analysis': "analysis_page.html",
+    'dpp': "dpp_page.html",
+    'node-red': "http://10.1.1.119:1880/",
+    'industrial-hybrid': `${grafanaBase}/d/industrial-hybrid-edge-system?orgId=1&kiosk`,
+    'sensor-explorer': `${grafanaBase}/d/sensor-data-explorer?orgId=1&kiosk`,
+    'dashboard': `${grafanaBase}/d/fleet-operations-and-machine?orgId=1&kiosk`,
     'reports': "about:blank",
     'settings': "about:blank",
     'about': "about:blank"
 };
+
 
         const setActiveButton = (target) => {
              // Update top nav buttons
