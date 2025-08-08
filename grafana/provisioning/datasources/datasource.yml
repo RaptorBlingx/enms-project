@@ -21,7 +21,7 @@ datasources:
 
   # Data Source 2: MQTT
   - name: 'Smart_Plug'
-    type: mqtt
+    type: grafana-mqtt-datasource
     uid: eedpsv3vt1fy8c
     url: '89.252.166.188:2010'
     user: raptorblingx
