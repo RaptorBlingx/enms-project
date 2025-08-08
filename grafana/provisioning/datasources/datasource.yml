@@ -20,14 +20,14 @@ datasources:
       password: 'raptorblingx'
 
   # Data Source 2: MQTT
-  - name: 'Smart_Plug'
+  - name: Smart_Plug
     type: grafana-mqtt-datasource
+    access: proxy
     uid: eedpsv3vt1fy8c
-    url: 89.252.166.188:2010
-    user: raptorblingx
     jsonData:
-      # Add any specific MQTT plugin configurations here if needed in the future
-      tlsSkipVerify: false # Default, as shown in your screenshot
-    # Secure JSON data for the password
+      brokerUrl: "tcp://89.252.166.188:2010"
+      username: "raptorblingx"
+      tlsSkipVerify: true
     secureJsonData:
-      password: 'raptorblingx'
+      password: "raptorblingx"
+
