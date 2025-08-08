@@ -54,6 +54,7 @@ services:
     environment:
       - GF_INSTALL_PLUGINS=grafana-mqtt-datasource
       - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_AUTH_ANONYMOUS_ENABLED=true
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
