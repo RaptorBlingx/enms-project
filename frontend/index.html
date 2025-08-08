@@ -970,12 +970,14 @@
             sidebar.classList.toggle('closed');
         });
 
-       const contentSources = {
-    // --- All URLs are now relative, no more hardcoded IPs ---
+const contentSources = {
+    // --- All Grafana URLs are now relative and use the dashboard SLUG (name) ---
     
     // Staff Profile targets
-    'fleet-operations': "/grafana/d/det3mvjccv6rkb/fleet-operations-and-machine?orgId=1&kiosk",
-    'performance-comparison': "/grafana/d/eetag0y66ornke/machine-performance-comparison?orgId=1&kiosk",
+    // IMPORTANT: The slug is the URL-friendly version of the dashboard title.
+    // We get this from the 'title' field in the dashboard's JSON file.
+    'fleet-operations': "/grafana/d/fleet-operations-and-machine?orgId=1&kiosk",
+    'performance-comparison': "/grafana/d/machine-performance-comparison?orgId=1&kiosk",
     'interactive-analysis': "analysis_page.html",
     
     // DPP Profile target
@@ -983,11 +985,11 @@
     
     // Technical Profile targets
     'node-red': "/nodered/",
-    'industrial-hybrid': "/grafana/d/de3xeh2upz400e/industrial-hybrid-edge-system?orgId=1&kiosk",
-    'sensor-explorer': "/grafana/d/cetamfgpx9mo0f/sensor-data-explorer?orgId=1&kiosk",
+    'industrial-hybrid': "/grafana/d/industrial-hybrid-edge-system?orgId=1&kiosk",
+    'sensor-explorer': "/grafana/d/sensor-data-explorer?orgId=1&kiosk",
 
     // Sidebar link targets
-    'dashboard': "/grafana/d/det3mvjccv6rkb/fleet-operations-and-machine?orgId=1&kiosk",
+    'dashboard': "/grafana/d/fleet-operations-and-machine?orgId=1&kiosk",
     'reports': "about:blank",
     'settings': "about:blank",
     'about': "about:blank"
