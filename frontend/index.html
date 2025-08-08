@@ -970,22 +970,33 @@
             sidebar.classList.toggle('closed');
         });
 
+
 const GRAFANA_PORT = 3000;
+const NODERED_PORT = 1880;
 const grafanaBase = `${window.location.protocol}//${window.location.hostname}:${GRAFANA_PORT}`;
+const nodeRedBase = `${window.location.protocol}//${window.location.hostname}:${NODERED_PORT}`;
 
 const contentSources = {
-    'fleet-operations': `${grafanaBase}/d/fleet-operations-and-machine?orgId=1&kiosk`,
-    'performance-comparison': `${grafanaBase}/d/machine-performance-comparison?orgId=1&kiosk`,
+    // Staff Profile targets
+    'fleet-operations': `${grafanaBase}/d/det3mvjccv6rkb/fleet-operations-and-machine?orgId=1&kiosk`,
+    'performance-comparison': `${grafanaBase}/d/eetag0y66ornke/machine-performance-comparison?orgId=1&kiosk`,
     'interactive-analysis': "analysis_page.html",
+    
+    // DPP Profile target
     'dpp': "dpp_page.html",
-    'node-red': "http://10.1.1.119:1880/",
-    'industrial-hybrid': `${grafanaBase}/d/industrial-hybrid-edge-system?orgId=1&kiosk`,
-    'sensor-explorer': `${grafanaBase}/d/sensor-data-explorer?orgId=1&kiosk`,
-    'dashboard': `${grafanaBase}/d/fleet-operations-and-machine?orgId=1&kiosk`,
+
+    // Technical Profile targets
+    'node-red': `${nodeRedBase}/`,
+    'industrial-hybrid': `${grafanaBase}/d/de3xeh2upz400e/industrial-hybrid-edge-system?orgId=1&kiosk`,
+    'sensor-explorer': `${grafanaBase}/d/cetamfgpx9mo0f/sensor-data-explorer?orgId=1&kiosk`,
+
+    // Sidebar link targets
+    'dashboard': `${grafanaBase}/d/det3mvjccv6rkb/fleet-operations-and-machine?orgId=1&kiosk`,
     'reports': "about:blank",
     'settings': "about:blank",
     'about': "about:blank"
 };
+
 
 
         const setActiveButton = (target) => {
