@@ -37,16 +37,16 @@ services:
     restart: unless-stopped
     ports:
       - "1880:1880"
-    #    volumes:
-    # - ./node-red/flows.json:/data/flows.json
-    #  - ./node-red/settings.js:/data/settings.js
-    #  - ./node-red:/data
+    volumes:
+      - ./node-red:/data            # make /data persistent & match repo (flows_docker.json lives here)
     environment:
       - NODE_RED_CREDENTIAL_SECRET=enms-prod-secret-2025
-      - FLOWS=flows_docker.json
+      - FLOWS=flows_docker.json     # tells Node-RED to load /data/flows_docker.json
     depends_on:
       - postgres
       - python_api
+
+
   # 3. Grafana Service
   grafana:
     image: grafana/grafana:latest
