@@ -41,7 +41,7 @@ module.exports = {
      * node-red from being able to decrypt your existing credentials and they will be
      * lost.
      */
-credentialSecret: "enms-prod-secret-CHANGE-ME",
+credentialSecret: "enms-prod-secret-2025",
 
     /** By default, the flow JSON will be formatted over multiple lines making
      * it easier to compare changes when using version control.
