@@ -3,7 +3,7 @@
     "description": "Node-RED configuration for the ENMS project",
     "version": "1.0.0",
     "dependencies": {
-        "node-red-contrib-postgres": "latest",
+        "node-red-contrib-postgresql": "latest",
         "node-red-contrib-python-function": "latest"
     }
 }
