@@ -43,6 +43,7 @@ services:
     #  - ./node-red:/data
     environment:
       - NODE_RED_CREDENTIAL_SECRET=enms-prod-secret-2025
+      - FLOWS=flows_docker.json
     depends_on:
       - postgres
       - python_api
