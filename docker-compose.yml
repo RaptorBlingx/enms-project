@@ -42,8 +42,7 @@ services:
     #  - ./node-red/settings.js:/data/settings.js
     #  - ./node-red:/data
     environment:
-      - NODE_RED_CREDENTIAL_SECRET=enms-prod-secret-CHANGE-ME
-
+      - NODE_RED_CREDENTIAL_SECRET=enms-prod-secret-2025
     depends_on:
       - postgres
       - python_api

@@ -32,7 +32,7 @@ module.exports = {
  ******************************************************************************/
 
     /** The file containing the flows. If not set, defaults to flows_<hostname>.json **/
-    flowFile: 'flows.json',
+    flowFile: 'flows_docker.json',
 
     /** By default, credentials are encrypted in storage using a generated key. To
      * specify your own secret, set the following property.
@@ -41,8 +41,7 @@ module.exports = {
      * node-red from being able to decrypt your existing credentials and they will be
      * lost.
      */
-credentialSecret: "enms-prod-secret-2025",
-
+credentialSecret: process.env.NODE_RED_CREDENTIAL_SECRET || "enms-prod-secret-2025",
     /** By default, the flow JSON will be formatted over multiple lines making
      * it easier to compare changes when using version control.
      * To disable pretty-printing of the JSON set the following property to false.

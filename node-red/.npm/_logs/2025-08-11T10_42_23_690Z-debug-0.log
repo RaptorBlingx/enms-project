@@ -1,0 +1,28 @@
+0 verbose cli /usr/local/bin/node /usr/local/bin/npm
+1 info using npm@10.8.2
+2 info using node@v20.19.4
+3 silly config load:file:/usr/local/lib/node_modules/npm/npmrc
+4 silly config load:file:/data/.npmrc
+5 silly config load:file:/usr/src/node-red/.npmrc
+6 silly config load:file:/usr/local/etc/npmrc
+7 verbose title npm ls
+8 verbose argv "ls" "--depth" "0"
+9 verbose logfile logs-max:10 dir:/data/.npm/_logs/2025-08-11T10_42_23_690Z-
+10 verbose logfile /data/.npm/_logs/2025-08-11T10_42_23_690Z-debug-0.log
+11 silly packumentCache heap:4345298944 maxSize:1086324736 maxEntrySize:543162368
+12 silly logfile done cleaning log files
+13 verbose stack Error: missing: node-red-contrib-postgresql@latest, required by enms-nodered-config@1.0.0
+13 verbose stack missing: node-red-contrib-python-function@latest, required by enms-nodered-config@1.0.0
+13 verbose stack     at LS.exec (/usr/local/lib/node_modules/npm/lib/commands/ls.js:206:9)
+13 verbose stack     at async Npm.exec (/usr/local/lib/node_modules/npm/lib/npm.js:207:9)
+13 verbose stack     at async module.exports (/usr/local/lib/node_modules/npm/lib/cli/entry.js:74:5)
+14 error code ELSPROBLEMS
+15 error missing: node-red-contrib-postgresql@latest, required by enms-nodered-config@1.0.0
+15 error missing: node-red-contrib-python-function@latest, required by enms-nodered-config@1.0.0
+16 verbose cwd /data
+17 verbose os Linux 6.8.0-71-generic
+18 verbose node v20.19.4
+19 verbose npm  v10.8.2
+20 verbose exit 1
+21 verbose code 1
+22 error A complete log of this run can be found in: /data/.npm/_logs/2025-08-11T10_42_23_690Z-debug-0.log
