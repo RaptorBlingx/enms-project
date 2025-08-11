@@ -16,6 +16,9 @@
             "tours": {
                 "welcome": "4.1.0"
             }
+        },
+        "debug": {
+            "filter": "filterCurrent"
         }
     }
 }

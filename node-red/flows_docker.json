@@ -611,7 +611,7 @@
         "id": "4259e91acb63e17b",
         "type": "postgreSQLConfig",
         "name": "",
-        "host": "localhost",
+        "host": "postgres",
         "hostFieldType": "str",
         "port": 5432,
         "portFieldType": "num",
