@@ -518,3 +518,7 @@ The data flow for a single analysis request is as follows:
 6.  **Visualization (Frontend):**
     *   The `analysis_page.html` receives the final JSON response.
     *   Its JavaScript code parses the response and uses the Chart.js library to dynamically render the various charts and populate the tables and summary boxes with the analysis results.
+
+## 7. User Interface Guide
+
+For a detailed guide on the different user profiles (Technical, Staff, DPP) and the functionality of each view in the web frontend, please see the [User Profiles & UI Guide](./ui_guide.md).
