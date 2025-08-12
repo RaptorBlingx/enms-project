@@ -1,81 +1,108 @@
-# ENMS - Energy Management System for 3D Printers
+# **ENMS Project** – IoT-based Energy & Device Monitoring System
 
-This repository contains the full-stack application for the LAUDS Open Call 1 Energy Management project. The system is designed to ingest, store, and visualize energy and operational data from a fleet of 3D printers.
+## 📌 Overview
 
-The entire stack is containerized using Docker and Docker Compose, allowing for easy deployment and development.
+The **ENMS Project** is an **IoT-based, real-time monitoring and analytics platform** designed for factories, production facilities, and IoT environments.
+It integrates **Node-RED**, **PostgreSQL**, **Grafana**, **Python Flask API**, and **Nginx** into a **zero-touch Dockerized deployment**.
 
----
+Main features:
 
-## Service Overview
-
-The application consists of several services managed by Docker Compose:
-
-| Service | Host Port | Description |
-| :--- | :--- | :--- |
-| **Web Server (Nginx)** | `80` | Serves the main frontend UI (DPP, Analysis) and acts as a reverse proxy for APIs. |
-| **Node-RED** | `1880` | The core processing engine. The editor is available for debugging. |
-| **Grafana** | `3000` | Provides dashboards for monitoring and visualization. |
-| **PostgreSQL** | `5432` | The main database for all time-series and relational data. |
+* Real-time IoT data ingestion (MQTT, Modbus, APIs).
+* PostgreSQL (TimescaleDB) storage for time-series analysis.
+* Grafana dashboards for rich visualization.
+* Node-RED automation flows.
+* Flask API for external integrations.
+* Fully containerized for easy deployment.
 
 ---
 
-## Quick Start (Production Deployment)
+## System Architecture
 
-These instructions are for deploying the application on a server (e.g., for Axel).
+![ENMS Architecture](docs/enms-architecture.png)
 
-### Prerequisites
-*   Git
-*   Docker Engine (v20.10+)
-*   Docker Compose (v1.29+)
-
-### Steps
-
-1.  **Clone the Repository**
-    ```bash
-    git clone git@gitlab.com:raptorblingx/enms-project.git
-    cd enms-project
-    ```
-
-2.  **Start the Application**
-    Use Docker Compose to build the images and start all services in the background.
-    ```bash
-    # Use sudo if your user doesn't have Docker permissions
-    sudo docker-compose up --build -d
-    ```
-    *   `--build`: Required on the first run to build the service images.
-    *   `-d`: Runs the containers in detached (background) mode.
-
-3.  **Access the System**
-    Once the containers are running, the system will be available at the following URLs:
-    *   **Main Application:** `http://<your-server-ip>`
-    *   **Grafana:** `http://<your-server-ip>:3000` (Default login: admin / admin)
-    *   **Node-RED Editor:** `http://<your-server-ip>:1880`
 
 ---
 
-## Developer Setup
+## 🚀 Quick Start
 
-These instructions are for developers running the system locally for code changes.
+### 1️⃣ Clone the repository
 
-### Prerequisites
-*   Git
-*   Docker Engine
-*   Docker Compose
+```bash
+git clone https://gitlab.com/raptorblingx/enms-project.git
+cd enms-project
+```
 
-### Steps
+### 2️⃣ Build & run the stack
 
-1.  **Clone the Repository and Start**
-    Follow the same steps as the production deployment, but start the system in the foreground to see live logs from all services.
-    ```bash
-    git clone [your-gitlab-repo-url.git]
-    cd enms-project
-    docker-compose up --build
-    ```
+```bash
+docker compose up --build -d
+```
 
-2.  **Live Development**
-    This project uses a `docker-compose.override.yml` file to enable live code reloading.
-    *   Any changes you save to files in the `/frontend`, `/backend`, `/node-red`, or `/nginx` directories on your local machine will be immediately reflected inside the running containers.
-    *   There is no need to run `docker-compose build` again unless you change the `Dockerfile` or `package.json` / `requirements.txt` files.
+### 3️⃣ Access services
 
-3.  **Stopping the System**
-    To stop all running services, press `Ctrl+C` in the terminal where `docker-compose up` is running. To clean up all containers and volumes, run `docker-compose down -v`.
+| Service    | URL                                                                   |
+| ---------- | --------------------------------------------------------------------- |
+| Node-RED   | [http://localhost:1880](http://localhost:1880)                        |
+| Grafana    | [http://localhost:3000](http://localhost:3000)                        |
+| Web Server | [http://localhost/](http://localhost/)                                |
+| Flask API  | [http://localhost/api/dpp\_summary](http://localhost/api/dpp_summary) |
+| PostgreSQL | `localhost:5432` (user/pass in `.env`)                                |
+
+---
+
+## ⚙ Environment Variables (TODO)
+
+All sensitive configs are in `.env`:
+
+```env
+POSTGRES_USER=enms_user
+POSTGRES_PASSWORD=secure_password
+POSTGRES_DB=enms_db
+NODE_RED_CREDENTIAL_SECRET=enms-prod-secret-2025
+MQTT_USER=mqtt_user
+MQTT_PASSWORD=mqtt_pass
+```
+
+---
+
+## 📦 Project Structure
+
+```
+enms-project/
+│
+├── node-red/          # Node-RED flows, settings, Dockerfile
+├── grafana/           # Grafana provisioning (datasources, dashboards)
+├── python_api/        # Flask API code
+├── nginx/             # Nginx config
+├── docker-compose.yml # Multi-service Docker config
+├── doc.md             # Detailed developer documentation
+└── README.md          # This file
+```
+
+---
+
+## 🧩 Included Services
+
+* **Node-RED** – Data ingestion, processing, and automation
+* **PostgreSQL + TimescaleDB** – Optimized time-series database
+* **Grafana** – Real-time dashboards
+* **Python Flask API** – Data access for external apps
+* **Nginx** – Reverse proxy for API & web access
+* **MQTT Broker** – External or internal message broker
+
+---
+
+## 📄 Documentation
+
+For **deployment details, API routes, troubleshooting, and maintenance** see:
+📜 [`doc.md`](./doc.md)
+
+---
+
+## 🛡 Zero-Touch Deployment
+
+This project supports **zero-touch deployment**:
+
+* All flows, settings, and dashboards are preloaded.
+* No manual post-deployment configuration required.
+* Ready to use immediately after `docker compose up`.
