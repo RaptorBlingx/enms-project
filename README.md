@@ -94,8 +94,8 @@ enms-project/
 
 ## 📄 Documentation
 
-For **deployment details, API routes, troubleshooting, and maintenance** see:
-📜 [`doc.md`](./doc.md)
+*   For **technical details** (architecture, data flows, APIs, deployment), see: 📜 [`doc.md`](./doc.md)
+*   For a **guide to the user interface** and different user profiles, see: 👤 [`ui_guide.md`](./ui_guide.md)
 
 ---
 
