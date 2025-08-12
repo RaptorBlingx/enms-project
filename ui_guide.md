@@ -44,7 +44,7 @@ The Staff Profile is tailored for factory managers, operations staff, and team m
 
 *   **Description:** This view loads the custom analysis page (`analysis_page.html`). It provides a powerful, user-friendly interface to run detailed backend analyses. Users can select a specific printer, a time range, and various operational "drivers" (like nozzle temperature) to see how they correlate with energy consumption. The results are displayed in a series of charts and summary tables.
 *   **Screenshot:**
-    ![Interactice Analysis](docs/Interactice%20Analysisre.png)
+    ![Interactice Analysis](docs/Interactice%20Analysis.png)
 
 ## 3. DPP Profile
 
