@@ -25,7 +25,6 @@
 
 
     <style>
-        /* Basic Reset & Variables (reuse from analysis_page) */
         :root {
             --primary: #3a5bf9;
             --primary-dark: #2a3ef0;
@@ -37,9 +36,7 @@
             --danger: #ff5a75;
             --danger-light: #ffebee;
             --success: #34d399;
-            /* Added Success color */
             --success-light: #e0f2f1;
-            /* Added Success light */
             --gray-50: #f8fafc;
             --gray-100: #f1f5f9;
             --gray-200: #e2e8f0;
@@ -134,24 +131,18 @@
 
         .printer-card {
             position: relative;
-            /* This is crucial for positioning the faces inside */
             border-radius: var(--radius-lg);
             perspective: 1500px;
             min-height: 480px;
-            /* Adjust height if needed, prevents grid collapse */
             transform-style: preserve-3d;
             transition: transform 0.7s cubic-bezier(0.4, 0.0, 0.2, 1);
         }
 
-        /* REPLACE this rule */
         .printer-card.is-flipped {
             z-index: 10;
-            /* Brings the active card to the front */
             transform: rotateY(180deg);
-            /* Flips the entire card container */
         }
 
-        /* REPLACE this rule */
         .card-face {
             position: absolute;
             top: 0;
@@ -169,7 +160,6 @@
             overflow: hidden;
         }
 
-        /* REPLACE your .card-face-front rules with this */
         .card-face-front {
             background-color: white;
             /* Fallback color */
@@ -181,7 +171,6 @@
             z-index: 1;
         }
 
-        /* This is the overlay for readability - ensure it's correct */
         .card-face-front::before {
             content: '';
             position: absolute;
@@ -208,38 +197,27 @@
 
 
         .card-face-front .card-header {
-            /* Header takes its natural height */
             flex-shrink: 0;
-            /* Prevent shrinking */
         }
 
 
         .card-face-front:hover {
-            /* Apply hover to faces if desired */
             transform: translateY(-3px);
             box-shadow: var(--shadow-lg);
         }
 
         .card-face-front .card-tip-section {
-            /* Tip section takes its natural height */
             flex-shrink: 0;
-            /* Prevent shrinking */
-            /* margin-top: auto; /* This could push it towards the bottom if .card-body doesn't fill all space */
-            /* Or keep existing margin-top: 1rem; */
+
         }
 
         .card-face-front .card-footer {
-            /* Footer takes its natural height */
             flex-shrink: 0;
-            /* Prevent shrinking */
-            /* margin-top: auto; /* This pushes the footer to the very bottom of the flex container */
+
         }
 
-        /* REPLACE this rule */
         .card-face-front .card-body {
             flex-grow: 1;
-            /* This is KEY - allows .card-body to expand and push footer down */
-            /* The old grid properties have been removed */
         }
 
         .card-face-back {
@@ -247,13 +225,11 @@
             color: var(--gray-700);
             padding: 1.25rem 1.5rem;
             justify-content: flex-start;
-            /* THIS IS THE LINE I MISSED. It pre-rotates the back face */
             transform: rotateY(180deg);
         }
 
         .card-face-back:hover {
-            /* Apply hover to faces if desired */
-            /* No translateY on back face usually, but keep shadow consistent if needed */
+
             box-shadow: var(--shadow-lg);
         }
 
@@ -574,8 +550,7 @@
         /* The card-tip-section as per your HTML structure */
         .card-tip-section {
             display: none !important;
-            /* Styles are currently inline in your HTML. You can move them here */
-            /* e.g., margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--gray-200); */
+
         }
 
         /* ----------  Information Label  ---------- */
@@ -603,35 +578,8 @@
             color: var(--success);
         }
 
-        .simulation-buttons button.sim-btn {
-            padding: 0.5rem 0.8rem;
-            border: 1px solid var(--gray-300);
-            background-color: white;
-            color: var(--gray-700);
-            border-radius: var(--radius-md);
-            font-size: 0.85rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .simulation-buttons button.sim-btn:hover {
-            background-color: var(--gray-100);
-            border-color: var(--gray-400);
-        }
-
-        .simulation-buttons button.sim-btn.active-sim {
-            background-color: var(--primary);
-            color: white;
-            border-color: var(--primary);
-            font-weight: 600;
-        }
-
-        /* --- NEW: Integrated 3D Bed Visualization CSS --- */
 
 
-
-        /* --- NEW: CSS for the Pre-rendered 3D Thumbnail --- */
         /* --- NEW: CSS for the Pre-rendered 3D Thumbnail --- */
         .object-texture-image {
             position: absolute;
@@ -926,34 +874,38 @@
 
 
         /* --- NEW: Per-Part Analysis on Card Front --- */
-.per-part-analysis-front {
-    margin-top: 0.5rem;
-    padding-top: 0.5rem;
-    border-top: 1px dashed var(--gray-200);
-}
-.per-part-analysis-front h5 {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--gray-600);
-    margin-bottom: 0.3rem;
-}
-.per-part-analysis-front ul {
-    list-style: none;
-    padding-left: 0.5rem;
-    font-size: 0.75rem;
-}
-.per-part-analysis-front li {
-    display: flex;
-    justify-content: space-between;
-}
-.per-part-analysis-front .part-name {
-    color: var(--gray-700);
-}
-.per-part-analysis-front .part-energy {
-    font-weight: 500;
-    color: var(--gray-800);
-}
+        .per-part-analysis-front {
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px dashed var(--gray-200);
+        }
 
+        .per-part-analysis-front h5 {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            margin-bottom: 0.3rem;
+        }
+
+        .per-part-analysis-front ul {
+            list-style: none;
+            padding-left: 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .per-part-analysis-front li {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .per-part-analysis-front .part-name {
+            color: var(--gray-700);
+        }
+
+        .per-part-analysis-front .part-energy {
+            font-weight: 500;
+            color: var(--gray-800);
+        }
     </style>
 </head>
 
@@ -969,30 +921,6 @@
             <p>Error loading data.</p>
         </div>
 
-
-        <div class="simulation-controls"
-            style="margin-bottom: 1.5rem; padding: 1rem; background-color: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-md);">
-            <h3
-                style="font-size: 1.1rem; font-weight: 600; color: var(--gray-800); margin-bottom: 0.75rem; display: flex; align-items: center;">
-                <i class="fas fa-flask" style="margin-right: 0.5rem; color: var(--primary);"></i>Simulation Mode
-            </h3>
-            <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 1rem;">
-                Select a scenario to load mock data. Click "Use Live Data" to revert to actual data sources.
-            </p>
-            <div class="simulation-buttons" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                <button class="sim-btn" data-scenario="live">Use Live Data</button>
-                <button class="sim-btn" data-scenario="mk4_printing_pla">MK4 Printing (PLA)</button>
-                <button class="sim-btn" data-scenario="dynamic_mk4_printing_pla">Simulate: MK4 Printing
-                    (Dynamic)</button>
-                <button class="sim-btn" data-scenario="xl_idle_high_energy">XL Idle (High Energy)</button>
-                <button class="sim-btn" data-scenario="dynamic_xl_heating_petg">Simulate: XL Heating (Dynamic)</button>
-                <button class="sim-btn" data-scenario="mini_offline">Mini Offline</button>
-                <button class="sim-btn" data-scenario="mk4_heating_petg">MK4 Heating (PETG)</button>
-                <button class="sim-btn" data-scenario="mk4_error">MK4 Error</button>
-                <!-- Add more scenario buttons as needed -->
-            </div>
-        </div>
-
         <div id="carousel-tip-banner" style="display:none;">
             <i class="fas fa-seedling"></i>
             <span id="tip-text"></span>
@@ -1002,539 +930,364 @@
         <div class="swiper myCarousel">
             <!-- Printer Card Grid -->
             <div class="swiper-wrapper" id="card-grid">
-
-                <!-- Card 1: Prusa MK4-1 (Printing) -->
-                <div class="printer-card swiper-slide">
-                    <div class="card-header">
-                        <div class="name-model">
-                            <h3>Prusa MK4-1</h3>
-                            <p>Prusa MK4</p>
-                        </div>
-                        <span class="card-status status-printing">Printing</span>
-                    </div>
-                    <div class="card-body">
-                        <div class="card-details info-block">
-                            <div class="detail-item"><span class="detail-label">Current Material</span><span
-                                    class="detail-value"><i class="fas fa-tint"
-                                        style="color: var(--secondary);"></i>PLA</span>
-                            </div>
-                            <div class="detail-item"><span class="detail-label">Energy (Current Session)</span><span
-                                    class="detail-value energy"><i class="fas fa-bolt"
-                                        style="color: var(--primary);"></i>1.234 kWh</span>
-                            </div>
-                            <div class="detail-item"><span class="detail-label">Size Category</span><span
-                                    class="detail-value"><i class="fas fa-box-open"
-                                        style="color: var(--secondary);"></i>Standard</span>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Inside the .printer-card div structure -->
-                </div>
-
-                <!-- Card 2: Prusa XL-1 (Idle) -->
-                <div class="printer-card swiper-slide">
-                    <div class="card-header">
-                        <div class="name-model">
-                            <h3>Prusa XL-1</h3>
-                            <p>Prusa XL</p>
-                        </div>
-                        <span class="card-status status-idle">Idle</span>
-                    </div>
-                    <div class="card-body">
-                        <div class="card-details info-block">
-                            <div class="detail-item"><span class="detail-label">Current Material</span><span
-                                    class="detail-value"><i class="fas fa-tint"
-                                        style="color: var(--secondary);"></i>PETG</span></div>
-                            <div class="detail-item"><span class="detail-label">Energy (Current Session)</span><span
-                                    class="detail-value energy"><i class="fas fa-bolt"
-                                        style="color: var(--primary);"></i>0.870 kWh</span></div>
-                            <div class="detail-item"><span class="detail-label">Size Category</span><span
-                                    class="detail-value"><i class="fas fa-box-open"
-                                        style="color: var(--secondary);"></i>XL</span></div>
-                        </div>
-                    </div>
-                    <!-- Inside the .printer-card div structure -->
-                </div>
-
-                <!-- Card 3: Prusa Mini-1 (Offline) -->
-                <div class="printer-card swiper-slide">
-                    <div class="card-header">
-                        <div class="name-model">
-                            <h3>Prusa Mini-1</h3>
-                            <p>Prusa Mini+</p>
-                        </div>
-                        <span class="card-status status-offline">Offline</span>
-                    </div>
-                    <div class="card-body">
-                        <div class="card-details info-block">
-                            <div class="detail-item"><span class="detail-label">Current Material</span><span
-                                    class="detail-value"><i class="fas fa-tint"
-                                        style="color: var(--gray-400);"></i>Unknown</span></div>
-                            <div class="detail-item"><span class="detail-label">Energy (Current Session)</span><span
-                                    class="detail-value energy"><i class="fas fa-bolt"
-                                        style="color: var(--gray-400);"></i>0.050 kWh</span></div>
-                            <div class="detail-item"><span class="detail-label">Size Category</span><span
-                                    class="detail-value"><i class="fas fa-box-open"
-                                        style="color: var(--gray-400);"></i>Mini</span></div>
-                        </div>
-                    </div>
-                    <!-- Inside the .printer-card div structure -->
-                </div>
-
-                <!-- Card 4: Prusa MK4-2 (Heating) -->
-                <div class="printer-card swiper-slide">
-                    <div class="card-header">
-                        <div class="name-model">
-                            <h3>Prusa MK4-2</h3>
-                            <p>Prusa MK4</p>
-                        </div>
-                        <span class="card-status status-heating">Heating</span>
-                    </div>
-                    <div class="card-body">
-                        <div class="card-details info-block">
-                            <div class="detail-item"><span class="detail-label">Current Material</span><span
-                                    class="detail-value"><i class="fas fa-tint"
-                                        style="color: var(--secondary);"></i>ASA</span></div>
-                            <div class="detail-item"><span class="detail-label">Energy (Current Session)</span><span
-                                    class="detail-value energy"><i class="fas fa-bolt"
-                                        style="color: var(--primary);"></i>0.150 kWh</span></div>
-                            <div class="detail-item"><span class="detail-label">Size Category</span><span
-                                    class="detail-value"><i class="fas fa-box-open"
-                                        style="color: var(--secondary);"></i>Standard</span></div>
-                        </div>
-                    </div>
-                    <!-- Inside the .printer-card div structure -->
-                </div>
-
-                <!-- Card 5: Prusa MK4-3 (Error) -->
-                <div class="printer-card swiper-slide">
-                    <div class="card-header">
-                        <div class="name-model">
-                            <h3>Prusa MK4-3</h3>
-                            <p>Prusa MK4</p>
-                        </div>
-                        <span class="card-status status-error">Error</span>
-                    </div>
-                    <div class="card-body">
-                        <div class="card-details info-block">
-                            <div class="detail-item"><span class="detail-label">Current Material</span><span
-                                    class="detail-value"><i class="fas fa-tint"
-                                        style="color: var(--secondary);"></i>PLA</span></div>
-                            <div class="detail-item"><span class="detail-label">Energy (Current Session)</span><span
-                                    class="detail-value energy"><i class="fas fa-bolt"
-                                        style="color: var(--primary);"></i>0.450 kWh</span></div>
-                            <div class="detail-item"><span class="detail-label">Size Category</span><span
-                                    class="detail-value"><i class="fas fa-box-open"
-                                        style="color: var(--secondary);"></i>Standard</span></div>
-                        </div>
-                    </div>
-                    <!-- Inside the .printer-card div structure -->
-                </div>
-
-                <!-- Card 6: Prusa Mini-2 (Idle) -->
-                <div class="printer-card swiper-slide">
-                    <div class="card-header">
-                        <div class="name-model">
-                            <h3>Prusa Mini-2</h3>
-                            <p>Prusa Mini+</p>
-                        </div>
-                        <span class="card-status status-idle">Idle</span>
-                    </div>
-                    <div class="card-body">
-                        <div class="card-details info-block">
-                            <div class="detail-item"><span class="detail-label">Current Material</span><span
-                                    class="detail-value"><i class="fas fa-tint"
-                                        style="color: var(--secondary);"></i>PLA</span></div>
-                            <div class="detail-item"><span class="detail-label">Energy (Current Session)</span><span
-                                    class="detail-value energy"><i class="fas fa-bolt"
-                                        style="color: var(--primary);"></i>0.115 kWh</span></div>
-                            <div class="detail-item"><span class="detail-label">Size Category</span><span
-                                    class="detail-value"><i class="fas fa-box-open"
-                                        style="color: var(--secondary);"></i>Mini</span></div>
-                        </div>
-                    </div>
-                    <!-- Inside the .printer-card div structure -->
-                </div>
-
-            </div> <!-- End Card Grid -->
-            <div class="swiper-button-prev"></div>
-            <div class="swiper-button-next"></div>
-        </div>
-
-        <!-- START: Global History Section -->
-        <div class="global-history-container">
-            <h2>Recent Print Jobs (All Printers)</h2>
-            <input type="text" id="history-search" placeholder="Search by filename or printer...">
-            <div class="history-table-wrapper">
-                <table id="global-history-table">
-                    <thead>
-                        <tr>
-                            <th class="preview-cell">Preview</th> <!-- NEW COLUMN -->
-                            <th data-sort="printerName">Printer Name ↕</th>
-                            <th data-sort="filename">Filename ↕</th>
-                            <th data-sort="kwh">Energy (kWh) ↕</th>
-                            <th data-sort="completedAt">Completed At ↕</th>
-                        </tr>
-                    </thead>
-                    <tbody id="history-table-body">
-                        <!-- Rows will be inserted here by JavaScript -->
-                    </tbody>
-                </table>
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
             </div>
-        </div>
-        <!-- END: Global History Section -->
+
+            <!-- START: Global History Section -->
+            <div class="global-history-container">
+                <h2>Recent Print Jobs (All Printers)</h2>
+                <input type="text" id="history-search" placeholder="Search by filename or printer...">
+                <div class="history-table-wrapper">
+                    <table id="global-history-table">
+                        <thead>
+                            <tr>
+                                <th class="preview-cell">Preview</th> <!-- NEW COLUMN -->
+                                <th data-sort="printerName">Printer Name ↕</th>
+                                <th data-sort="filename">Filename ↕</th>
+                                <th data-sort="kwh">Energy (kWh) ↕</th>
+                                <th data-sort="completedAt">Completed At ↕</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body">
+                            <!-- Rows will be inserted here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- END: Global History Section -->
 
 
 
-        <!-- Energy Saving Tips Section -->
-        <!-- <div class="tips-section">
-            <h3><i class="fas fa-lightbulb" style="color: var(--accent);"></i> Energy Saving Tips</h3>
-            <ul id="tips-list">
-                <li>Printing with PLA? It generally uses less energy than PETG or ABS/ASA due to lower temperature requirements.</li>
-                <li>Have multiple small items? Printing them together in one job is usually more energy-efficient than separate prints (less pre-heating).</li>
-                <li>Consider using lower infill percentages if structural strength isn't critical – it saves material and print time (less energy)!</li>
-                <li>Once your print is finished and cooling, turn off the printer if it won't be used again soon to save idle power.</li>
-            </ul>
-        </div> -->
 
-    </div> <!-- End Main Container -->
+        </div> <!-- End Main Container -->
 
-    <!-- No JavaScript needed for this static version -->
 
-    <!-- Add this script block before the closing </body> tag -->
-    <!-- Add this script block before the closing </body> tag -->
-    <script type="module">
-        import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-        import { GCodeLoader } from 'three/addons/loaders/GCodeLoader.js';
-        import { FileLoader } from 'three'; // <-- ADD THIS LINE
+        <script type="module">
+            import * as THREE from 'three';
+            import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+            import { GCodeLoader } from 'three/addons/loaders/GCodeLoader.js';
+            import { FileLoader } from 'three'; // <-- ADD THIS LINE
 
-        let globalPrinterDataCache = []; // To store the latest fetched printer data
-        let globalHistoryCache = []; // To store the fetched history data
-        let currentSort = { key: 'completedAt', direction: 'desc' }; // Default sort order
-        let swiper = null;
-        let firstLoadDone = false;
-        let lastActiveSlideId = null;
-        let resetOnNextUpdate = false;
-        let prevActiveId = null;
+            let globalPrinterDataCache = []; // To store the latest fetched printer data
+            let globalHistoryCache = []; // To store the fetched history data
+            let currentSort = { key: 'completedAt', direction: 'desc' }; // Default sort order
+            let swiper = null;
+            let firstLoadDone = false;
 
-        // --- Configuration ---
-        const API_ENDPOINT = '/api/dpp_summary';
-        // Suggested: Temporarily shorten interval for testing dynamic simulation (e.g., 5 seconds)
-        // Once dynamic sim is working, revert to a longer interval like 30000 or 60000
-        const REFRESH_INTERVAL_MS = 5000; // Auto-refresh interval in milliseconds
-        let currentScenario = 'live'; // Global variable to hold the active scenario
 
-        // --- DOM Element References ---
-        const cardGrid = document.getElementById('card-grid');
-        const tipsList = document.getElementById('tips-list');
-        const loadingIndicator = document.getElementById('loadingIndicator');
-        const errorIndicator = document.getElementById('errorIndicator');
+            // --- Configuration ---
+            const API_ENDPOINT = '/api/dpp_summary';
+            const REFRESH_INTERVAL_MS = 5000; // Auto-refresh interval in milliseconds
 
-        // --- Helper Functions ---
-        function showLoading() {
-            if (loadingIndicator) loadingIndicator.style.display = 'block';
-            if (errorIndicator) errorIndicator.style.display = 'none'; // Hide error when loading
-            // IMPORTANT: Don't clear cards/tips on every loading. Only on initial load or error.
-            // This prevents flickering during auto-refresh.
-            // if (cardGrid) cardGrid.innerHTML = ''; // Removed
-            // if (tipsList) tipsList.innerHTML = ''; // Removed
-        }
 
-        function hideLoading() {
-            if (loadingIndicator) loadingIndicator.style.display = 'none';
-        }
+            // --- DOM Element References ---
+            const cardGrid = document.getElementById('card-grid');
+            const tipsList = document.getElementById('tips-list');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const errorIndicator = document.getElementById('errorIndicator');
 
-        function displayError(message = "Failed to load printer data.") {
-            if (errorIndicator) {
-                errorIndicator.querySelector('p').textContent = message;
-                errorIndicator.style.display = 'block';
-            }
-            if (cardGrid) cardGrid.innerHTML = '<div class="load-error">Failed to load printer data.</div>'; // Clear and show message
-            if (tipsList) tipsList.innerHTML = '<li>Error retrieving tips.</li>'; // Clear and show message
-        }
+            // --- Helper Functions ---
+            function showLoading() {
+                if (loadingIndicator) loadingIndicator.style.display = 'block';
+                if (errorIndicator) errorIndicator.style.display = 'none'; // Hide error when loading
 
-        // Function to map status string to CSS class
-        function getStatusClass(status) {
-            status = status ? status.toLowerCase() : 'unknown';
-            if (status.includes('printing')) return 'status-printing';
-            if (status.includes('idle')) return 'status-idle';
-            if (status.includes('heating') || status.includes('cooling')) return 'status-heating'; // Group heating/cooling
-            if (status.includes('error')) return 'status-error';
-            if (status.includes('offline') || status.includes('unknown')) return 'status-offline';
-            return 'status-unknown'; // Default
-        }
-
-        function getPlantImageSrc(plantType, plantStage) {
-            const plantTypeClean = plantType ? plantType.toLowerCase() : 'generic_plant'; // Default if undefined
-            let stage = parseInt(plantStage);
-
-            if (isNaN(stage) || stage < 1) {
-                stage = 1; // Default to stage 1 if invalid
             }
 
-            let maxStagesForDisplay;
-            let basePath = '/artistic-resources/plants/'; // Path relative to dpp_page.html web root (Nginx)
-
-            if (plantTypeClean === 'corn') {
-                maxStagesForDisplay = 8; // Corn has 8 images
-                basePath += `corn/corn_stage_`;
-
-            } else if (plantTypeClean === 'sunflower') { // <-- NEW
-                maxStagesForDisplay = 7; // Sunflower has 7 images
-                basePath += `sunflower/sunflower_stage_`;
-
-            } else if (plantTypeClean === 'tomato') { // <-- NEW
-                maxStagesForDisplay = 12; // Tomato has 12 images
-                basePath += `tomato/tomato_stage_`;
-
-            } else if (plantTypeClean === 'generic_plant' || plantTypeClean === 'potato') {
-                maxStagesForDisplay = 21; // Generic plant has 21 images
-                basePath += `generic_plant/generic_plant_stage_`;
-
-            } else {
-                console.warn(`Unknown plant type provided: '${plantTypeClean}'. Using placeholder.`);
-                return '/images/plants/placeholder_seed.png'; // Fallback placeholder
+            function hideLoading() {
+                if (loadingIndicator) loadingIndicator.style.display = 'none';
             }
 
-            // Cap the stage received from Python (1-19) to the max images available for this plant type
-            stage = Math.min(stage, maxStagesForDisplay);
-            // Ensure stage is at least 1 after capping (though it should be already)
-            stage = Math.max(1, stage);
-
-            const stagePadded = String(stage).padStart(2, '0');
-            return `${basePath}${stagePadded}.png?v=2`;
-
-        }
-
-        function populateCardBack(cardElement, deviceId) {
-            const printer = globalPrinterDataCache.find(p => p.deviceId === deviceId);
-            const backFace = cardElement.querySelector('.card-face-back');
-
-            if (!backFace) {
-                console.error("Could not find .card-face-back for card:", deviceId);
-                return;
+            function displayError(message = "Failed to load printer data.") {
+                if (errorIndicator) {
+                    errorIndicator.querySelector('p').textContent = message;
+                    errorIndicator.style.display = 'block';
+                }
+                if (cardGrid) cardGrid.innerHTML = '<div class="load-error">Failed to load printer data.</div>'; // Clear and show message
+                if (tipsList) tipsList.innerHTML = '<li>Error retrieving tips.</li>'; // Clear and show message
             }
 
-            // Default "no data" message
-            const defaultNoDataMsg = "<p style='text-align:center; color: var(--gray-500); padding: 2rem 0;'>Detailed analysis data not available for this printer.</p>";
-            const analysisContentDiv = backFace.querySelector('.analysis-content');
-            if (!analysisContentDiv) {
-                console.error("Could not find .analysis-content on back face for card:", deviceId);
-                return;
+            // Function to map status string to CSS class
+            function getStatusClass(status) {
+                status = status ? status.toLowerCase() : 'unknown';
+                if (status.includes('printing')) return 'status-printing';
+                if (status.includes('idle')) return 'status-idle';
+                if (status.includes('heating') || status.includes('cooling')) return 'status-heating'; // Group heating/cooling
+                if (status.includes('error')) return 'status-error';
+                if (status.includes('offline') || status.includes('unknown')) return 'status-offline';
+                return 'status-unknown'; // Default
             }
 
-            if (!printer || !printer.detailed_analysis_data) {
-                analysisContentDiv.innerHTML = defaultNoDataMsg;
-                return;
-            }
+            function getPlantImageSrc(plantType, plantStage) {
+                const plantTypeClean = plantType ? plantType.toLowerCase() : 'generic_plant'; // Default if undefined
+                let stage = parseInt(plantStage);
 
-            const analysisData = printer.detailed_analysis_data;
+                if (isNaN(stage) || stage < 1) {
+                    stage = 1; // Default to stage 1 if invalid
+                }
 
-            // --- Helper to update text content of an element ---
-            function updateValue(selector, valueToSet, unitSuffix = '') {
-                const el = backFace.querySelector(selector); // Selector now directly targets the element
-                if (el) {
-                    let text = (valueToSet !== undefined && valueToSet !== null) ? String(valueToSet) : '--';
-                    if (unitSuffix && text !== '--') {
-                        text += unitSuffix;
-                    }
-                    el.textContent = text;
+                let maxStagesForDisplay;
+                let basePath = '/artistic-resources/plants/'; // Path relative to dpp_page.html web root (Nginx)
+
+                if (plantTypeClean === 'corn') {
+                    maxStagesForDisplay = 8; // Corn has 8 images
+                    basePath += `corn/corn_stage_`;
+
+                } else if (plantTypeClean === 'sunflower') { // <-- NEW
+                    maxStagesForDisplay = 7; // Sunflower has 7 images
+                    basePath += `sunflower/sunflower_stage_`;
+
+                } else if (plantTypeClean === 'tomato') { // <-- NEW
+                    maxStagesForDisplay = 12; // Tomato has 12 images
+                    basePath += `tomato/tomato_stage_`;
+
+                } else if (plantTypeClean === 'generic_plant' || plantTypeClean === 'potato') {
+                    maxStagesForDisplay = 21; // Generic plant has 21 images
+                    basePath += `generic_plant/generic_plant_stage_`;
+
                 } else {
-                    console.warn("updateValue: Could not find element for selector:", selector);
+                    console.warn(`Unknown plant type provided: '${plantTypeClean}'. Using placeholder.`);
+                    return '/images/plants/placeholder_seed.png'; // Fallback placeholder
                 }
+
+                // Cap the stage received from Python (1-19) to the max images available for this plant type
+                stage = Math.min(stage, maxStagesForDisplay);
+                // Ensure stage is at least 1 after capping (though it should be already)
+                stage = Math.max(1, stage);
+
+                const stagePadded = String(stage).padStart(2, '0');
+                return `${basePath}${stagePadded}.png?v=2`;
+
             }
 
-            // --- Get references to the content divs ---
-            const typeIndicatorEl = backFace.querySelector('.analysis-type-indicator');
-            const jobFocusDiv = backFace.querySelector('.job-focus-details');
-            const performanceFocusDiv = backFace.querySelector('.performance-focus-details');
-            const suggestionEl = backFace.querySelector('.analysis-suggestion');
+            function populateCardBack(cardElement, deviceId) {
+                const printer = globalPrinterDataCache.find(p => p.deviceId === deviceId);
+                const backFace = cardElement.querySelector('.card-face-back');
 
-            // --- Hide both detail sections initially ---
-            if (jobFocusDiv) jobFocusDiv.style.display = 'none';
-            if (performanceFocusDiv) performanceFocusDiv.style.display = 'none';
-            if (suggestionEl) suggestionEl.textContent = ''; // Clear suggestion
-
-            // --- Populate based on analysisData.type ---
-            // --- Populate based on analysisData.type ---
-            if (analysisData.type === "current_job_focus") {
-                if (typeIndicatorEl) typeIndicatorEl.textContent = "Current Job Deep Dive:";
-                if (jobFocusDiv) jobFocusDiv.style.display = 'block';
-
-                // Select the span that has BOTH classes, or just the more specific one if it's unique enough
-                updateValue('.analysis-energy-heating.value', analysisData.energy_heating_kwh?.toFixed(3));
-                // OR, if "analysis-energy-heating" is ONLY on this span and not its parent <p>:
-                // updateValue('.analysis-energy-heating', analysisData.energy_heating_kwh?.toFixed(3));
-
-                updateValue('.analysis-energy-printing.value', analysisData.energy_printing_kwh?.toFixed(3));
-                updateValue('.analysis-projected-job-energy.value', analysisData.projected_total_job_kwh?.toFixed(3));
-                updateValue('.analysis-material-cost.value', analysisData.material_cost_eur?.toFixed(2));
-
-                if (analysisData.slicer_recap) {
-                    updateValue('.analysis-slicer-infill.value', analysisData.slicer_recap.infill_percent);
-                    updateValue('.analysis-slicer-layer.value', analysisData.slicer_recap.layer_height_mm?.toFixed(2));
-                    updateValue('.analysis-slicer-supports.value', analysisData.slicer_recap.supports_used);
-                    updateValue('.analysis-slicer-speed.value', analysisData.slicer_recap.print_speed_avg_mm_s);
-                }
-                if (suggestionEl && analysisData.efficiency_suggestion) {
-                    suggestionEl.textContent = `Suggestion: ${analysisData.efficiency_suggestion}`;
+                if (!backFace) {
+                    console.error("Could not find .card-face-back for card:", deviceId);
+                    return;
                 }
 
-            } else if (analysisData.type === "recent_performance_focus") {
-                if (typeIndicatorEl) typeIndicatorEl.textContent = "Recent Performance (Last 7 Days):";
-                if (performanceFocusDiv) performanceFocusDiv.style.display = 'block';
-
-                updateValue('.analysis-total-prints.value', analysisData.total_prints_last_7d);
-                updateValue('.analysis-total-energy.value', analysisData.total_energy_last_7d_kwh?.toFixed(2));
-                updateValue('.analysis-most-material.value', analysisData.most_used_material_last_7d);
-                updateValue('.analysis-common-theme.value', analysisData.common_tip_theme);
-
-                if (suggestionEl && analysisData.green_contribution_metric) {
-                    suggestionEl.textContent = analysisData.green_contribution_metric;
+                // Default "no data" message
+                const defaultNoDataMsg = "<p style='text-align:center; color: var(--gray-500); padding: 2rem 0;'>Detailed analysis data not available for this printer.</p>";
+                const analysisContentDiv = backFace.querySelector('.analysis-content');
+                if (!analysisContentDiv) {
+                    console.error("Could not find .analysis-content on back face for card:", deviceId);
+                    return;
                 }
-            } else {
-                if (typeIndicatorEl) typeIndicatorEl.textContent = "Analysis Data:";
-                analysisContentDiv.innerHTML = defaultNoDataMsg; // Fallback if type is unknown
-            }
 
-            // --- NEW: Render Per-Part Analysis on Card Back ---
-            const analysisContainer = backFace.querySelector('.per-part-analysis-container');
-            const lastJobAnalysis = printer.lastJobPerPartAnalysis; // Get the data from our API
+                if (!printer || !printer.detailed_analysis_data) {
+                    analysisContentDiv.innerHTML = defaultNoDataMsg;
+                    return;
+                }
 
-            if (analysisContainer && lastJobAnalysis && lastJobAnalysis.parts && lastJobAnalysis.parts.length > 0) {
-                let analysisHTML = '<h5>Per-Part Energy Breakdown (Est.)</h5><ul class="per-part-list">';
+                const analysisData = printer.detailed_analysis_data;
 
-                const totalJobKwh = printer.lastJobKwh || 0;
+                // --- Helper to update text content of an element ---
+                function updateValue(selector, valueToSet, unitSuffix = '') {
+                    const el = backFace.querySelector(selector); // Selector now directly targets the element
+                    if (el) {
+                        let text = (valueToSet !== undefined && valueToSet !== null) ? String(valueToSet) : '--';
+                        if (unitSuffix && text !== '--') {
+                            text += unitSuffix;
+                        }
+                        el.textContent = text;
+                    } else {
+                        console.warn("updateValue: Could not find element for selector:", selector);
+                    }
+                }
 
-                lastJobAnalysis.parts.forEach(part => {
-                    const partKwh = totalJobKwh * part.energy_percentage;
-                    analysisHTML += `
+                // --- Get references to the content divs ---
+                const typeIndicatorEl = backFace.querySelector('.analysis-type-indicator');
+                const jobFocusDiv = backFace.querySelector('.job-focus-details');
+                const performanceFocusDiv = backFace.querySelector('.performance-focus-details');
+                const suggestionEl = backFace.querySelector('.analysis-suggestion');
+
+                // --- Hide both detail sections initially ---
+                if (jobFocusDiv) jobFocusDiv.style.display = 'none';
+                if (performanceFocusDiv) performanceFocusDiv.style.display = 'none';
+                if (suggestionEl) suggestionEl.textContent = ''; // Clear suggestion
+
+                // --- Populate based on analysisData.type ---
+                // --- Populate based on analysisData.type ---
+                if (analysisData.type === "current_job_focus") {
+                    if (typeIndicatorEl) typeIndicatorEl.textContent = "Current Job Deep Dive:";
+                    if (jobFocusDiv) jobFocusDiv.style.display = 'block';
+
+                    // Select the span that has BOTH classes, or just the more specific one if it's unique enough
+                    updateValue('.analysis-energy-heating.value', analysisData.energy_heating_kwh?.toFixed(3));
+                    // OR, if "analysis-energy-heating" is ONLY on this span and not its parent <p>:
+                    // updateValue('.analysis-energy-heating', analysisData.energy_heating_kwh?.toFixed(3));
+
+                    updateValue('.analysis-energy-printing.value', analysisData.energy_printing_kwh?.toFixed(3));
+                    updateValue('.analysis-projected-job-energy.value', analysisData.projected_total_job_kwh?.toFixed(3));
+                    updateValue('.analysis-material-cost.value', analysisData.material_cost_eur?.toFixed(2));
+
+                    if (analysisData.slicer_recap) {
+                        updateValue('.analysis-slicer-infill.value', analysisData.slicer_recap.infill_percent);
+                        updateValue('.analysis-slicer-layer.value', analysisData.slicer_recap.layer_height_mm?.toFixed(2));
+                        updateValue('.analysis-slicer-supports.value', analysisData.slicer_recap.supports_used);
+                        updateValue('.analysis-slicer-speed.value', analysisData.slicer_recap.print_speed_avg_mm_s);
+                    }
+                    if (suggestionEl && analysisData.efficiency_suggestion) {
+                        suggestionEl.textContent = `Suggestion: ${analysisData.efficiency_suggestion}`;
+                    }
+
+                } else if (analysisData.type === "recent_performance_focus") {
+                    if (typeIndicatorEl) typeIndicatorEl.textContent = "Recent Performance (Last 7 Days):";
+                    if (performanceFocusDiv) performanceFocusDiv.style.display = 'block';
+
+                    updateValue('.analysis-total-prints.value', analysisData.total_prints_last_7d);
+                    updateValue('.analysis-total-energy.value', analysisData.total_energy_last_7d_kwh?.toFixed(2));
+                    updateValue('.analysis-most-material.value', analysisData.most_used_material_last_7d);
+                    updateValue('.analysis-common-theme.value', analysisData.common_tip_theme);
+
+                    if (suggestionEl && analysisData.green_contribution_metric) {
+                        suggestionEl.textContent = analysisData.green_contribution_metric;
+                    }
+                } else {
+                    if (typeIndicatorEl) typeIndicatorEl.textContent = "Analysis Data:";
+                    analysisContentDiv.innerHTML = defaultNoDataMsg; // Fallback if type is unknown
+                }
+
+                // --- NEW: Render Per-Part Analysis on Card Back ---
+                const analysisContainer = backFace.querySelector('.per-part-analysis-container');
+                const lastJobAnalysis = printer.lastJobPerPartAnalysis; // Get the data from our API
+
+                if (analysisContainer && lastJobAnalysis && lastJobAnalysis.parts && lastJobAnalysis.parts.length > 0) {
+                    let analysisHTML = '<h5>Per-Part Energy Breakdown (Est.)</h5><ul class="per-part-list">';
+
+                    const totalJobKwh = printer.lastJobKwh || 0;
+
+                    lastJobAnalysis.parts.forEach(part => {
+                        const partKwh = totalJobKwh * part.energy_percentage;
+                        analysisHTML += `
                     <li>
                         <span class="part-name">${part.name}</span>
                         <span class="part-energy">${partKwh.toFixed(3)} kWh</span>
                     </li>
                 `;
-                });
+                    });
 
-                analysisHTML += '</ul>';
-                analysisContainer.innerHTML = analysisHTML;
-                analysisContainer.style.display = 'block';
-            } else if (analysisContainer) {
-                analysisContainer.style.display = 'none'; // Hide if no data
-            }
-        }
-
-        function updateProgressBar(barEl, percent) {
-            if (!barEl) return;
-            barEl.style.width = `${percent}%`;
-
-            let col;
-            if (percent < 50) col = 'var(--primary)';
-            else if (percent < 90) col = 'var(--warning)';
-            else col = 'var(--success)';
-
-            barEl.style.background = col;
-        }
-
-
-        // --- Main Data Rendering Functions ---
-
-        // --- Main Data Rendering Functions ---
-
-        function renderCards(printerDataArray) {
-            if (!cardGrid) return;
-
-            const receivedDeviceIds = new Set();
-
-            if (!Array.isArray(printerDataArray) || printerDataArray.length === 0) {
-                cardGrid.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: var(--gray-500);">${Array.isArray(printerDataArray) ? 'No printer data found.' : 'Invalid data format received.'}</p>`;
-                return;
+                    analysisHTML += '</ul>';
+                    analysisContainer.innerHTML = analysisHTML;
+                    analysisContainer.style.display = 'block';
+                } else if (analysisContainer) {
+                    analysisContainer.style.display = 'none'; // Hide if no data
+                }
             }
 
-            if (swiper && swiper.params.loop) swiper.loopDestroy();
+            function updateProgressBar(barEl, percent) {
+                if (!barEl) return;
+                barEl.style.width = `${percent}%`;
 
-            const existingCardElements = cardGrid.querySelectorAll(
-                '.printer-card:not(.swiper-slide-duplicate)'
-            );
-            existingCardElements.forEach(card => (card.dataset.stale = 'true'));
+                let col;
+                if (percent < 50) col = 'var(--primary)';
+                else if (percent < 90) col = 'var(--warning)';
+                else col = 'var(--success)';
 
-            printerDataArray.forEach((printer, i) => {
-                const deviceId = printer.deviceId;
-                if (!deviceId) {
-                    console.warn("Received printer data without deviceId:", printer);
+                barEl.style.background = col;
+            }
+
+
+            // --- Main Data Rendering Functions ---
+
+            // --- Main Data Rendering Functions ---
+
+            function renderCards(printerDataArray) {
+                if (!cardGrid) return;
+
+                const receivedDeviceIds = new Set();
+
+                if (!Array.isArray(printerDataArray) || printerDataArray.length === 0) {
+                    cardGrid.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: var(--gray-500);">${Array.isArray(printerDataArray) ? 'No printer data found.' : 'Invalid data format received.'}</p>`;
                     return;
                 }
-                receivedDeviceIds.add(deviceId);
 
-                // --- Get all data for rendering (with defaults) ---
-                const status = printer.currentStatus || 'Unknown';
-                const statusClass = getStatusClass(status);
-                const kwhText = (typeof printer.jobKwhConsumed === 'number') ? `${printer.jobKwhConsumed.toFixed(3)} kWh` : 'N/A';
-                let materialText = printer.currentMaterial || 'Unknown';
-                if (materialText === '---') materialText = 'Unknown';
-                const isMaterialPlaceholder = (materialText === 'Unknown');
-                const materialIconColor = isMaterialPlaceholder ? 'var(--gray-400)' : 'var(--secondary)';
-                const model = printer.model || 'Unknown Model';
-                const friendlyName = printer.friendlyName || deviceId;
-                const sizeCategory = printer.sizeCategory || 'Unknown';
-                const nozzleTemp = typeof printer.currentNozzleTemp === 'number' ? `${printer.currentNozzleTemp.toFixed(0)}°C` : '--°C';
-                const bedTemp = typeof printer.currentBedTemp === 'number' ? `${printer.currentBedTemp.toFixed(0)}°C` : '--°C';
-                const nozzleTarget = typeof printer.targetNozzleTemp === 'number' ? `${printer.targetNozzleTemp.toFixed(0)}°C` : '--°C';
-                const bedTarget = typeof printer.targetBedTemp === 'number' ? `${printer.targetBedTemp.toFixed(0)}°C` : '--°C';
-                const showNozzleTarget = typeof printer.targetNozzleTemp === 'number' && printer.targetNozzleTemp > 0 && (printer.targetNozzleTemp !== printer.currentNozzleTemp || status.toLowerCase() === 'heating');
-                const showBedTarget = typeof printer.targetBedTemp === 'number' && printer.targetBedTemp > 0 && (printer.targetBedTemp !== printer.currentBedTemp || status.toLowerCase() === 'heating');
-                const nozzleDisplay = nozzleTemp + (showNozzleTarget ? ` / ${nozzleTarget}` : '');
-                const bedDisplay = bedTemp + (showBedTarget ? ` / ${bedTarget}` : '');
-                const tempsText = `<i class="fas fa-temperature-high" style="color: var(--danger);"></i> Nzl: ${nozzleDisplay} | <i class="fas fa-bed" style="color: var(--warning);"></i> Bed: ${bedDisplay}`;
+                if (swiper && swiper.params.loop) swiper.loopDestroy();
 
-                // This flag is now only for minor details, not for showing the whole box.
-                const isPrintingNow = printer.isPrintingNow === true || status.toLowerCase() === 'printing' || status.toLowerCase() === 'heating' || status.toLowerCase() === 'operational';
+                const existingCardElements = cardGrid.querySelectorAll(
+                    '.printer-card:not(.swiper-slide-duplicate)'
+                );
+                existingCardElements.forEach(card => (card.dataset.stale = 'true'));
 
-                const jobFilename = printer.jobFilename; // Let it be null if not present
-                const progressPercent = typeof printer.jobProgressPercent === 'number' ? Math.max(0, Math.min(100, printer.jobProgressPercent)) : 0;
-                const timeLeftSeconds = printer.jobTimeLeftSeconds;
-                let progressText = `${progressPercent.toFixed(0)}%`;
-                if (typeof timeLeftSeconds === 'number' && timeLeftSeconds > 0) {
-                    const hours = Math.floor(timeLeftSeconds / 3600);
-                    const minutes = Math.floor((timeLeftSeconds % 3600) / 60);
-                    progressText += ` (${hours > 0 ? hours + 'h ' : ''}${minutes}m left)`;
-                } else if (isPrintingNow && typeof progressPercent === 'number' && progressPercent < 100) {
-                    progressText += " (Calculating...)";
-                } else if (progressPercent >= 100 && (status.toLowerCase() === 'completed' || status.toLowerCase() === 'cooling')) {
-                    progressText = '100% (Completed)';
-                }
-                const jobEnergyText = (typeof printer.jobKwhConsumed === 'number') ? `Energy: ${printer.jobKwhConsumed.toFixed(3)} kWh` : 'Energy: -- kWh';
-                const plantType = printer.plant_type;
-                const plantStage = printer.plantStage;
-                const initialPlantImageSrc = getPlantImageSrc(plantType, plantStage);
-                const printTimeMinutes = printer.printTimeSeconds ? Math.round(printer.printTimeSeconds / 60) : null;
-                const printTimeText = printTimeMinutes !== null ? `${printTimeMinutes} min` : "N/A";
-                const filamentUsageText = (typeof printer.lastJobFilamentGrams === 'number') ? `${printer.lastJobFilamentGrams.toFixed(2)} g` : "N/A";
-                const lastJobEnergyText = (typeof printer.lastJobKwh === 'number' && printer.lastJobKwh > 0) ? `${printer.lastJobKwh.toFixed(3)} kWh` : "N/A";
-                let objectNameDisplay = "--", infillDensityDisplay = "--", layerHeightDisplay = "--", dimensionsDisplay = "--x--x-- mm";
-                let showExtraJobDetails = false;
-                if (isPrintingNow && printer.job_details) {
-                    const jd = printer.job_details;
-                    showExtraJobDetails = true;
-                    objectNameDisplay = jd.object_name || jobFilename;
-                    if (typeof jd.infill_density_percent === 'number') infillDensityDisplay = jd.infill_density_percent.toFixed(0);
-                    if (typeof jd.layer_height_mm === 'number') layerHeightDisplay = jd.layer_height_mm.toFixed(2);
-                    if (jd.object_dimensions_mm && typeof jd.object_dimensions_mm.x === 'number') {
-                        dimensionsDisplay = `${jd.object_dimensions_mm.x.toFixed(0)}x${jd.object_dimensions_mm.y.toFixed(0)}x${jd.object_dimensions_mm.z.toFixed(0)} mm`;
+                printerDataArray.forEach((printer, i) => {
+                    const deviceId = printer.deviceId;
+                    if (!deviceId) {
+                        console.warn("Received printer data without deviceId:", printer);
+                        return;
                     }
-                }
+                    receivedDeviceIds.add(deviceId);
 
-                let cardElement = document.getElementById(`card-${deviceId}`);
+                    // --- Get all data for rendering (with defaults) ---
+                    const status = printer.currentStatus || 'Unknown';
+                    const statusClass = getStatusClass(status);
+                    const kwhText = (typeof printer.jobKwhConsumed === 'number') ? `${printer.jobKwhConsumed.toFixed(3)} kWh` : 'N/A';
+                    let materialText = printer.currentMaterial || 'Unknown';
+                    if (materialText === '---') materialText = 'Unknown';
+                    const isMaterialPlaceholder = (materialText === 'Unknown');
+                    const materialIconColor = isMaterialPlaceholder ? 'var(--gray-400)' : 'var(--secondary)';
+                    const model = printer.model || 'Unknown Model';
+                    const friendlyName = printer.friendlyName || deviceId;
+                    const sizeCategory = printer.sizeCategory || 'Unknown';
+                    const nozzleTemp = typeof printer.currentNozzleTemp === 'number' ? `${printer.currentNozzleTemp.toFixed(0)}°C` : '--°C';
+                    const bedTemp = typeof printer.currentBedTemp === 'number' ? `${printer.currentBedTemp.toFixed(0)}°C` : '--°C';
+                    const nozzleTarget = typeof printer.targetNozzleTemp === 'number' ? `${printer.targetNozzleTemp.toFixed(0)}°C` : '--°C';
+                    const bedTarget = typeof printer.targetBedTemp === 'number' ? `${printer.targetBedTemp.toFixed(0)}°C` : '--°C';
+                    const showNozzleTarget = typeof printer.targetNozzleTemp === 'number' && printer.targetNozzleTemp > 0 && (printer.targetNozzleTemp !== printer.currentNozzleTemp || status.toLowerCase() === 'heating');
+                    const showBedTarget = typeof printer.targetBedTemp === 'number' && printer.targetBedTemp > 0 && (printer.targetBedTemp !== printer.currentBedTemp || status.toLowerCase() === 'heating');
+                    const nozzleDisplay = nozzleTemp + (showNozzleTarget ? ` / ${nozzleTarget}` : '');
+                    const bedDisplay = bedTemp + (showBedTarget ? ` / ${bedTarget}` : '');
+                    const tempsText = `<i class="fas fa-temperature-high" style="color: var(--danger);"></i> Nzl: ${nozzleDisplay} | <i class="fas fa-bed" style="color: var(--warning);"></i> Bed: ${bedDisplay}`;
 
-                // --- NEW, ROBUST RENDERING LOGIC ---
-                if (!cardElement) {
-                    // 1. CARD DOES NOT EXIST: CREATE IT AND INJECT FULL HTML ONCE
-                    cardElement = document.createElement('div');
-                    cardElement.className = 'printer-card swiper-slide';
-                    cardElement.id = `card-${deviceId}`;
+                    // This flag is now only for minor details, not for showing the whole box.
+                    const isPrintingNow = printer.isPrintingNow === true || status.toLowerCase() === 'printing' || status.toLowerCase() === 'heating' || status.toLowerCase() === 'operational';
 
-                    const cardHTML = `
+                    const jobFilename = printer.jobFilename; // Let it be null if not present
+                    const progressPercent = typeof printer.jobProgressPercent === 'number' ? Math.max(0, Math.min(100, printer.jobProgressPercent)) : 0;
+                    const timeLeftSeconds = printer.jobTimeLeftSeconds;
+                    let progressText = `${progressPercent.toFixed(0)}%`;
+                    if (typeof timeLeftSeconds === 'number' && timeLeftSeconds > 0) {
+                        const hours = Math.floor(timeLeftSeconds / 3600);
+                        const minutes = Math.floor((timeLeftSeconds % 3600) / 60);
+                        progressText += ` (${hours > 0 ? hours + 'h ' : ''}${minutes}m left)`;
+                    } else if (isPrintingNow && typeof progressPercent === 'number' && progressPercent < 100) {
+                        progressText += " (Calculating...)";
+                    } else if (progressPercent >= 100 && (status.toLowerCase() === 'completed' || status.toLowerCase() === 'cooling')) {
+                        progressText = '100% (Completed)';
+                    }
+                    const jobEnergyText = (typeof printer.jobKwhConsumed === 'number') ? `Energy: ${printer.jobKwhConsumed.toFixed(3)} kWh` : 'Energy: -- kWh';
+                    const plantType = printer.plant_type;
+                    const plantStage = printer.plantStage;
+                    const initialPlantImageSrc = getPlantImageSrc(plantType, plantStage);
+                    const printTimeMinutes = printer.printTimeSeconds ? Math.round(printer.printTimeSeconds / 60) : null;
+                    const printTimeText = printTimeMinutes !== null ? `${printTimeMinutes} min` : "N/A";
+                    const filamentUsageText = (typeof printer.lastJobFilamentGrams === 'number') ? `${printer.lastJobFilamentGrams.toFixed(2)} g` : "N/A";
+                    const lastJobEnergyText = (typeof printer.lastJobKwh === 'number' && printer.lastJobKwh > 0) ? `${printer.lastJobKwh.toFixed(3)} kWh` : "N/A";
+                    let objectNameDisplay = "--", infillDensityDisplay = "--", layerHeightDisplay = "--", dimensionsDisplay = "--x--x-- mm";
+                    let showExtraJobDetails = false;
+                    if (isPrintingNow && printer.job_details) {
+                        const jd = printer.job_details;
+                        showExtraJobDetails = true;
+                        objectNameDisplay = jd.object_name || jobFilename;
+                        if (typeof jd.infill_density_percent === 'number') infillDensityDisplay = jd.infill_density_percent.toFixed(0);
+                        if (typeof jd.layer_height_mm === 'number') layerHeightDisplay = jd.layer_height_mm.toFixed(2);
+                        if (jd.object_dimensions_mm && typeof jd.object_dimensions_mm.x === 'number') {
+                            dimensionsDisplay = `${jd.object_dimensions_mm.x.toFixed(0)}x${jd.object_dimensions_mm.y.toFixed(0)}x${jd.object_dimensions_mm.z.toFixed(0)} mm`;
+                        }
+                    }
+
+                    let cardElement = document.getElementById(`card-${deviceId}`);
+
+                    // --- NEW, ROBUST RENDERING LOGIC ---
+                    if (!cardElement) {
+                        // 1. CARD DOES NOT EXIST: CREATE IT AND INJECT FULL HTML ONCE
+                        cardElement = document.createElement('div');
+                        cardElement.className = 'printer-card swiper-slide';
+                        cardElement.id = `card-${deviceId}`;
+
+                        const cardHTML = `
                 <div class="card-face card-face-front">
                     <div class="card-header">
                         <div class="name-model">
@@ -1664,466 +1417,399 @@
                 <!-- ===== END OF CORRECTION ===== -->
             `;
 
-                    cardElement.innerHTML = cardHTML;
-                    cardGrid.appendChild(cardElement);
-                }
-
-                const originals = Array.from(
-                    cardGrid.querySelectorAll('.printer-card:not(.swiper-slide-duplicate)')
-                );
-
-                const anchor = originals[i] || null;
-
-                if (anchor !== cardElement) {
-                    cardGrid.insertBefore(cardElement, anchor);
-                }
-
-                // --- ALWAYS UPDATE DYNAMIC CONTENT ---
-                const statusElement = cardElement.querySelector('.card-status');
-                if (statusElement.textContent !== status || !statusElement.classList.contains(statusClass)) {
-                    statusElement.textContent = status;
-                    statusElement.className = `card-status ${statusClass}`;
-                }
-                cardElement.querySelector('.card-friendly-name').textContent = friendlyName;
-                cardElement.querySelector('.card-model').textContent = model;
-                const materialTextElement = cardElement.querySelector('.card-material .text-value');
-                if (materialTextElement.textContent !== materialText) {
-                    materialTextElement.textContent = materialText;
-                    cardElement.querySelector('.card-material .fa-tint').style.color = materialIconColor;
-                    cardElement.querySelector('.card-material').setAttribute('title', isMaterialPlaceholder ? 'Material not detected' : '');
-                }
-                const kwhTextElement = cardElement.querySelector('.card-kwh .text-value');
-                if (kwhTextElement.textContent !== kwhText) {
-                    kwhTextElement.textContent = kwhText;
-                    cardElement.querySelector('.card-kwh .fa-bolt').style.color = (kwhText === 'N/A' ? 'var(--gray-400)' : 'var(--primary)');
-                }
-                cardElement.querySelector('.card-size .text-value').textContent = sizeCategory;
-                cardElement.querySelector('.card-temps').innerHTML = tempsText;
-                cardElement.querySelector('.last-job-time').innerHTML = `<i class="fas fa-clock" style="color: var(--secondary);"></i> Time: ${printTimeText}`;
-                cardElement.querySelector('.last-job-filament').innerHTML = `<i class="fas fa-ruler-vertical" style="color: var(--secondary);"></i> Filament: ${filamentUsageText}`;
-                cardElement.querySelector('.last-job-energy').innerHTML = `<i class="fas fa-bolt" style="color: var(--secondary);"></i> Energy: ${lastJobEnergyText}`;
-
-                // --- CORE FIX: Update visibility based on jobFilename ---
-                const jobInfoSection = cardElement.querySelector('.job-info');
-                const shouldShowJobInfo = jobFilename && jobFilename !== '--';
-                jobInfoSection.style.display = shouldShowJobInfo ? 'block' : 'none';
-
-                if (shouldShowJobInfo) {
-                    cardElement.querySelector('.job-filename').textContent = jobFilename;
-                    const barFill = cardElement.querySelector('.progress-bar-fill');
-
-                    console.log("barFill", barFill);
-                    console.log("progressPercent", progressPercent);
-
-                    updateProgressBar(barFill, progressPercent);
-                    cardElement.querySelector('.job-progress-text').textContent = progressText;
-                    //     cardElement.querySelector('.job-energy').textContent = jobEnergyText;
-
-                    const jobExtraDetailsDiv = cardElement.querySelector('.job-extra-details');
-                    jobExtraDetailsDiv.style.display = showExtraJobDetails ? 'block' : 'none';
-                    if (showExtraJobDetails) {
-                        jobExtraDetailsDiv.querySelector('.job-object-name-display .value').textContent = objectNameDisplay;
-                        jobExtraDetailsDiv.querySelector('.job-infill .value').textContent = infillDensityDisplay;
-                        jobExtraDetailsDiv.querySelector('.job-layer-height .value').textContent = layerHeightDisplay;
-                        jobExtraDetailsDiv.querySelector('.job-dimensions .value').textContent = dimensionsDisplay;
+                        cardElement.innerHTML = cardHTML;
+                        cardGrid.appendChild(cardElement);
                     }
 
-                    // --- Handle 3D Preview Canvas (using .bed-scene-wrapper) ---
-                    const bedWrapper = cardElement.querySelector('.bed-scene-wrapper');
-                    let canvas = bedWrapper ? bedWrapper.querySelector('.card-3d-preview') : null;
+                    const originals = Array.from(
+                        cardGrid.querySelectorAll('.printer-card:not(.swiper-slide-duplicate)')
+                    );
 
-                    if (printer.gcodePath) {
-                        if (!canvas && bedWrapper) {
-                            canvas = document.createElement('canvas');
-                            canvas.className = 'card-3d-preview';
-                            bedWrapper.appendChild(canvas);
-                        }
-                        if (canvas) {
-                            canvas.width = printer.bedWidth + 40;
-                            canvas.height = 200;
-                            canvas.dataset.bedWidth = printer.bedWidth;
-                            canvas.dataset.bedDepth = printer.bedDepth;
-                            canvas.dataset.apiKey = printer.gcode_preview_api_key;
-                            canvas.dataset.gcodeUrl = printer.gcodePath;
-                            // No need for left/top anymore! Flexbox centers it.
-                            init3DPreview(canvas);
-                        }
-                    } else if (canvas) {
-                        canvas.remove();
+                    const anchor = originals[i] || null;
+
+                    if (anchor !== cardElement) {
+                        cardGrid.insertBefore(cardElement, anchor);
                     }
-                }
 
-                // --- NEW: Render Print History ---
-                const historyListElement = cardElement.querySelector('.history-list');
-                const historyBoxElement = cardElement.querySelector('.history-box');
-                const historyData = printer.history || [];
+                    // --- ALWAYS UPDATE DYNAMIC CONTENT ---
+                    const statusElement = cardElement.querySelector('.card-status');
+                    if (statusElement.textContent !== status || !statusElement.classList.contains(statusClass)) {
+                        statusElement.textContent = status;
+                        statusElement.className = `card-status ${statusClass}`;
+                    }
+                    cardElement.querySelector('.card-friendly-name').textContent = friendlyName;
+                    cardElement.querySelector('.card-model').textContent = model;
+                    const materialTextElement = cardElement.querySelector('.card-material .text-value');
+                    if (materialTextElement.textContent !== materialText) {
+                        materialTextElement.textContent = materialText;
+                        cardElement.querySelector('.card-material .fa-tint').style.color = materialIconColor;
+                        cardElement.querySelector('.card-material').setAttribute('title', isMaterialPlaceholder ? 'Material not detected' : '');
+                    }
+                    const kwhTextElement = cardElement.querySelector('.card-kwh .text-value');
+                    if (kwhTextElement.textContent !== kwhText) {
+                        kwhTextElement.textContent = kwhText;
+                        cardElement.querySelector('.card-kwh .fa-bolt').style.color = (kwhText === 'N/A' ? 'var(--gray-400)' : 'var(--primary)');
+                    }
+                    cardElement.querySelector('.card-size .text-value').textContent = sizeCategory;
+                    cardElement.querySelector('.card-temps').innerHTML = tempsText;
+                    cardElement.querySelector('.last-job-time').innerHTML = `<i class="fas fa-clock" style="color: var(--secondary);"></i> Time: ${printTimeText}`;
+                    cardElement.querySelector('.last-job-filament').innerHTML = `<i class="fas fa-ruler-vertical" style="color: var(--secondary);"></i> Filament: ${filamentUsageText}`;
+                    cardElement.querySelector('.last-job-energy').innerHTML = `<i class="fas fa-bolt" style="color: var(--secondary);"></i> Energy: ${lastJobEnergyText}`;
 
-                if (historyListElement && historyBoxElement) {
-                    if (historyData.length > 0) {
-                        let historyHTML = '';
-                        historyData.forEach(job => {
-                            const energy = (typeof job.session_energy_wh === 'number')
-                                ? (job.session_energy_wh / 1000).toFixed(3)
-                                : 'N/A';
-                            historyHTML += `
+                    // --- CORE FIX: Update visibility based on jobFilename ---
+                    const jobInfoSection = cardElement.querySelector('.job-info');
+                    const shouldShowJobInfo = jobFilename && jobFilename !== '--';
+                    jobInfoSection.style.display = shouldShowJobInfo ? 'block' : 'none';
+
+                    if (shouldShowJobInfo) {
+                        cardElement.querySelector('.job-filename').textContent = jobFilename;
+                        const barFill = cardElement.querySelector('.progress-bar-fill');
+
+                        console.log("barFill", barFill);
+                        console.log("progressPercent", progressPercent);
+
+                        updateProgressBar(barFill, progressPercent);
+                        cardElement.querySelector('.job-progress-text').textContent = progressText;
+                        //     cardElement.querySelector('.job-energy').textContent = jobEnergyText;
+
+                        const jobExtraDetailsDiv = cardElement.querySelector('.job-extra-details');
+                        jobExtraDetailsDiv.style.display = showExtraJobDetails ? 'block' : 'none';
+                        if (showExtraJobDetails) {
+                            jobExtraDetailsDiv.querySelector('.job-object-name-display .value').textContent = objectNameDisplay;
+                            jobExtraDetailsDiv.querySelector('.job-infill .value').textContent = infillDensityDisplay;
+                            jobExtraDetailsDiv.querySelector('.job-layer-height .value').textContent = layerHeightDisplay;
+                            jobExtraDetailsDiv.querySelector('.job-dimensions .value').textContent = dimensionsDisplay;
+                        }
+
+                        // --- Handle 3D Preview Canvas (using .bed-scene-wrapper) ---
+                        const bedWrapper = cardElement.querySelector('.bed-scene-wrapper');
+                        let canvas = bedWrapper ? bedWrapper.querySelector('.card-3d-preview') : null;
+
+                        if (printer.gcodePath) {
+                            if (!canvas && bedWrapper) {
+                                canvas = document.createElement('canvas');
+                                canvas.className = 'card-3d-preview';
+                                bedWrapper.appendChild(canvas);
+                            }
+                            if (canvas) {
+                                canvas.width = printer.bedWidth + 40;
+                                canvas.height = 200;
+                                canvas.dataset.bedWidth = printer.bedWidth;
+                                canvas.dataset.bedDepth = printer.bedDepth;
+                                canvas.dataset.apiKey = printer.gcode_preview_api_key;
+                                canvas.dataset.gcodeUrl = printer.gcodePath;
+                                // No need for left/top anymore! Flexbox centers it.
+                                init3DPreview(canvas);
+                            }
+                        } else if (canvas) {
+                            canvas.remove();
+                        }
+                    }
+
+                    // --- NEW: Render Print History ---
+                    const historyListElement = cardElement.querySelector('.history-list');
+                    const historyBoxElement = cardElement.querySelector('.history-box');
+                    const historyData = printer.history || [];
+
+                    if (historyListElement && historyBoxElement) {
+                        if (historyData.length > 0) {
+                            let historyHTML = '';
+                            historyData.forEach(job => {
+                                const energy = (typeof job.session_energy_wh === 'number')
+                                    ? (job.session_energy_wh / 1000).toFixed(3)
+                                    : 'N/A';
+                                historyHTML += `
                                 <li>
                                     <span class="history-filename" title="${job.filename}">${job.filename}</span>
                                     <span class="history-energy">${energy} kWh</span>
                                 </li>
                             `;
-                        });
-                        historyListElement.innerHTML = historyHTML;
-                        historyBoxElement.style.display = 'block'; // Show the history box
-                    } else {
-                        historyListElement.innerHTML = '<li>No recent completed jobs.</li>';
-                        // Or optionally hide it completely:
-                        // historyBoxElement.style.display = 'none'; 
+                            });
+                            historyListElement.innerHTML = historyHTML;
+                            historyBoxElement.style.display = 'block'; // Show the history box
+                        } else {
+                            historyListElement.innerHTML = '<li>No recent completed jobs.</li>';
+                            // Or optionally hide it completely:
+                            // historyBoxElement.style.display = 'none';
+                        }
                     }
-                }
 
-                // --- NEW: Render Per-Part Analysis on Card Front ---
-const analysisContainerFront = cardElement.querySelector('.per-part-analysis-front');
-// We get this data from the main printer object now
-const lastJobAnalysis = printer.lastJobPerPartAnalysis; 
+                    // --- NEW: Render Per-Part Analysis on Card Front ---
+                    const analysisContainerFront = cardElement.querySelector('.per-part-analysis-front');
+                    // We get this data from the main printer object now
+                    const lastJobAnalysis = printer.lastJobPerPartAnalysis;
 
-if (analysisContainerFront && lastJobAnalysis && lastJobAnalysis.parts && lastJobAnalysis.parts.length > 1) {
-    let analysisHTML = '<h5>Part Breakdown (Est.)</h5><ul>';
-    const totalJobKwh = printer.lastJobKwh || 0;
+                    if (analysisContainerFront && lastJobAnalysis && lastJobAnalysis.parts && lastJobAnalysis.parts.length > 1) {
+                        let analysisHTML = '<h5>Part Breakdown (Est.)</h5><ul>';
+                        const totalJobKwh = printer.lastJobKwh || 0;
 
-    lastJobAnalysis.parts.forEach(part => {
-        const partKwh = totalJobKwh * part.energy_percentage;
-        analysisHTML += `
+                        lastJobAnalysis.parts.forEach(part => {
+                            const partKwh = totalJobKwh * part.energy_percentage;
+                            analysisHTML += `
             <li>
                 <span class="part-name">${part.name}</span>
                 <span class="part-energy">${partKwh.toFixed(3)} kWh</span>
             </li>
         `;
-    });
+                        });
 
-    analysisHTML += '</ul>';
-    analysisContainerFront.innerHTML = analysisHTML;
-    analysisContainerFront.style.display = 'block';
-} else if (analysisContainerFront) {
-    analysisContainerFront.innerHTML = ''; // Clear it out
-    analysisContainerFront.style.display = 'none'; // Hide if no data or only one part
-}
+                        analysisHTML += '</ul>';
+                        analysisContainerFront.innerHTML = analysisHTML;
+                        analysisContainerFront.style.display = 'block';
+                    } else if (analysisContainerFront) {
+                        analysisContainerFront.innerHTML = ''; // Clear it out
+                        analysisContainerFront.style.display = 'none'; // Hide if no data or only one part
+                    }
 
-                const tipSectionElement = cardElement.querySelector('.card-tip-section');
-                const tipContentElement = tipSectionElement.querySelector('.tip-content');
-                const newTipText = printer.tipText || "";
-                if (newTipText) {
-                    if (tipContentElement.textContent !== newTipText) tipContentElement.textContent = newTipText;
-                    tipSectionElement.style.display = 'block';
-                } else {
-                    tipSectionElement.style.display = 'none';
-                }
-                const frontFace = cardElement.querySelector('.card-face-front');
-                const newPlantImageSrc = getPlantImageSrc(printer.plant_type, printer.plantStage);
-                const newUrlStyle = `url("${newPlantImageSrc}")`;
-                if (frontFace.style.backgroundImage !== newUrlStyle) {
-                    frontFace.style.backgroundImage = `url('${newPlantImageSrc}')`;
-                }
-
-                cardElement.dataset.stale = "false";
-            });
-
-            existingCardElements.forEach(card => {
-                if (card.dataset.stale === 'true') card.remove();
-            });
-        } // End renderCards function
-
-        // --- Fetch Data Function ---
-
-        // Function now reads the global 'currentScenario'
-        async function fetchDppData() {
-            const prevIndex = swiper ? swiper.realIndex : 0;
-            let prevActiveId = null;
-            if (swiper && swiper.slides[swiper.activeIndex]) {
-                prevActiveId = swiper.slides[swiper.activeIndex].getAttribute('id');
-            }
-
-            showLoading(); // Show loading indicator at the start of fetch
-
-            try {
-                let apiUrl = API_ENDPOINT; // Original endpoint
-                if (currentScenario && currentScenario !== 'live') {
-                    apiUrl += `?scenario=${encodeURIComponent(currentScenario)}`;
-                }
-
-                const response = await fetch(apiUrl);
-                if (!response.ok) {
-                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
-                }
-
-                // The API now returns an object: { printers: [...], globalHistory: [...] }
-                const responseData = await response.json();
-                console.log("Received Combined Data:", responseData);
-
-                // New validation for the object format
-                if (!responseData || !Array.isArray(responseData.printers)) {
-                    throw new Error("Invalid data format received from API. Expected an object with a 'printers' array.");
-                }
-
-                // Populate both caches from the single response
-                globalPrinterDataCache = responseData.printers;
-                globalHistoryCache = responseData.globalHistory || [];
-
-                // Render both sections of the UI
-                renderCards(globalPrinterDataCache);
-                renderHistoryTable();
-
-                // Initialize Swiper only on the first successful data load
-                if (!swiper) {
-                    initSwiper();
-                }
-
-                hideLoading();
-                firstLoadDone = true;
-
-            } catch (error) {
-                console.error("Error fetching or rendering data:", error);
-                displayError(`Failed to load data: ${error.message}`);
-                hideLoading(); // Ensure loading is hidden even on error
-            }
-
-            // This block correctly updates the Swiper UI AFTER the DOM has been changed
-            if (swiper) {
-                swiper.updateSlides();
-                swiper.update();
-                if (swiper.params.loop) swiper.loopCreate();
-                swiper.updateSlidesClasses();
-
-                let target = 0;
-                if (!resetOnNextUpdate && prevActiveId) {
-                    const idx = [...swiper.slides].findIndex(
-                        s => s.getAttribute('id') === prevActiveId
-                    );
-                    if (idx !== -1) target = idx;
-                }
-                swiper.slideToLoop(target, 0, false);
-                resetOnNextUpdate = false;
-
-                updateActiveTipBanner();
-            }
-        }
-
-        // --- Initial Load & Auto-Refresh ---
-        document.addEventListener('DOMContentLoaded', () => {
-            // Set initial state (default is 'live')
-            currentScenario = 'live';
-            // Find and highlight the default 'live' button
-            const defaultLiveButton = document.querySelector('.simulation-buttons button.sim-btn[data-scenario="live"]');
-            if (defaultLiveButton) {
-                defaultLiveButton.classList.add('active-sim');
-            }
-
-            cardGrid.addEventListener('click', function (event) {
-                // ===== ADD THIS LINE FOR DEBUGGING =====
-                console.log("Card grid was clicked!", event.target);
-                // =======================================
-
-                const clickedElement = event.target;
-                const printerCard = clickedElement.closest('.printer-card');
-
-                if (!printerCard) {
-                    return; // Click was not inside any printer card
-                }
-
-                // Handle flip to back (when "Detailed Analysis" or its icon is clicked)
-                // Updated to check for the link itself or its child (like the icon)
-                if (clickedElement.classList.contains('flip-to-back-link') || clickedElement.closest('.flip-to-back-link')) {
-                    event.preventDefault(); // Prevent default link behavior if it's an <a> tag
-
-                    // Toggle flip: if already flipped, unflip; otherwise, flip.
-                    // This allows clicking the same link to flip back and forth if desired,
-                    // or you can make it one-way and rely on the back button.
-                    // For now, let's make it a toggle, but primarily driven by the front link.
-                    if (printerCard.classList.contains('is-flipped')) {
-                        // If you want the front link to also unflip, keep this.
-                        // Otherwise, remove this part if only the back button unflips.
-                        // printerCard.classList.remove('is-flipped');
+                    const tipSectionElement = cardElement.querySelector('.card-tip-section');
+                    const tipContentElement = tipSectionElement.querySelector('.tip-content');
+                    const newTipText = printer.tipText || "";
+                    if (newTipText) {
+                        if (tipContentElement.textContent !== newTipText) tipContentElement.textContent = newTipText;
+                        tipSectionElement.style.display = 'block';
                     } else {
-                        printerCard.classList.add('is-flipped');
-                        const deviceId = printerCard.id.replace('card-', ''); // Get deviceId from card's ID
-                        populateCardBack(printerCard, deviceId); // Populate the back of THIS card
+                        tipSectionElement.style.display = 'none';
                     }
+                    const frontFace = cardElement.querySelector('.card-face-front');
+                    const newPlantImageSrc = getPlantImageSrc(printer.plant_type, printer.plantStage);
+                    const newUrlStyle = `url("${newPlantImageSrc}")`;
+                    if (frontFace.style.backgroundImage !== newUrlStyle) {
+                        frontFace.style.backgroundImage = `url('${newPlantImageSrc}')`;
+                    }
+
+                    cardElement.dataset.stale = "false";
+                });
+
+                existingCardElements.forEach(card => {
+                    if (card.dataset.stale === 'true') card.remove();
+                });
+            } // End renderCards function
+
+            // --- Fetch Data Function ---
+
+            // Function now reads the global 'currentScenario'
+            async function fetchDppData() {
+                showLoading(); // Show loading indicator at the start of fetch
+
+                try {
+
+                    const response = await fetch(API_ENDPOINT);
+
+                    if (!response.ok) {
+                        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                    }
+
+                    // The API now returns an object: { printers: [...], globalHistory: [...] }
+                    const responseData = await response.json();
+                    console.log("Received Combined Data:", responseData);
+
+                    // New validation for the object format
+                    if (!responseData || !Array.isArray(responseData.printers)) {
+                        throw new Error("Invalid data format received from API. Expected an object with a 'printers' array.");
+                    }
+
+                    // Populate both caches from the single response
+                    globalPrinterDataCache = responseData.printers;
+                    globalHistoryCache = responseData.globalHistory || [];
+
+                    // Render both sections of the UI
+                    renderCards(globalPrinterDataCache);
+                    renderHistoryTable();
+
+                    // Initialize Swiper only on the first successful data load
+                    if (!swiper) {
+                        initSwiper();
+                    }
+
+                    hideLoading();
+                    firstLoadDone = true;
+
+                } catch (error) {
+                    console.error("Error fetching or rendering data:", error);
+                    displayError(`Failed to load data: ${error.message}`);
+                    hideLoading(); // Ensure loading is hidden even on error
                 }
 
-                // Handle flip to front (when the "Back to Overview" button on the back face is clicked)
-                if (clickedElement.classList.contains('flip-to-front-btn')) {
-                    event.preventDefault(); // Although it's a button, good practice
-                    printerCard.classList.remove('is-flipped');
+                if (swiper) {
+                    swiper.update();
+                    updateActiveTipBanner();
                 }
+
+            }
+
+            // --- Initial Load & Auto-Refresh ---
+            document.addEventListener('DOMContentLoaded', () => {
+                cardGrid.addEventListener('click', function (event) {
+
+                    const clickedElement = event.target;
+                    const printerCard = clickedElement.closest('.printer-card');
+
+                    if (!printerCard) {
+                        return; // Click was not inside any printer card
+                    }
+
+                    // Handle flip to back (when "Detailed Analysis" or its icon is clicked)
+                    // Updated to check for the link itself or its child (like the icon)
+                    if (clickedElement.classList.contains('flip-to-back-link') || clickedElement.closest('.flip-to-back-link')) {
+                        event.preventDefault(); // Prevent default link behavior if it's an <a> tag
+
+                        // Toggle flip: if already flipped, unflip; otherwise, flip.
+                        // This allows clicking the same link to flip back and forth if desired,
+                        // or you can make it one-way and rely on the back button.
+                        // For now, let's make it a toggle, but primarily driven by the front link.
+                        if (printerCard.classList.contains('is-flipped')) {
+                            // If you want the front link to also unflip, keep this.
+                            // Otherwise, remove this part if only the back button unflips.
+                            // printerCard.classList.remove('is-flipped');
+                        } else {
+                            printerCard.classList.add('is-flipped');
+                            const deviceId = printerCard.id.replace('card-', ''); // Get deviceId from card's ID
+                            populateCardBack(printerCard, deviceId); // Populate the back of THIS card
+                        }
+                    }
+
+                    // Handle flip to front (when the "Back to Overview" button on the back face is clicked)
+                    if (clickedElement.classList.contains('flip-to-front-btn')) {
+                        event.preventDefault(); // Although it's a button, good practice
+                        printerCard.classList.remove('is-flipped');
+                    }
+                    const searchInput = document.getElementById('history-search');
+                    const tableHeaders = document.querySelectorAll('#global-history-table th');
+
+                    searchInput.addEventListener('input', renderHistoryTable);
+                    tableHeaders.forEach(header => {
+                        header.addEventListener('click', () => handleSort(header.dataset.sort));
+                    });
+
+
+                });
+
+
+                // --- Auto-Refresh Setup ---
+                let refreshIntervalId = null; // Variable to hold the interval ID
+
+                function startAutoRefresh() {
+                    if (refreshIntervalId !== null) {
+                        clearInterval(refreshIntervalId); // Clear any existing interval first
+                    }
+                    if (REFRESH_INTERVAL_MS && REFRESH_INTERVAL_MS > 0) {
+                        console.log(`Setting auto-refresh interval to ${REFRESH_INTERVAL_MS}ms`);
+                        // Set the interval to call fetchDppData periodically
+                        refreshIntervalId = setInterval(fetchDppData, REFRESH_INTERVAL_MS);
+                    } else {
+                        console.log("Auto-refresh is disabled.");
+                    }
+                }
+                fetchDppData(); // Fetch data when page loads (will use currentScenario = 'live')
+                // Start auto-refresh on page load
+                startAutoRefresh();
+
+            });
+
+            function initSwiper() {
+                swiper = new Swiper('.myCarousel', {
+                    loop: false,
+                    grabCursor: true,
+                    simulateTouch: true,
+                    effect: 'coverflow',
+                    centeredSlides: true,
+                    slidesPerView: 'auto',
+                    spaceBetween: -120,
+
+                    // --- ADD THESE TWO LINES TO FIX THE CLICK ISSUE ---
+                    preventClicks: false,
+                    preventClicksPropagation: false,
+                    // -------------------------------------------------
+
+                    observer: true,
+                    observeParents: true,
+                    observeSlideChildren: true,
+                    navigation: {
+                        nextEl: '.swiper-button-next',
+                        prevEl: '.swiper-button-prev',
+                    },
+                    breakpoints: {
+                        0: { slidesPerView: 1, spaceBetween: 0 },
+                        641: { slidesPerView: 'auto', spaceBetween: -120 },
+                    },
+                    on: {
+                        init: updateActiveTipBanner,
+                        slideChange: updateActiveTipBanner,
+                    }
+                });
+            }
+
+
+            function updateActiveTipBanner() {
+                // Wait until Swiper is fully initialized
+                if (!swiper || !swiper.initialized) {
+                    // If not ready, try again in a moment. This prevents errors on initial load.
+                    return setTimeout(updateActiveTipBanner, 50);
+                }
+
+                // Find the HTML element for the currently active slide
+                const activeSlide = swiper.slides[swiper.activeIndex];
+                if (!activeSlide) return; // Exit if there's no active slide
+
+                // Get the unique ID of the slide (e.g., "card-Ender-3-Pro-1")
+                const slideId = activeSlide.id;
+                // Extract the deviceId from the slide's ID
+                const deviceId = slideId.replace('card-', '');
+
+                // Find the complete data object for this specific printer from our cached data
+                const printerData = globalPrinterDataCache.find(p => p.deviceId === deviceId);
+
+                // Extract the tip text from the data object. This comes from your Python script.
+                const tipText = printerData ? printerData.tipText : '';
+
+                // Get the HTML elements for the banner and its text
+                const banner = document.getElementById('carousel-tip-banner');
+                const bannerText = document.getElementById('tip-text');
+
+                // If a valid tip exists, display it in the banner
+                if (tipText && banner && bannerText) {
+                    bannerText.textContent = tipText;
+                    banner.style.display = 'flex'; // Make the banner visible
+                }
+                // Otherwise, hide the banner
+                else if (banner) {
+                    banner.style.display = 'none';
+                }
+            }
+
+            // --- NEW: Global History Functions ---
+            function renderHistoryTable() {
+                const tableBody = document.getElementById('history-table-body');
                 const searchInput = document.getElementById('history-search');
-                const tableHeaders = document.querySelectorAll('#global-history-table th');
+                if (!tableBody || !searchInput) return;
 
-                searchInput.addEventListener('input', renderHistoryTable);
-                tableHeaders.forEach(header => {
-                    header.addEventListener('click', () => handleSort(header.dataset.sort));
+                const searchTerm = searchInput.value.toLowerCase();
+
+                const filteredData = globalHistoryCache.filter(job =>
+                    job.printerName.toLowerCase().includes(searchTerm) ||
+                    job.filename.toLowerCase().includes(searchTerm)
+                );
+
+                filteredData.sort((a, b) => {
+                    const valA = a[currentSort.key];
+                    const valB = b[currentSort.key];
+                    if (valA === null) return 1;
+                    if (valB === null) return -1;
+                    let comparison = 0;
+                    if (valA > valB) comparison = 1;
+                    else if (valA < valB) comparison = -1;
+                    return currentSort.direction === 'desc' ? comparison * -1 : comparison;
                 });
 
-
-            });
-
-
-
-            // --- Simulation Button Logic ---
-            const simButtons = document.querySelectorAll('.simulation-buttons button.sim-btn');
-            let currentActiveSimButton = defaultLiveButton; // Track the currently active button element
-
-            simButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const scenarioFromButton = this.dataset.scenario;
-                    resetOnNextUpdate = true;
-                    // Remove active style from previously active button
-                    if (currentActiveSimButton) {
-                        currentActiveSimButton.classList.remove('active-sim');
-                    }
-                    // Add active style to clicked button
-                    this.classList.add('active-sim');
-                    currentActiveSimButton = this; // Update current active element
-
-                    // UPDATE THE GLOBAL SCENARIO VARIABLE
-                    currentScenario = scenarioFromButton;
-
-                    // Fetch data for the newly selected scenario (which fetchDppData now reads)
-                    fetchDppData();
-                });
-            });
-            // --- End Simulation Button Logic ---
-
-            // --- Auto-Refresh Setup ---
-            let refreshIntervalId = null; // Variable to hold the interval ID
-
-            function startAutoRefresh() {
-                if (refreshIntervalId !== null) {
-                    clearInterval(refreshIntervalId); // Clear any existing interval first
+                if (filteredData.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="5">No matching jobs found.</td></tr>`;
+                    return;
                 }
-                if (REFRESH_INTERVAL_MS && REFRESH_INTERVAL_MS > 0) {
-                    console.log(`Setting auto-refresh interval to ${REFRESH_INTERVAL_MS}ms`);
-                    // Set the interval to call fetchDppData periodically
-                    refreshIntervalId = setInterval(fetchDppData, REFRESH_INTERVAL_MS);
-                } else {
-                    console.log("Auto-refresh is disabled.");
-                }
-            }
-            fetchDppData(); // Fetch data when page loads (will use currentScenario = 'live')
-            // Start auto-refresh on page load
-            startAutoRefresh();
 
-            // Note: We don't stop/restart the interval on button clicks here.
-            // The fetchDppData function *already uses* the updated `currentScenario`
-            // so the next time the interval triggers, it will fetch the correct data.
-            // If you wanted to *immediately* refresh on button click AND keep the interval,
-            // you would just call fetchDppData() after updating currentScenario, which we do.
-            // Clearing and restarting might be useful if switching scenarios should reset the refresh timer,
-            // but for now, just letting it trigger when it's due is simpler and sufficient.
-        });
-
-        function initSwiper() {
-            swiper = new Swiper('.myCarousel', {
-                loop: false,
-                grabCursor: true,
-                simulateTouch: true,
-                effect: 'coverflow',
-                centeredSlides: true,
-                slidesPerView: 'auto',
-                spaceBetween: -120,
-
-                // --- ADD THESE TWO LINES TO FIX THE CLICK ISSUE ---
-                preventClicks: false,
-                preventClicksPropagation: false,
-                // -------------------------------------------------
-
-                observer: true,
-                observeParents: true,
-                observeSlideChildren: true,
-                navigation: {
-                    nextEl: '.swiper-button-next',
-                    prevEl: '.swiper-button-prev',
-                },
-                breakpoints: {
-                    0: { slidesPerView: 1, spaceBetween: 0 },
-                    641: { slidesPerView: 'auto', spaceBetween: -120 },
-                },
-                on: {
-                    init: updateActiveTipBanner,
-                    slideChange: updateActiveTipBanner,
-                }
-            });
-        }
-
-
-        function updateActiveTipBanner() {
-            // Wait until Swiper is fully initialized
-            if (!swiper || !swiper.initialized) {
-                // If not ready, try again in a moment. This prevents errors on initial load.
-                return setTimeout(updateActiveTipBanner, 50);
-            }
-
-            // Find the HTML element for the currently active slide
-            const activeSlide = swiper.slides[swiper.activeIndex];
-            if (!activeSlide) return; // Exit if there's no active slide
-
-            // Get the unique ID of the slide (e.g., "card-Ender-3-Pro-1")
-            const slideId = activeSlide.id;
-            // Extract the deviceId from the slide's ID
-            const deviceId = slideId.replace('card-', '');
-
-            // Find the complete data object for this specific printer from our cached data
-            const printerData = globalPrinterDataCache.find(p => p.deviceId === deviceId);
-
-            // Extract the tip text from the data object. This comes from your Python script.
-            const tipText = printerData ? printerData.tipText : '';
-
-            // Get the HTML elements for the banner and its text
-            const banner = document.getElementById('carousel-tip-banner');
-            const bannerText = document.getElementById('tip-text');
-
-            // If a valid tip exists, display it in the banner
-            if (tipText && banner && bannerText) {
-                bannerText.textContent = tipText;
-                banner.style.display = 'flex'; // Make the banner visible
-            }
-            // Otherwise, hide the banner
-            else if (banner) {
-                banner.style.display = 'none';
-            }
-        }
-
-        // --- NEW: Global History Functions ---
-        function renderHistoryTable() {
-            const tableBody = document.getElementById('history-table-body');
-            const searchInput = document.getElementById('history-search');
-            if (!tableBody || !searchInput) return;
-
-            const searchTerm = searchInput.value.toLowerCase();
-
-            const filteredData = globalHistoryCache.filter(job =>
-                job.printerName.toLowerCase().includes(searchTerm) ||
-                job.filename.toLowerCase().includes(searchTerm)
-            );
-
-            filteredData.sort((a, b) => {
-                const valA = a[currentSort.key];
-                const valB = b[currentSort.key];
-                if (valA === null) return 1;
-                if (valB === null) return -1;
-                let comparison = 0;
-                if (valA > valB) comparison = 1;
-                else if (valA < valB) comparison = -1;
-                return currentSort.direction === 'desc' ? comparison * -1 : comparison;
-            });
-
-            if (filteredData.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="5">No matching jobs found.</td></tr>`;
-                return;
-            }
-
-            tableBody.innerHTML = filteredData.map(job => {
-                const completedDate = job.completedAt ? new Date(job.completedAt).toLocaleString() : 'N/A';
-                const kwh = typeof job.kwh === 'number' ? job.kwh.toFixed(3) : 'N/A';
-                return `
+                tableBody.innerHTML = filteredData.map(job => {
+                    const completedDate = job.completedAt ? new Date(job.completedAt).toLocaleString() : 'N/A';
+                    const kwh = typeof job.kwh === 'number' ? job.kwh.toFixed(3) : 'N/A';
+                    return `
                 <tr>
                     <td class="preview-cell">
                         ${job.thumbnailUrl ? `<img src="${job.thumbnailUrl}" class="history-thumbnail">` : ''}
@@ -2134,158 +1820,146 @@ if (analysisContainerFront && lastJobAnalysis && lastJobAnalysis.parts && lastJo
                     <td>${completedDate}</td>
                 </tr>
             `;
-            }).join('');
-        }
-
-        function handleSort(sortKey) {
-            if (currentSort.key === sortKey) {
-                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-            } else {
-                currentSort.key = sortKey;
-                currentSort.direction = 'desc';
-            }
-            renderHistoryTable();
-        }
-
-
-
-
-        // Initialize one Three.js scene per <canvas class="card-3d-preview">
-        // Initialize one Three.js scene per <canvas class="card-3d-preview">
-        function init3DPreview(canvas) {
-            // --- NEW, SMARTER FLICKER FIX ---
-            const newUrl = canvas.dataset.gcodeUrl;
-            const octo_api_key = canvas.dataset.apiKey;
-            // If the URL is the same as the last one we rendered, do nothing.
-            if (canvas.dataset.renderedUrl === newUrl) {
-                return;
-            }
-            // Store the new URL so we don't re-render it next time.
-            canvas.dataset.renderedUrl = newUrl;
-            // --- END OF FIX ---
-
-            console.log('Initializing 3D preview on canvas:', canvas, 'with URL:', newUrl);
-
-            const bedWidth = +canvas.dataset.bedWidth;
-            const bedDepth = +canvas.dataset.bedDepth;
-
-            // 1) Renderer
-            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-            renderer.setClearColor(0x000000, 0);
-            renderer.setSize(canvas.width, canvas.height);
-
-            const scene = new THREE.Scene();  // <-- Make sure this line is present here!
-            // 2) Scene & Camera
-            const aspect = canvas.width / canvas.height;
-            const camDist = Math.max(bedWidth, bedDepth) * 1.5;
-            const camera = new THREE.PerspectiveCamera(45, aspect, 1, 2000);
-            // Classic isometric view, like slicers
-            camera.position.set(camDist, camDist, camDist * 0.9);
-            camera.lookAt(0, 0, 0);
-
-            scene.add(new THREE.AmbientLight(0xbbbbbb));
-            const dirLight = new THREE.DirectionalLight(0xffffff, 0.65);
-            dirLight.position.set(1, 2, 4);
-            scene.add(dirLight);
-            // 4) Grid bed
-            // 4) Grid bed
-            const size = Math.max(bedWidth, bedDepth);
-            const divisions = Math.floor(size / 10);
-            // Use subtle, clean slicer-like grid colors
-            const grid = new THREE.GridHelper(
-                Math.max(bedWidth, bedDepth),
-                Math.floor(Math.max(bedWidth, bedDepth) / 10),
-                0xbcc3d6,           // medium grey minor lines
-                0xdfe3ec            // very light major lines
-            );
-            scene.add(grid);
-
-
-
-            // 5) Controls
-            const controls = new OrbitControls(camera, renderer.domElement);
-            controls.target.set(0, 0, 0);
-            controls.enablePan = false;
-            controls.enableZoom = true;
-            controls.autoRotate = true;
-            controls.autoRotateSpeed = 0.3; // nice slow spin
-
-            // 6) Placeholder mesh
-            // 6) Load real G-code, replacing the placeholder
-            // 6) Load real G-code, replacing the placeholder (CORRECTED METHOD)
-            //   const octo_api_key = "SowWLwhx8FMncjopPGswdd2Mpi16ko3MbrQeiXb9mwU"; // Your OctoPrint API Key
-
-            // Step 1: Use FileLoader to fetch the text, because it allows setting headers.
-            // Step 1: Use FileLoader to fetch the text, because it allows setting headers.
-            const fileLoader = new FileLoader();
-            if (octo_api_key) {
-                fileLoader.setRequestHeader({ 'X-Api-Key': octo_api_key });
+                }).join('');
             }
 
-            fileLoader.load(
-                canvas.dataset.gcodeUrl, // The URL from your python script
-                // onSuccess callback (this runs when the text is downloaded)
-                // onSuccess callback (this runs when the text is downloaded)
-                // onSuccess callback (this runs when the text is downloaded)
-                function (gcodeText) {
-                    // Step 2: Use GCodeLoader to parse the downloaded text.
-                    const gcodeLoader = new GCodeLoader();
-                    const object = gcodeLoader.parse(gcodeText);
-
-                    const extrusionColor = new THREE.Color(0x3483ff); // Blue for printing moves
-                    const travelColor = new THREE.Color(0x999999);    // Gray for travel moves
-
-                    object.traverse(function (child) {
-                        if (child.isLine) {
-                            const isTravel = child.userData.type === 'travel';
-                            child.material.color = isTravel ? travelColor : extrusionColor;
-                            child.material.transparent = true;
-                            child.material.opacity = isTravel ? 0.05 : 0.96;
-                            // Try to make lines visually thicker (WebGL2 browsers only)
-                            if ('linewidth' in child.material) {
-                                child.material.linewidth = isTravel ? 1 : 2.5;
-                            }
-                        }
-                    });
-
-
-                    // --- Pro-Tip: Auto-center the model on the bed ---
-                    const box = new THREE.Box3().setFromObject(object);
-
-                    /*  centre in X & Z … */
-                    const offsetX = -(box.min.x + box.max.x) / 2;
-                    const offsetZ = -(box.min.z + box.max.z) / 2;
-
-                    /*  …but lift in Y so the *bottom* sits on the bed (y = 0) */
-                    const offsetY = -box.min.y;
-
-                    object.position.set(offsetX, offsetY, offsetZ);
-
-
-                    scene.add(object);
-                    console.log(`Successfully parsed and rendered G-code for canvas:`, canvas);
-                },      // onProgress callback (optional)
-                undefined,
-                // onError callback
-                function (error) {
-                    console.error('An error happened while fetching the G-code text:', error);
+            function handleSort(sortKey) {
+                if (currentSort.key === sortKey) {
+                    currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                } else {
+                    currentSort.key = sortKey;
+                    currentSort.direction = 'desc';
                 }
-            );
+                renderHistoryTable();
+            }
 
-            // 7) Render loop
-            (function animate() {
-                requestAnimationFrame(animate);
-                controls.update();
-                renderer.render(scene, camera);
-            })();
-        }
+            // Initialize one Three.js scene per <canvas class="card-3d-preview">
+            function init3DPreview(canvas) {
+                // --- NEW, SMARTER FLICKER FIX ---
+                const newUrl = canvas.dataset.gcodeUrl;
+                const octo_api_key = canvas.dataset.apiKey;
+                // If the URL is the same as the last one we rendered, do nothing.
+                if (canvas.dataset.renderedUrl === newUrl) {
+                    return;
+                }
+                // Store the new URL so we don't re-render it next time.
+                canvas.dataset.renderedUrl = newUrl;
+                // --- END OF FIX ---
 
-    </script>
+                console.log('Initializing 3D preview on canvas:', canvas, 'with URL:', newUrl);
 
-    <!-- Swiper JS -->
-    <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+                const bedWidth = +canvas.dataset.bedWidth;
+                const bedDepth = +canvas.dataset.bedDepth;
+
+                // 1) Renderer
+                const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+                renderer.setClearColor(0x000000, 0);
+                renderer.setSize(canvas.width, canvas.height);
+
+                const scene = new THREE.Scene();  // <-- Make sure this line is present here!
+                // 2) Scene & Camera
+                const aspect = canvas.width / canvas.height;
+                const camDist = Math.max(bedWidth, bedDepth) * 1.5;
+                const camera = new THREE.PerspectiveCamera(45, aspect, 1, 2000);
+                // Classic isometric view, like slicers
+                camera.position.set(camDist, camDist, camDist * 0.9);
+                camera.lookAt(0, 0, 0);
+
+                scene.add(new THREE.AmbientLight(0xbbbbbb));
+                const dirLight = new THREE.DirectionalLight(0xffffff, 0.65);
+                dirLight.position.set(1, 2, 4);
+                scene.add(dirLight);
+                // 4) Grid bed
+                // 4) Grid bed
+                const size = Math.max(bedWidth, bedDepth);
+                const divisions = Math.floor(size / 10);
+                // Use subtle, clean slicer-like grid colors
+                const grid = new THREE.GridHelper(
+                    Math.max(bedWidth, bedDepth),
+                    Math.floor(Math.max(bedWidth, bedDepth) / 10),
+                    0xbcc3d6,           // medium grey minor lines
+                    0xdfe3ec            // very light major lines
+                );
+                scene.add(grid);
+
+                // 5) Controls
+                const controls = new OrbitControls(camera, renderer.domElement);
+                controls.target.set(0, 0, 0);
+                controls.enablePan = false;
+                controls.enableZoom = true;
+                controls.autoRotate = true;
+                controls.autoRotateSpeed = 0.3; // nice slow spin
+
+
+                // Step 1: Use FileLoader to fetch the text, because it allows setting headers.
+                const fileLoader = new FileLoader();
+                if (octo_api_key) {
+                    fileLoader.setRequestHeader({ 'X-Api-Key': octo_api_key });
+                }
+
+                fileLoader.load(
+                    canvas.dataset.gcodeUrl, // The URL from your python script
+                    // onSuccess callback (this runs when the text is downloaded)
+                    // onSuccess callback (this runs when the text is downloaded)
+                    // onSuccess callback (this runs when the text is downloaded)
+                    function (gcodeText) {
+                        // Step 2: Use GCodeLoader to parse the downloaded text.
+                        const gcodeLoader = new GCodeLoader();
+                        const object = gcodeLoader.parse(gcodeText);
+
+                        const extrusionColor = new THREE.Color(0x3483ff); // Blue for printing moves
+                        const travelColor = new THREE.Color(0x999999);    // Gray for travel moves
+
+                        object.traverse(function (child) {
+                            if (child.isLine) {
+                                const isTravel = child.userData.type === 'travel';
+                                child.material.color = isTravel ? travelColor : extrusionColor;
+                                child.material.transparent = true;
+                                child.material.opacity = isTravel ? 0.05 : 0.96;
+                                // Try to make lines visually thicker (WebGL2 browsers only)
+                                if ('linewidth' in child.material) {
+                                    child.material.linewidth = isTravel ? 1 : 2.5;
+                                }
+                            }
+                        });
+
+
+                        // --- Pro-Tip: Auto-center the model on the bed ---
+                        const box = new THREE.Box3().setFromObject(object);
+
+                        /*  centre in X & Z … */
+                        const offsetX = -(box.min.x + box.max.x) / 2;
+                        const offsetZ = -(box.min.z + box.max.z) / 2;
+
+                        /*  …but lift in Y so the *bottom* sits on the bed (y = 0) */
+                        const offsetY = -box.min.y;
+
+                        object.position.set(offsetX, offsetY, offsetZ);
+
+
+                        scene.add(object);
+                        console.log(`Successfully parsed and rendered G-code for canvas:`, canvas);
+                    },      // onProgress callback (optional)
+                    undefined,
+                    // onError callback
+                    function (error) {
+                        console.error('An error happened while fetching the G-code text:', error);
+                    }
+                );
+
+                // 7) Render loop
+                (function animate() {
+                    requestAnimationFrame(animate);
+                    controls.update();
+                    renderer.render(scene, camera);
+                })();
+            }
+
+        </script>
+
+        <!-- Swiper JS -->
+        <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
 
 </body>
 
 </html>
-<!-- sudo nano /var/www/html/dpp_page.html -->
