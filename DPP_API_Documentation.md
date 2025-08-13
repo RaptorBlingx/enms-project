@@ -143,6 +143,9 @@ The response is a JSON object containing two top-level keys: `printers` and `glo
 | Code | Meaning                 | Description                                                                                              |
 | :--- | :---------------------- | :------------------------------------------------------------------------------------------------------- |
 | `200 OK` | The request was successful. | The response body contains the DPP summary JSON object.                                          |
+| `403 Forbidden` | Access is denied. | This indicates that the request was understood, but the server is refusing to fulfill it. This is typically due to network access rules (e.g., firewall, VPN) blocking the client's IP address. |
+| `404 Not Found` | The endpoint does not exist. | The requested URL (e.g., `/api/dpp_summaryyy`) does not match a valid endpoint. Please check the path for typos. |
+| `429 Too Many Requests` | The client is sending too many requests. | While not currently implemented, this code will be used if rate limiting is introduced in the future. Clients should be prepared to handle this response by implementing a backoff strategy. |
 | `500 Internal Server Error` | The server encountered an error. | This typically occurs if the API cannot connect to the database or if an unexpected error happens during data processing. The response body may contain an `error` key with a descriptive message. |
 
 ## 4. Data Model
@@ -215,6 +218,23 @@ Each object in the `globalHistory` array represents a single completed print job
 | `kwh`         | float                     | `print_jobs` (`session_energy_wh`)| The total energy consumed by the job, in kWh.                |
 | `completedAt` | string (ISO 8601)         | `print_jobs` (`end_time`)       | The timestamp when the job was completed.                    |
 | `thumbnailUrl`| string                    | `print_jobs` (`thumbnail_url`)  | A URL to a thumbnail image of the printed object. `null` if not available. |
+
+### 4.5. Field Nullability
+
+Several fields in the `Printer Object` can be `null` depending on the printer's state. Your application should be designed to handle these cases gracefully.
+
+| Field                  | Condition for being `null`                                       |
+| :--------------------- | :--------------------------------------------------------------- |
+| `jobFilename`          | The printer is not currently in a `Printing` or `Heating` state. |
+| `jobProgressPercent`   | The printer is not currently printing.                           |
+| `jobTimeLeftSeconds`   | The printer is not currently printing.                           |
+| `jobKwhConsumed`       | The printer is not currently printing.                           |
+| `job_details`          | The printer is not currently printing.                           |
+| `gcodePath`            | A G-code preview host is not configured for the device.          |
+| `gcode_preview_api_key`| A G-code preview host is not configured for the device.          |
+| `lastJobKwh`           | The printer has not yet completed any jobs.                      |
+| `printTimeSeconds`     | The printer has not yet completed any jobs.                      |
+| `lastJobFilamentGrams` | The printer has not yet completed any jobs.                      |
 
 ## 5. Performance & Scalability
 
@@ -304,65 +324,4 @@ if __name__ == "__main__":
     base_url = f"http://{enms_ip}/api"
     get_dpp_summary(base_url)
 
-```
-
-### 9.2. JavaScript Example (Node.js)
-
-This example uses `node-fetch` to get the data in a Node.js environment. It demonstrates async/await and comprehensive error handling.
-
-```javascript
-// This example requires node-fetch v2. To install: npm install node-fetch@2
-const fetch = require('node-fetch');
-
-async function getDppSummary(apiBaseUrl) {
-    const apiEndpoint = `${apiBaseUrl}/dpp_summary`;
-    console.log(`Fetching data from: ${apiEndpoint}`);
-
-    try {
-        const response = await fetch(apiEndpoint, { timeout: 10000 }); // 10-second timeout
-
-        if (!response.ok) {
-            // Handle non-2xx responses
-            throw new Error(`API request failed with status ${response.status}: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-
-        console.log('--- Printer Fleet Status ---');
-        const printers = data.printers;
-        if (!printers || printers.length === 0) {
-            console.log('No printer data returned from API.');
-            return;
-        }
-
-        printers.forEach(printer => {
-            const name = printer.friendlyName || 'Unknown Printer';
-            const status = printer.currentStatus || 'N/A';
-
-            if (status === 'Printing') {
-                const progress = printer.jobProgressPercent || 0;
-                console.log(`- ${name}: ${status} (${progress.toFixed(1)}%)`);
-            } else {
-                console.log(`- ${name}: ${status}`);
-            }
-        });
-
-    } catch (error) {
-        if (error.name === 'AbortError' || error.code === 'ETIMEDOUT') {
-            console.error('Error: The API request timed out.');
-        } else if (error.name === 'FetchError') {
-            console.error(`Error: A network error occurred: ${error.message}`);
-        } else if (error instanceof SyntaxError) {
-            console.error('Error: Failed to parse a valid JSON response from the API.');
-        } else {
-            console.error(`An unexpected error occurred: ${error.message}`);
-        }
-    }
-}
-
-// It is recommended to use an environment variable for the IP address
-const enmsIp = process.env.ENMS_INSTANCE_IP || 'localhost';
-const baseUrl = `http://${enmsIp}/api`;
-
-getDppSummary(baseUrl);
 ```

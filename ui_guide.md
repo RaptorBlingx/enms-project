@@ -2,6 +2,8 @@
 
 This document provides a guide to the different user profiles available in the ENMS frontend and explains the purpose of each view or dashboard accessible to them.
 
+> For detailed information on the backend API that powers these views, please see the 📖 [**DPP API Documentation**](./DPP_API_Documentation.md).
+
 ## 1. Technical Profile
 
 The Technical Profile is designed for engineers, developers, and system administrators who need deep access to the system's configuration and raw data streams.
