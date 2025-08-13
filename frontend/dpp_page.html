@@ -974,6 +974,9 @@
             let currentSort = { key: 'completedAt', direction: 'desc' }; // Default sort order
             let swiper = null;
             let firstLoadDone = false;
+            let lastActiveSlideId = null;
+            let resetOnNextUpdate = false;
+            let prevActiveId = null;
 
 
             // --- Configuration ---
@@ -1630,10 +1633,24 @@
                     hideLoading(); // Ensure loading is hidden even on error
                 }
 
-                if (swiper) {
-                    swiper.update();
-                    updateActiveTipBanner();
-                }
+if (swiper) {
+    swiper.updateSlides();
+    swiper.update();
+    if (swiper.params.loop) swiper.loopCreate();
+    swiper.updateSlidesClasses();
+
+    let target = 0;
+    if (!resetOnNextUpdate && prevActiveId) {
+        const idx = [...swiper.slides].findIndex(
+            s => s.getAttribute('id') === prevActiveId
+        );
+        if (idx !== -1) target = idx;
+    }
+    swiper.slideToLoop(target, 0, false);
+    resetOnNextUpdate = false;
+
+    updateActiveTipBanner();
+}
 
             }
 
