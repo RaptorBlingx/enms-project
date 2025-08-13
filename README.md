@@ -70,13 +70,20 @@ MQTT_PASSWORD=mqtt_pass
 ```
 enms-project/
 │
-├── node-red/          # Node-RED flows, settings, Dockerfile
-├── grafana/           # Grafana provisioning (datasources, dashboards)
-├── python_api/        # Flask API code
-├── nginx/             # Nginx config
-├── docker-compose.yml # Multi-service Docker config
-├── doc.md             # Detailed developer documentation
-└── README.md          # This file
+├── backend/             # Backend services, including database initialization and ML model training
+├── docs/                # Supporting documentation and architecture diagrams
+├── frontend/            # Frontend HTML, CSS, and JavaScript files
+├── grafana/             # Grafana provisioning (datasources, dashboards)
+├── nginx/               # Nginx reverse proxy configuration
+├── node-red/            # Node-RED flows, settings, and custom nodes
+├── python-api/          # Python Flask application for the DPP API
+├── artistic-resources/  # Image assets for the frontend
+│
+├── docker-compose.yml   # Main Docker Compose file for orchestrating services
+├── DPP_API_Documentation.md # Detailed developer documentation for the DPP API
+├── ui_guide.md          # Guide to the user interface and user profiles
+├── doc.md               # General project documentation
+└── README.md            # This file
 ```
 
 ---
@@ -94,7 +101,8 @@ enms-project/
 
 ## 📄 Documentation
 
-*   For **technical details** (architecture, data flows, APIs, deployment), see: 📜 [`doc.md`](./doc.md)
+*   For **The DPP API Reference**, see: 📖 [`DPP_API_Documentation.md`](./DPP_API_Documentation.md)
+*   For **technical details** (architecture, data flows, deployment), see: 📜 [`doc.md`](./doc.md)
 *   For a **guide to the user interface** and different user profiles, see: 👤 [`ui_guide.md`](./ui_guide.md)
 
 ---
