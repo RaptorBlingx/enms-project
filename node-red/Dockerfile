@@ -17,7 +17,7 @@ RUN npm install --no-audit --no-fund
 COPY node-red/flows.json ./flows.json
 COPY node-red/flows_cred.json ./flows_cred.json
 COPY node-red/settings.js ./settings.js
-COPY node-red/lib ./lib
+#COPY node-red/lib ./lib
 
 # ensure perms
 USER root
