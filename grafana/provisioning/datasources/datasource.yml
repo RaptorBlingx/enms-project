@@ -1,33 +1,28 @@
-# /home/ubuntu/enms-project/grafana/provisioning/datasources/datasource.yml
-
 apiVersion: 1
 
-# List of data sources to be provisioned
 datasources:
-  # Data Source 1: PostgreSQL/TimescaleDB
-  - name: 'reg_ml'
-    type: postgres
+  - name: reg_ml
     uid: aei784ojzbrpca
+    type: grafana-postgresql-datasource   # <— use the new plugin id explicitly
     access: proxy
-    url: postgres:5432 # 'postgres' is the name of the Docker service
+    url: postgres:5432
     user: reg_ml
-    database: reg_ml
+    isDefault: true
     jsonData:
-      sslmode: 'disable'
+      database: reg_ml                    # <— MUST live here for this plugin
+      sslmode: disable
       timescaledb: true
-    # Secure JSON data for the password
+      postgresVersion: 1600               # optional but recommended for PG16
     secureJsonData:
-      password: 'raptorblingx'
+      password: raptorblingx
 
-  # Data Source 2: MQTT
   - name: Smart_Plug
+    uid: eedpsv3vt1fy8c
     type: grafana-mqtt-datasource
     access: proxy
-    uid: eedpsv3vt1fy8c
     jsonData:
       uri: tcp://89.252.166.188:2010
-      username: "raptorblingx"
+      username: raptorblingx
       tlsSkipVerify: true
     secureJsonData:
-      password: "raptorblingx"
-
+      password: raptorblingx
