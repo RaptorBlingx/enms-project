@@ -453,12 +453,14 @@
             "1895161b40f4b2c6",
             "a849c171e8e54fe4",
             "fa016904d46e14e2",
-            "637017bc129598ca"
+            "637017bc129598ca",
+            "00554013c989e511",
+            "8e468d1a2e629d6c"
         ],
         "x": 1434,
         "y": 619,
         "w": 752,
-        "h": 402
+        "h": 422
     },
     {
         "id": "5e9c772230c2d4b1",
@@ -4075,7 +4077,7 @@
         "z": "c4582a5c3c4d6d09",
         "g": "39cad17b39cec1d1",
         "name": "Build Prusa Analyzer Command",
-        "func": "// We need a unique job ID for the analyzer script.\n// PrusaLink jobs don't have a numeric ID like SimplyPrint,\n// so we will create a unique identifier from the device and filename.\nconst unique_job_id = msg.device_id_for_update + '_' + msg.filename_for_update;\n\n// The main python command is in the exec node.\n// This payload contains only the arguments for the script.\nmsg.payload = `/home/ubuntu/monitor_ml/gcode_analyzer.py --file /tmp/prusa_gcode.gcode --jobid '${unique_job_id}'`;\n\nreturn msg;",
+        "func": "const unique_job_id = msg.device_id_for_update + '_' + msg.filename_for_update;\nconst gcodePath = \"/tmp/prusa_gcode.gcode\"; // ensure your flow writes the file here (inside the container)\nmsg.payload = `/data/scripts/gcode_analyzer.py --file \"${gcodePath}\" --jobid \"${unique_job_id}\"`;\nreturn msg;\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -4095,7 +4097,7 @@
         "type": "exec",
         "z": "c4582a5c3c4d6d09",
         "g": "39cad17b39cec1d1",
-        "command": "/home/ubuntu/monitor_ml/venv/bin/python",
+        "command": "python3",
         "addpay": "payload",
         "append": "",
         "useSpawn": "false",
@@ -4541,7 +4543,7 @@
                 "t": "set",
                 "p": "payload",
                 "pt": "msg",
-                "to": "'/home/ubuntu/monitor_ml/gcode_analyzer.py --file /tmp/temp_gcode.gcode --jobid ' & preserved_job_id",
+                "to": "'/data/scripts/gcode_analyzer.py --file /tmp/temp_gcode.gcode --jobid ' & preserved_job_id\t",
                 "tot": "jsonata"
             }
         ],
@@ -4563,7 +4565,7 @@
         "type": "exec",
         "z": "088fab733419c707",
         "g": "ec87e2210a0fba2e",
-        "command": "/home/ubuntu/monitor_ml/venv/bin/python",
+        "command": "python3",
         "addpay": "payload",
         "append": "",
         "useSpawn": "false",
@@ -4577,8 +4579,12 @@
             [
                 "637017bc129598ca"
             ],
-            [],
-            []
+            [
+                "8e468d1a2e629d6c"
+            ],
+            [
+                "00554013c989e511"
+            ]
         ],
         "info": "**Purpose:** Executes the `gcode_analyzer.py` script to extract the thumbnail and perform per-part volume analysis.\r\n**Logic:** It passes the path to the temporarily saved G-code file (`/tmp/temp_gcode.gcode`) and the `job_id` to the script."
     },
@@ -4679,6 +4685,42 @@
         "statusType": "auto",
         "x": 810,
         "y": 560,
+        "wires": []
+    },
+    {
+        "id": "00554013c989e511",
+        "type": "debug",
+        "z": "088fab733419c707",
+        "g": "ec87e2210a0fba2e",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1730,
+        "y": 960,
+        "wires": []
+    },
+    {
+        "id": "8e468d1a2e629d6c",
+        "type": "debug",
+        "z": "088fab733419c707",
+        "g": "ec87e2210a0fba2e",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1830,
+        "y": 1000,
         "wires": []
     },
     {

@@ -15,7 +15,15 @@
             },
             "tours": {
                 "welcome": "4.1.0"
+            },
+            "dialog": {
+                "export": {
+                    "pretty": true
+                }
             }
+        },
+        "debug": {
+            "filter": "filterCurrent"
         }
     }
 }
