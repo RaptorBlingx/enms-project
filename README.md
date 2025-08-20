@@ -82,7 +82,7 @@ enms-project/
 ├── docker-compose.yml   # Main Docker Compose file for orchestrating services
 ├── DPP_API_Documentation.md # Detailed developer documentation for the DPP API
 ├── ui_guide.md          # Guide to the user interface and user profiles
-├── doc.md               # General project documentation
+├── ENMS_Technical_Details.md               # General project documentation
 └── README.md            # This file
 ```
 
@@ -102,7 +102,7 @@ enms-project/
 ## 📄 Documentation
 
 *   For **The DPP API Reference**, see: 📖 [`DPP_API_Documentation.md`](./DPP_API_Documentation.md)
-*   For **technical details** (architecture, data flows, deployment), see: 📜 [`doc.md`](./doc.md)
+*   For **technical details** (architecture, data flows, deployment), see: 📜 [`ENMS_Technical_Details.md`](./ENMS_Technical_Details.md)
 *   For a **guide to the user interface** and different user profiles, see: 👤 [`ui_guide.md`](./ui_guide.md)
 
 ---
