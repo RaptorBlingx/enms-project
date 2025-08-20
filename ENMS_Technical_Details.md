@@ -20,15 +20,24 @@ This layer consists of the physical hardware and devices that generate data.
 
 *   **Printers/Machines:** These are the primary assets being monitored. The system is designed to handle various 3D printers (e.g., Prusa MK4, Prusa Mini, Ender-3) and can be extended to other industrial machines. They provide operational data such as temperature, job progress, and state.
 *   **Smart Plugs:** Shelly smart plugs are used to monitor the electrical energy consumption of each connected machine. They provide real-time data on power (Watts), total energy (Watt-hours), voltage, and current.
-*   **ESP32 Sensor Hub:** A custom environmental sensor hub based on an ESP32 microcontroller. It is equipped with sensors like the DHT22 (temperature and humidity) and MPU6050 (accelerometer/gyroscope) to capture ambient conditions and machine vibration data.
+*   **ESP32 Sensor Hub:** A custom-built hardware solution designed to capture environmental and machine-specific data not available from the printers' default sensors.
+    *   **Purpose:** To provide critical context for print quality (ambient conditions) and machine health (vibration, temperature).
+    *   **Implementation (`esp.cpp`):** The C++ code for the ESP32 connects to WiFi and an MQTT broker. It reads data from its attached sensors at defined intervals and publishes each reading to a unique MQTT topic.
+    *   **Sensors Used:**
+        *   `DHT22`: Measures ambient room temperature and humidity. This is crucial as many 3D printing filaments are sensitive to environmental conditions.
+        *   `MPU6050`: An accelerometer and gyroscope that measures vibration and motion on three axes. This data can be used to detect mechanical faults or for advanced tuning like input shaping.
+        *   `MAX6675`: A high-precision K-Type thermocouple used for accurate temperature measurement, often for verifying nozzle temperatures or monitoring the temperature within a printer enclosure.
 
 #### 1.2.2. Network Layer (The Gateway & Transport)
 
 This layer is responsible for data transport from the edge devices to the central platform.
 
-*   **Printer Controllers (PrusaLink / OctoPrint):** The system interfaces with printers via their respective controllers.
-    *   **PrusaLink API:** For Prusa printers, the system polls the local REST API provided by the PrusaLink software running on the printer.
-    *   **OctoPrint / SimplyPrint Gateway:** For other printers like the Ender-3, the system can interface with OctoPrint or a cloud gateway service like SimplyPrint. These gateways expose APIs to get printer status and job information.
+*   **Printer Controllers (e.g., Raspberry Pi with PrusaLink / OctoPrint):** These are the brains of the individual printers.
+    *   **Role:** A single-board computer (like a Raspberry Pi) runs software (PrusaLink for Prusa printers, OctoPrint for many others) that directly manages the printer's operations.
+    *   **Function as a Data Gateway:** This software exposes a local **REST API**. The ENMS platform's Node-RED service polls this API to retrieve detailed, real-time data, including printer status (`Printing`, `Idle`), job progress, and temperatures. This makes the controller a vital gateway, translating the printer's state into a standardized format for the platform.
+*   **SimplyPrint Cloud Gateway:** A third-party, cloud-based platform for managing 3D printers.
+    *   **Purpose:** It provides a single, consistent **cloud API** for managing a wide variety of printer models that may not have a robust or accessible local API. This abstracts away the complexity of dealing with many different printer firmwares and models.
+    *   **How it is used:** For printers connected to this service, Node-RED polls the SimplyPrint cloud API to get status and job information, just as it would a local PrusaLink API. This makes it an essential gateway for integrating a diverse fleet of machines into the ENMS.
 *   **MQTT Broker:** A central messaging bus (like Mosquitto or a cloud-based MQTT service) is used for real-time data ingestion from IoT devices. The Shelly plugs and the ESP32 Sensor Hub publish their readings to specific MQTT topics, which are then subscribed to by the platform layer.
 
 #### 1.2.3. Platform Layer (The "Brain")
@@ -483,41 +492,69 @@ This section provides a detailed look at specific, advanced modules within the E
 
 ### 6.1. Interactive Analysis Module (`/api/analyze`)
 
-The interactive analysis module is one of the most powerful features of the platform. It allows users to perform a deep-dive analysis of a specific printer's performance, correlating its energy consumption with various operational and environmental factors. This entire process is orchestrated by the `Analysis API` flow in Node-RED.
+The Interactive Analysis module is a powerful diagnostic and optimization tool that allows users to correlate a printer's energy consumption with its operational state and environmental conditions. This entire process is orchestrated by the `Analysis API` flow in Node-RED and is the backend for the "Interactive Analysis" page.
 
-The data flow for a single analysis request is as follows:
+**Purpose and Value:**
+This module helps answer critical performance and efficiency questions, such as:
+*   **Energy Profiling:** "How much energy does this printer consume during the heating phase vs. the active printing phase?"
+*   **Driver Correlation:** "Is there a statistically significant relationship between nozzle temperature and power draw?"
+*   **Idle Cost Analysis:** "What is the baseline energy cost of leaving this printer idle but powered on?"
+
+**End-to-End Data Flow:**
 
 1.  **User Interaction (Frontend):**
-    *   On the `analysis_page.html`, the user selects a device (e.g., "PrusaMK4-1"), a time range (e.g., "24h"), and a set of "drivers" to analyze (e.g., "Nozzle Temp", "Is Printing").
-    *   When the user clicks the "Run Energy Analysis" button, the frontend sends a `POST` request to the `/api/analyze` endpoint. The body of this request is a JSON object containing the user's selections.
+    *   On `analysis_page.html`, a user selects a device, a time range, and a set of "drivers" (e.g., `nozzle_temp_actual`, `is_printing`) to analyze.
+    *   A `POST` request is sent to the `/api/analyze` endpoint with the user's selections.
 
-2.  **Request Handling (Node-RED):**
-    *   The `http in` node in the `Analysis API` flow receives the `POST` request.
-    *   A `function` node parses and validates the incoming JSON payload. It translates the user-friendly time range ("24h") into a precise ISO 8601 timestamp for the database query.
+2.  **Request Handling & Data Aggregation (Node-RED & PostgreSQL):**
+    *   The `Analysis API` flow in Node-RED receives the request.
+    *   It constructs and executes a complex SQL query. This query is the heart of the module, joining `energy_data` with the most recent `printer_status` and the closest `environment_data` for every single timestamp. This creates a rich, high-resolution, unified dataset for analysis.
 
-3.  **Data Aggregation (Node-RED & PostgreSQL):**
-    *   A subsequent `function` node prepares the parameters for the main database query.
-    *   The `postgresql` node executes a complex SQL query. This query is the heart of the data gathering process:
-        *   It selects all `energy_data` points for the chosen device and time range.
-        *   For each energy data point, it uses `LEFT JOIN LATERAL` to find the *most recent* `printer_status` record at or before that exact timestamp.
-        *   It performs another `LEFT JOIN LATERAL` to find the *closest* `environment_data` reading within a 15-minute window of the energy timestamp.
-        *   The result is a single, rich, high-resolution dataset where every energy reading is enriched with the state of the printer and the ambient environment at that precise moment.
+3.  **Statistical Analysis (Node-RED & Python):**
+    *   The dataset is passed to a `python-function` node, which executes a script to perform the core analysis:
+        *   **Phase Analysis:** It calculates the time spent and energy consumed in each operational state (e.g., `Idle`, `Printing`, `Heating`), providing a clear breakdown of energy usage.
+        *   **Correlation Analysis:** It calculates the Pearson correlation coefficient between the selected drivers and `power_watts`, showing the strength and direction of their linear relationship.
+        *   **ML Feature Importance:** It leverages the pre-trained ML model to determine which factors have the most significant influence on power consumption predictions.
 
-4.  **ML & Statistical Analysis (Node-RED & Python):**
-    *   The entire dataset is passed to a `python-function` node. This node executes a Python script that performs the core analysis:
-        *   **Preprocessing:** The script cleans the data, handles missing values, and prepares the feature set required by the machine learning model.
-        *   **ML Prediction:** It loads a pre-trained XGBoost or RandomForest model (depending on the device type) and its corresponding scaler. It then runs the model over the entire dataset to generate a "predicted power" value for every "actual power" value.
-        *   **Metrics Calculation:** It calculates key performance indicators, such as total kWh consumed, average power (overall and active), and performs a detailed **phase analysis** to determine how much time and energy was spent in different states (Idle, Printing, etc.).
-        *   **Statistical Analysis:** If the user selected drivers, the script calculates the Pearson correlation and performs a simple multiple linear regression to show the statistical relationship between the selected factors and power consumption.
-        *   **Feature Importance:** It extracts the feature importances from the trained model to identify which factors had the most significant influence on its predictions.
+4.  **Response and Visualization (Frontend):**
+    *   The analysis results are returned as a JSON object.
+    *   The frontend uses Chart.js to render visualizations (pie charts for phase analysis, bar charts for feature importance) and display key metrics, providing actionable insights to the user.
 
-5.  **Response Formatting (Node-RED):**
-    *   The Python script returns a large JSON object containing all the analysis results back to the Node-RED flow.
-    *   A final `function` node formats this data into the clean, structured JSON object that the frontend expects. This includes generating dynamic URLs for the Grafana panels.
+### 6.2. Machine Learning for Power Prediction
 
-6.  **Visualization (Frontend):**
-    *   The `analysis_page.html` receives the final JSON response.
-    *   Its JavaScript code parses the response and uses the Chart.js library to dynamically render the various charts and populate the tables and summary boxes with the analysis results.
+The ENMS project includes a complete machine learning pipeline to predict a printer's power consumption based on its real-time operational data. This predictive capability is key for anomaly detection and future "what-if" analysis.
+
+**The ML Pipeline consists of two main stages:**
+
+#### Stage 1: Offline Model Training (`backend/train_model.py`)
+
+This stage is performed once to create the predictive model.
+
+*   **Goal:** To train a regression model that accurately predicts `power_watts` based on a set of features.
+*   **Data Source:** A historical dataset (`printer_energy_data_raw.csv`) containing synchronized time-series data from the printers and smart plugs.
+*   **Feature Engineering:** The script performs crucial preprocessing, such as cleaning negative `z_height_mm` values and converting boolean flags like `is_printing` into a numerical format.
+*   **Feature Selection:** Based on the script `train_model.py`, the final set of features used for training the model is:
+    ```
+    ['plug_temp_c', 'nozzle_temp_actual', 'bed_temp_actual', 'is_printing', 'z_height_mm', 'nozzle_temp_target', 'bed_temp_target']
+    ```
+*   **Model Comparison:** The script uses **5-fold cross-validation** to rigorously evaluate and compare multiple machine learning models (including `RandomForestRegressor`, `XGBRegressor`, and `LGBMRegressor`). It selects the model with the best performance, measured by the lowest **Mean Absolute Error (MAE)**, ensuring the most accurate and robust model is chosen.
+*   **Artifact Generation:** The script saves the following critical files to disk:
+    *   `best_model.joblib`: The trained regression model itself.
+    *   `scaler.joblib`: The `StandardScaler` used to normalize the training data. This is essential for ensuring that live data is preprocessed in the exact same way.
+    *   `scaler_columns.joblib`: The list of feature columns in the correct order, which guarantees consistency between training and inference.
+
+#### Stage 2: Real-Time Inference (Node-RED "Live Predictor" Flow)
+
+This stage uses the trained model to make predictions on live data.
+
+*   **Process:**
+    1.  A Node-RED flow triggers every 10 seconds.
+    2.  It fetches the latest status data for all active printers.
+    3.  A `python-function` node loads the `best_model.joblib`, `scaler.joblib`, and `scaler_columns.joblib` from disk.
+    4.  It preprocesses the live data using the loaded scaler to match the training conditions.
+    5.  It feeds the scaled, live features into the model to generate a `predicted_power_watts` value.
+    6.  This prediction is stored in the `ml_predictions` TimescaleDB hypertable.
+*   **Application:** By storing both actual and predicted power, the system enables dashboards in Grafana that can visualize the difference (the "prediction error"). A consistently high error can signal an anomaly, prompting a user to investigate a potential hardware issue or inefficient printer configuration.
 
 ## 7. User Interface Guide
 
