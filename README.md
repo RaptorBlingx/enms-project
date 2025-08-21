@@ -78,11 +78,12 @@ enms-project/
 ├── node-red/            # Node-RED flows, settings, and custom nodes
 ├── python-api/          # Python Flask application for the DPP API
 ├── artistic-resources/  # Image assets for the frontend
-│
 ├── docker-compose.yml   # Main Docker Compose file for orchestrating services
+├── ANALYSIS_DEEP_DIVE.md # Deep dive into the analysis engine & ML models
+├── Custom Hardware.md # Details on custom sensor hardware (ESP32, etc.)
 ├── DPP_API_Documentation.md # Detailed developer documentation for the DPP API
 ├── ui_guide.md          # Guide to the user interface and user profiles
-├── ENMS_Technical_Details.md               # General project documentation
+├── ENMS_Technical_Details.md # General project documentation
 └── README.md            # This file
 ```
 
@@ -102,8 +103,10 @@ enms-project/
 ## 📄 Documentation
 
 *   For **The DPP API Reference**, see: 📖 [`DPP_API_Documentation.md`](./DPP_API_Documentation.md)
-*   For **technical details** (architecture, data flows, deployment), see: 📜 [`ENMS_Technical_Details.md`](./ENMS_Technical_Details.md)
-*   For a **guide to the user interface** and different user profiles, see: 👤 [`ui_guide.md`](./ui_guide.md)
+*   For **Technical Details** (architecture, data flows, deployment), see: 📜 [`ENMS_Technical_Details.md`](./ENMS_Technical_Details.md)
+*   For a **Guide to the User Interface** and different user profiles, see: 👤 [`ui_guide.md`](./ui_guide.md)
+*   For a **Deep Dive into the Analysis Engine and ML Model Training**, see: 🧠 [`ANALYSIS_DEEP_DIVE.md`](./ANALYSIS_DEEP_DIVE.md)
+*   For **Details on the Custom Sensor Hardware** and connectivity, see: 🔩 [`Custom Hardware.md`](./Custom%20Hardware.md)
 
 ---
 
