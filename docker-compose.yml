@@ -76,6 +76,10 @@ services:
       context: ./python-api
     container_name: enms_python_api
     restart: unless-stopped
+    env_file:
+      - .env.docker
+    volumes:
+      - ./generated_pdfs:/usr/src/app/generated_pdfs
     depends_on:
       - postgres
 

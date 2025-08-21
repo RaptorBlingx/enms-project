@@ -1,2 +1,7 @@
 *.sql.gz
 *-all-data.sql
+
+# Environment variables
+.env
+.env.*
+!.env.example

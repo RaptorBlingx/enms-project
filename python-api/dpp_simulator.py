@@ -15,8 +15,12 @@ import psycopg2
 import psycopg2.extras
 import numpy as np
 import re
+from dotenv import load_dotenv
 # No dependency on Node-RED specific objects (node, flow, etc.)
 from datetime import datetime, timedelta, timezone
+
+# Load environment variables from .env file
+load_dotenv()
 
 
 # --- Configuration ---
@@ -370,8 +374,11 @@ def get_live_dpp_data():
 
     try:
         conn = psycopg2.connect(
-            dbname="reg_ml", user="reg_ml", password="raptorblingx",
-            host="postgres", port="5432"
+            dbname=os.getenv("POSTGRES_DB"),
+            user=os.getenv("POSTGRES_USER"),
+            password=os.getenv("POSTGRES_PASSWORD"),
+            host=os.getenv("POSTGRES_HOST"),
+            port=os.getenv("POSTGRES_PORT", "5432")
         )
         cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
