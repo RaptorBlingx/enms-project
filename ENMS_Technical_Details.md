@@ -21,6 +21,8 @@ This layer consists of the physical hardware and devices that generate data.
 *   **Printers/Machines:** These are the primary assets being monitored. The system is designed to handle various 3D printers (e.g., Prusa MK4, Prusa Mini, Ender-3) and can be extended to other industrial machines. They provide operational data such as temperature, job progress, and state.
 *   **Smart Plugs:** Shelly smart plugs are used to monitor the electrical energy consumption of each connected machine. They provide real-time data on power (Watts), total energy (Watt-hours), voltage, and current.
 *   **ESP32 Sensor Hub:** A custom environmental sensor hub based on an ESP32 microcontroller. It is equipped with sensors like the DHT22 (temperature and humidity) and MPU6050 (accelerometer/gyroscope) to capture ambient conditions and machine vibration data.
+  
+For a more detailed breakdown of the custom hardware, its components, and its role in bridging legacy printers, please see the 🔩 **[Custom Hardware Documentation](./Custom%20Hardware.md)**.
 
 #### 1.2.2. Network Layer (The Gateway & Transport)
 
@@ -518,6 +520,8 @@ The data flow for a single analysis request is as follows:
 6.  **Visualization (Frontend):**
     *   The `analysis_page.html` receives the final JSON response.
     *   Its JavaScript code parses the response and uses the Chart.js library to dynamically render the various charts and populate the tables and summary boxes with the analysis results.
+
+For an even more granular, step-by-step walkthrough of this entire workflow and an explanation of the offline machine learning model training process, please see the 🧠 **[Analysis & Machine Learning Deep Dive](./ANALYSIS_DEEP_DIVE.md)**.
 
 ## 7. User Interface Guide
 
