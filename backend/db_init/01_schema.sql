@@ -56,6 +56,7 @@ CREATE TABLE public.print_jobs (
     start_energy_wh numeric(10,3),
     session_energy_wh numeric,
     thumbnail_url text,
+    dpp_pdf_url character varying(255),
     per_part_analysis jsonb,
     part_metadata jsonb,
     nozzle_diameter real,

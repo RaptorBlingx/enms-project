@@ -354,7 +354,8 @@ def get_live_dpp_data():
         pj.filename,
         pj.session_energy_wh,
         pj.end_time,
-        pj.thumbnail_url
+        pj.thumbnail_url,
+	pj.dpp_pdf_url
     FROM
         print_jobs pj
     JOIN
@@ -387,7 +388,8 @@ def get_live_dpp_data():
                 "filename": clean_filename(row['filename']),
                 "kwh": float(row['session_energy_wh']) / 1000.0 if row['session_energy_wh'] is not None else 0.0,
                 "completedAt": row['end_time'].isoformat() if row['end_time'] else None,
-                "thumbnailUrl": row['thumbnail_url']
+                "thumbnailUrl": row['thumbnail_url'],
+		"pdfUrl": row['dpp_pdf_url']
             })
 
         for i, row in enumerate(all_printers):

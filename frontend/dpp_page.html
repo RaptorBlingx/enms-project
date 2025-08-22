@@ -1151,6 +1151,7 @@
                             <th data-sort="filename">Filename ↕</th>
                             <th data-sort="kwh">Energy (kWh) ↕</th>
                             <th data-sort="completedAt">Completed At ↕</th>
+			    <th>Report</th>
                         </tr>
                     </thead>
                     <tbody id="history-table-body">
@@ -2100,7 +2101,10 @@ if (analysisContainerFront && lastJobAnalysis && lastJobAnalysis.parts && lastJo
             tableBody.innerHTML = filteredData.map(job => {
                 const completedDate = job.completedAt ? new Date(job.completedAt).toLocaleString() : 'N/A';
                 const kwh = typeof job.kwh === 'number' ? job.kwh.toFixed(3) : 'N/A';
-                return `
+                const pdfButton = job.pdfUrl
+		    ? `<a href="${job.pdfUrl}" target="_blank" title="Download DPP Report" style="color: var(--danger); font-size: 1.1em;"><i class="fas fa-file-pdf"></i></a>`
+		    : ''; // Otherwise, it's an empty string
+		return `
                 <tr>
                     <td class="preview-cell">
                         ${job.thumbnailUrl ? `<img src="${job.thumbnailUrl}" class="history-thumbnail">` : ''}
@@ -2109,6 +2113,7 @@ if (analysisContainerFront && lastJobAnalysis && lastJobAnalysis.parts && lastJo
                     <td title="${job.filename}">${job.filename}</td>
                     <td class="energy-cell">${kwh}</td>
                     <td>${completedDate}</td>
+		    <td>${pdfButton}</td>
                 </tr>
             `;
             }).join('');

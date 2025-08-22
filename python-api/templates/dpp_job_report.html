@@ -1,0 +1,962 @@
+<!-- /var/www/html/dpp_job_report.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DPP Report - {{ job.filename }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3a5bf9;
+            --primary-dark: #2a3ef0;
+            --primary-light: #eaedff;
+            --secondary: #5d6b98;
+            --accent: #00c896;
+            --accent-light: #e4f9f3;
+            --warning: #f9a63a;
+            --danger: #ff5a75;
+            --danger-light: #ffebee;
+            --success: #34d399;
+            --success-light: #e0f2f1;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--gray-100);
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .myCarousel {
+            width: 100%;
+            padding: 1rem 0;
+            perspective: 1600px;
+            perspective-origin: 50% 40%;
+        }
+
+        .myCarousel .swiper-slide {
+            display: flex;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(.5);
+            transition: opacity .25s ease, transform .25s ease;
+        }
+
+        .myCarousel .printer-card {
+            width: 480px;
+            overflow: hidden;
+            transition: transform .4s ease, box-shadow .4s ease;
+        }
+
+        .myCarousel .swiper-slide-active .printer-card {
+            transform: scale(1.22) translateZ(60px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, .30);
+            z-index: 3;
+        }
+
+        .myCarousel .swiper-slide-prev .printer-card,
+        .myCarousel .swiper-slide-next .printer-card {
+            transform: scale(.94) translateZ(20px) rotateY(-3deg);
+            opacity: .9;
+            z-index: 2;
+        }
+
+        .myCarousel .card-face {
+            min-height: 100%;
+        }
+
+        .myCarousel .swiper-slide-active,
+        .myCarousel .swiper-slide-prev,
+        .myCarousel .swiper-slide-next {
+            opacity: 1;
+            pointer-events: auto;
+            transform: none;
+        }
+
+        .printer-card {
+            position: relative;
+            border-radius: var(--radius-lg);
+            perspective: 1500px;
+            min-height: 480px;
+            transform-style: preserve-3d;
+            transition: transform 0.7s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        .printer-card.is-flipped {
+            z-index: 10;
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            /* Hides the back of a 3D element */
+            backface-visibility: hidden;
+            /* This is the key to a clean flip */
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .card-face-front {
+            background-color: white;
+            /* Fallback color */
+            padding: 1.25rem 1.5rem;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: 1;
+        }
+
+        .card-face-front::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(248, 250, 252, 0.0);
+            /* Light overlay */
+            border-radius: inherit;
+            z-index: -1;
+        }
+
+        .card-face-front::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: inherit;
+            background-size: cover;
+            background-position: center;
+            filter: saturate(1.35) contrast(1.05) brightness(1.05);
+            z-index: -2;
+        }
+
+
+        .card-face-front .card-header {
+            flex-shrink: 0;
+        }
+
+
+        .card-face-front:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-face-front .card-tip-section {
+            flex-shrink: 0;
+
+        }
+
+        .card-face-front .card-footer {
+            flex-shrink: 0;
+
+        }
+
+        .card-face-front .card-body {
+            flex-grow: 1;
+        }
+
+        .card-face-back {
+            background-color: var(--gray-50);
+            color: var(--gray-700);
+            padding: 1.25rem 1.5rem;
+            justify-content: flex-start;
+            transform: rotateY(180deg);
+        }
+
+        .card-face-back:hover {
+
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-face-back h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 0 0 0.75rem 0;
+            border-bottom: 1px solid var(--gray-200);
+            padding-bottom: 0.5rem;
+        }
+
+        .card-face-back .analysis-content {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .card-face-back .analysis-content p {
+            margin-bottom: 0.4em;
+            font-size: 0.85em;
+            line-height: 1.5;
+        }
+
+        .card-face-back .analysis-content p strong {
+            color: var(--gray-800);
+            font-weight: 600;
+        }
+
+        .card-face-back .analysis-content .value {
+            font-weight: 500;
+            color: var(--gray-900);
+        }
+
+        .card-face-back .analysis-suggestion {
+            background-color: var(--primary-light);
+            border-left: 3px solid var(--primary);
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.85em !important;
+        }
+
+        /* --- End Styles for Card Flip --- */
+        .card-header {
+            position: relative;
+            margin: -1px -1px 1rem -1px;
+            padding: 1rem 1.25rem 0.8rem;
+            background-color: rgba(255, 255, 255, 0.40);
+            backdrop-filter: blur(1px);
+            border-bottom: 1px solid rgba(255, 255, 255, .15);
+            border-top-left-radius: var(--radius-lg);
+            border-top-right-radius: var(--radius-lg);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .18);
+        }
+
+        .card-header .name-model h3 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, .45);
+        }
+
+        .card-header .name-model p {
+            color: rgba(255, 255, 255, .9);
+            font-size: 1rem;
+            font-weight: 700;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, .4);
+        }
+
+        .card-status {
+            position: absolute;
+            top: .6rem;
+            right: .8rem;
+            font-size: .72rem;
+            font-weight: 600;
+            padding: .3rem .7rem;
+            border-radius: 9999px;
+            letter-spacing: .03em;
+            display: flex;
+            align-items: center;
+            gap: .3rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, .25);
+        }
+
+        .status-printing {
+            background: #3a5bf9;
+            color: #fff;
+        }
+
+        .status-idle {
+            background: #10b981;
+            color: #fff;
+        }
+
+        .status-offline,
+        .status-unknown {
+            background: #9ca3af;
+            color: #fff;
+        }
+
+        .status-error {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        .status-heating,
+        .status-cooling {
+            background: #f59e0b;
+            color: #fff;
+        }
+
+
+        .card-details .detail-item {
+            margin-bottom: 0.75rem;
+        }
+
+        .card-details .detail-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--gray-600);
+            display: block;
+            margin-bottom: 0.1rem;
+        }
+
+        .card-details .detail-value {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .card-details .detail-value.energy {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        /* REPLACE this rule */
+        .card-visual {
+            display: none;
+            /* The image container is no longer needed */
+        }
+
+        /* Style for the iframe container - THIS WILL BE REPLACED/REMOVED LATER for img */
+        .card-visual .iframe-container {
+            width: 100%;
+            max-width: 280px;
+            height: 210px;
+            overflow: hidden;
+            margin: 0 auto 0.5rem auto;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-md);
+        }
+
+        .card-visual iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .card-visual .plant-label {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            text-align: center;
+        }
+
+        .card-footer {
+            margin-top: 1.25rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--gray-200);
+            text-align: right;
+        }
+
+        .card-footer .analysis-link {
+            font-size: 0.85rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .card-footer .analysis-link:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        /* Progress bar track */
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            border-radius: 9999px;
+            background: rgba(255, 255, 255, .25);
+            backdrop-filter: blur(2px);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg,
+                    var(--primary) 0%,
+                    var(--success) 100%);
+            box-shadow:
+                inset 0 0 4px rgba(0, 0, 0, .15),
+                0 0 4px rgba(0, 0, 0, .10);
+            transition: width .4s ease,
+                background-color .4s ease;
+            background-size: 200% 100%;
+            animation: barStripe 2s linear infinite;
+        }
+
+        @keyframes barStripe {
+            from {
+                background-position: 0 0;
+            }
+
+            to {
+                background-position: -200% 0;
+            }
+        }
+
+        .progress-label {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, .4);
+            pointer-events: none;
+        }
+
+
+        /* ─────────  Swiper Navigation Pills  ───────── */
+        .myCarousel .swiper-button-next,
+        .myCarousel .swiper-button-prev {
+            width: 44px;
+            height: 44px;
+            border-radius: 9999px;
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(4px);
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+            transition: background .25s ease,
+                transform .25s ease,
+                box-shadow .25s ease;
+            border: 1px solid rgba(255, 255, 255, .6);
+            z-index: 20;
+        }
+
+        .myCarousel .swiper-button-next::after,
+        .myCarousel .swiper-button-prev::after {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .myCarousel .swiper-button-next:hover,
+        .myCarousel .swiper-button-prev:hover {
+            background: rgba(255, 255, 255, 0.85);
+            transform: scale(1.06);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .35);
+        }
+
+        .myCarousel .swiper-button-disabled {
+            opacity: .25;
+            pointer-events: none;
+        }
+
+        /* Tips Section */
+        .tips-section {
+            /* This is a global class, was it intended for individual cards or a separate section? */
+            /* If for cards, it should be .card-tip-section based on HTML */
+            background-color: var(--accent-light);
+            border: 1px solid var(--accent);
+            border-left: 4px solid var(--accent);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .tips-section h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin: 0 0 0.75rem 0;
+        }
+
+        .tips-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .tips-section li {
+            font-size: 0.9rem;
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .tips-section li::before {
+            content: "\f0eb";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            color: var(--accent);
+            position: absolute;
+            left: 0;
+            top: 1px;
+            font-size: 0.85rem;
+        }
+
+        /* The card-tip-section as per your HTML structure */
+        .card-tip-section {
+            display: none !important;
+
+        }
+
+        /* ----------  Information Label  ---------- */
+        #carousel-tip-banner {
+            display: flex !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .6rem;
+            padding: .9rem 1.2rem;
+            margin: 1rem 0 1.5rem 0;
+            background: var(--success-light);
+            border: 1px solid var(--success);
+            border-left-width: 4px;
+            border-radius: var(--radius-md);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        #carousel-tip-banner i {
+            margin-top: 0.05rem;
+            font-size: 1.15rem;
+            color: var(--success);
+        }
+
+
+
+        /* --- NEW: CSS for the Pre-rendered 3D Thumbnail --- */
+        .object-texture-image {
+            position: absolute;
+            /* No transform is needed, the image is already in perspective */
+            transform-origin: top left;
+        }
+
+        .no-preview-on-bed {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #94a3b8;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+
+        /* FINAL look for the little preview window */
+        .bed-scene-wrapper {
+            border: none !important;
+            /* no grey frame      */
+            border-radius: var(--radius-lg);
+            /* softer corners      */
+            box-shadow: var(--shadow-sm);
+            /* subtle, uniform     */
+            background: transparent !important;
+            /* keep white box bg   */
+        }
+
+
+        .card-3d-preview {
+            width: 100% !important;
+            height: 100% !important;
+            background: transparent !important;
+            position: relative !important;
+        }
+
+        .info-block {
+            background-color: rgba(255, 255, 255, 0.40);
+            backdrop-filter: blur(1px);
+            border-radius: var(--radius-sm);
+            padding: 0.85rem 1rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1rem;
+        }
+
+        .info-block .detail-item+.detail-item {
+            border-top: 1px dashed var(--gray-200);
+            padding-top: 0.6rem;
+            margin-top: 0.6rem;
+        }
+
+
+        .job-info {
+            background: transparent;
+            border: none;
+            backdrop-filter: none;
+        }
+
+        .job-extra-details {
+            font-size: 0.75em;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-top: 0.4rem;
+            padding-top: 0.4rem;
+            border-top: 1px dashed var(--gray-200);
+        }
+
+        .tip-content {
+            color: white;
+        }
+
+        /* ------ errorIndicator ------ */
+        #errorIndicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem 1.5rem;
+            margin: 1rem 0;
+            background: #fff5f5;
+            border: 1px solid var(--danger-light);
+            border-radius: var(--radius-md);
+            color: var(--danger);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .load-error {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            text-align: center;
+            color: var(--gray-500);
+            font-weight: 600;
+        }
+
+
+
+        @media (max-width:640px) {
+            .myCarousel {
+                perspective: none;
+            }
+
+            .myCarousel .swiper-slide {
+                transform: none;
+            }
+
+            .printer-card {
+                width: 100vw;
+                max-width: 100%;
+                box-sizing: border-box;
+                transform: none;
+            }
+        }
+
+        /* --- NEW: Print History Box --- */
+        .history-box {
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .history-box h4 {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--gray-600);
+            margin-bottom: 0.5rem;
+        }
+
+        .history-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 120px;
+            /* This creates the scroll trigger */
+            overflow-y: auto;
+            /* This enables the scrollbar when needed */
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            background-color: var(--gray-50);
+        }
+
+        .history-list li {
+            font-size: 0.8em;
+            padding: 0.4rem 0.6rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-list li:not(:last-child) {
+            border-bottom: 1px dashed var(--gray-200);
+        }
+
+        .history-filename {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-right: 1rem;
+            color: var(--gray-700);
+        }
+
+        .history-energy {
+            font-weight: 600;
+            color: var(--primary);
+            white-space: nowrap;
+            background-color: var(--primary-light);
+            padding: 0.1rem 0.4rem;
+            border-radius: var(--radius-sm);
+        }
+
+        /* --- NEW: Global History Table --- */
+        .global-history-container {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+
+        .global-history-container h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--gray-800);
+        }
+
+        #history-search {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-md);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .history-table-wrapper {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        #global-history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #global-history-table th,
+        #global-history-table td {
+            padding: 0.75rem 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        #global-history-table th {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        #global-history-table th:hover {
+            background-color: var(--gray-50);
+        }
+
+        #global-history-table td {
+            font-size: 0.85rem;
+            color: var(--gray-700);
+        }
+
+        #global-history-table .energy-cell {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* --- NEW: Styles for Thumbnails & Per-Part Analysis --- */
+        .history-thumbnail {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: var(--radius-sm);
+            margin-right: 0.5rem;
+        }
+
+        #global-history-table .preview-cell {
+            width: 80px;
+            /* Give the preview column a fixed width */
+        }
+
+        .history-list li {
+            align-items: flex-start;
+            /* Align items to the top for better look with multi-line text */
+        }
+
+        .per-part-analysis-container {
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .per-part-analysis-container h5 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
+        }
+
+        .per-part-list {
+            list-style: none;
+            padding: 0;
+            font-size: 0.8rem;
+        }
+
+        .per-part-list li {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.3rem 0;
+        }
+
+        .part-name {
+            color: var(--gray-600);
+        }
+
+        .part-energy {
+            font-weight: 500;
+            color: var(--gray-800);
+        }
+
+
+        /* --- NEW: Per-Part Analysis on Card Front --- */
+        .per-part-analysis-front {
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px dashed var(--gray-200);
+        }
+
+        .per-part-analysis-front h5 {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            margin-bottom: 0.3rem;
+        }
+
+        .per-part-analysis-front ul {
+            list-style: none;
+            padding-left: 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .per-part-analysis-front li {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .per-part-analysis-front .part-name {
+            color: var(--gray-700);
+        }
+
+        .per-part-analysis-front .part-energy {
+            font-weight: 500;
+            color: var(--gray-800);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="printer-card" style="width: 480px; margin: 0 auto; min-height: auto;">
+         <div class="card-face card-face-front" style="background-image: url('{{ plant_image_url }}');">
+             <div class="card-header">
+                 <div class="name-model">
+                     <h3 class="card-friendly-name">{{ device.friendly_name }}</h3>
+                     <p class="card-model">{{ device.device_model }}</p>
+                 </div>
+                 <span class="card-status status-printing">Completed</span>
+             </div>
+             <div class="card-body">
+                 <div class="card-details info-block">
+                     <div class="detail-item">
+                         <span class="detail-label">Current Material</span>
+                         <span class="detail-value card-material"><i class="fas fa-tint"></i><span class="text-value">{{ job.material or 'N/A' }}</span></span>
+                     </div>
+                     <div class="detail-item">
+                         <span class="detail-label">Size Category</span>
+                         <span class="detail-value card-size"><i class="fas fa-box-open"></i><span class="text-value">{{ device.printer_size_category or 'N/A' }}</span></span>
+                     </div>
+                     <div class="detail-item">
+                         <span class="detail-label">Current Temps (Final)</span>
+                         <span class="detail-value card-temps">
+                            <i class="fas fa-temperature-high"></i> Nzl: {%- if job.nozzle_temp_actual is not none %}{{ job.nozzle_temp_actual|round|int }}°C{%- else %}N/A{%- endif %} |
+                            <i class="fas fa-bed"></i> Bed: {%- if job.bed_temp_actual is not none %}{{ job.bed_temp_actual|round|int }}°C{%- else %}N/A{%- endif -%}
+                         </span>
+                     </div>
+                     <div class="detail-item" style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed var(--gray-200);">
+                         <span class="detail-label">Final Job Metrics</span>
+                         <span class="detail-value last-job-time" style="font-size: 0.85em;"><i class="fas fa-clock"></i> Time: {% if job.duration_seconds is not none %}{{ (job.duration_seconds / 60)|round|int }} min{% else %}N/A{% endif %}</span>
+                         <span class="detail-value last-job-filament" style="font-size: 0.85em;"><i class="fas fa-ruler-vertical"></i> Filament: {% if job.filament_used_g is not none %}{{ '%.2f'|format(job.filament_used_g) }} g{% else %}N/A{% endif %}</span>
+                         <span class="detail-value last-job-energy" style="font-size: 0.85em;"><i class="fas fa-bolt"></i> Energy: {% if job.session_energy_wh is not none %}{{ '%.3f'|format(job.session_energy_wh / 1000.0) }} kWh{% else %}N/A{% endif %}</span>
+                     </div>
+
+                     <!-- ===== NEW VISUAL SEPARATOR ===== -->
+                     <div style="border-top: 1px dashed var(--gray-300); margin: 1rem 0;"></div>
+
+                     <div class="detail-item job-info" style="display: block;">
+                         <span class="detail-label" style="margin-bottom: 0.3rem;">Job Details</span>
+                         <span class="detail-value job-filename" style="font-size: 0.85em; display: block; word-break: break-all;">{{ job.filename or 'N/A' }}</span>
+                         {% if job.gcode_analysis_data %}
+                             <div class="job-extra-details" style="display: block;">
+                                 <span class="job-object-name-display" style="display: block; font-weight: 500;">Object: <span class="value">{{ job.gcode_analysis_data.object_name or job.filename }}</span></span>
+                                 <span class="job-infill" style="display: inline-block; margin-right: 0.5rem;">Infill: <span class="value">{% if job.gcode_analysis_data.infill_density_percent is defined and job.gcode_analysis_data.infill_density_percent is not none %}{{ job.gcode_analysis_data.infill_density_percent|round|int }}%{% else %}N/A{% endif %}</span></span>
+                                 <span class="job-layer-height" style="display: inline-block;">Layer: <span class="value">{% if job.gcode_analysis_data.layer_height_mm is defined and job.gcode_analysis_data.layer_height_mm is not none %}{{ '%.2f'|format(job.gcode_analysis_data.layer_height_mm) }}mm{% else %}N/A{% endif %}</span></span>
+                                 {% if job.gcode_analysis_data.object_dimensions_mm is defined and job.gcode_analysis_data.object_dimensions_mm and job.gcode_analysis_data.object_dimensions_mm.x is not none %}
+                                     <span class="job-dimensions" style="display: block; margin-top: 0.1rem;">Dimensions: <span class="value">{{ '%.0f'|format(job.gcode_analysis_data.object_dimensions_mm.x) }}x{{ '%.0f'|format(job.gcode_analysis_data.object_dimensions_mm.y) }}x{{ '%.0f'|format(job.gcode_analysis_data.object_dimensions_mm.z) }} mm</span></span>
+                                 {% else %}
+                                     <span class="job-dimensions" style="display: block; margin-top: 0.1rem;">Dimensions: <span class="value">N/A</span></span>
+                                 {% endif %}
+                             </div>
+                         {% else %}
+                            <div class="job-extra-details" style="display: block; font-style: italic; color: #64748b;">G-code analysis data not available.</div>
+                         {% endif %}
+
+                         <!-- ===== THE THUMBNAIL BLOCK HAS BEEN COMPLETELY REMOVED ===== -->
+
+                     </div>
+                 </div>
+             </div>
+             <div class="card-tip-section" style="display: block; margin-top: 1rem; padding-top: 0.75rem;">
+                 <p class="card-tip-text" style="font-size: 0.85rem; color: var(--gray-700); font-style: italic;"><i class="fas fa-lightbulb" style="color: var(--accent); margin-right: 0.3rem;"></i><span class="tip-content">{{ job.tipText_for_report or "Print complete." }}</span></p>
+             </div>
+         </div>
+    </div>
+</body>
+</html>

@@ -1,14 +1,19 @@
 # ====================================================================
 # FINAL Docker Compose for the ENMS Project
-# Version: 2.0 (Definitive)
+# Version: 2.1 (with PDF Generation Service)
 # ====================================================================
 
 version: '3.8'
 
+# Define named volumes for persistent data
+volumes:
+  postgres_data:
+  grafana_data:
+  generated_pdfs:   # <<< NEW: Add a named volume for our PDFs
+
 services:
-   # 1. PostgreSQL Database
+  # 1. PostgreSQL Database
   postgres:
-    # THE FINAL, VERIFIED IMAGE NAME AND TAG
     image: timescale/timescaledb:latest-pg16
     container_name: enms_postgres
     restart: unless-stopped
@@ -27,7 +32,6 @@ services:
       timeout: 5s
       retries: 5
 
-
   # 2. Node-RED Service
   nodered:
     build:
@@ -38,14 +42,13 @@ services:
     ports:
       - "1880:1880"
     volumes:
-      - ./node-red:/data            # make /data persistent & match repo (flows_docker.json lives here)
+      - ./node-red:/data
     environment:
       - NODE_RED_CREDENTIAL_SECRET=enms-prod-secret-2025
-      - FLOWS=flows_docker.json     # tells Node-RED to load /data/flows_docker.json
+      - FLOWS=flows_docker.json
     depends_on:
       - postgres
       - python_api
-
 
   # 3. Grafana Service
   grafana:
@@ -59,12 +62,10 @@ services:
       - GF_SECURITY_ALLOW_EMBEDDING=true
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
-    #  - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s/grafana
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
       - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
-      # This is the correct path for the dashboard files
       - ./grafana/dashboards:/var/lib/grafana/dashboards
     depends_on:
       postgres:
@@ -76,6 +77,9 @@ services:
       context: ./python-api
     container_name: enms_python_api
     restart: unless-stopped
+    volumes:
+      # <<< NEW: Mount the named volume to the path where PDFs are saved
+      - generated_pdfs:/app/generated_pdfs
     depends_on:
       - postgres
 
@@ -87,15 +91,11 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/conf.d:/etc/nginx/conf.d  # Use conf.d for modular configs
       - ./frontend:/usr/share/nginx/html
       - ./artistic-resources:/usr/share/nginx/html/artistic-resources
+      # <<< NEW: Mount the PDF volume read-only for serving
+      - generated_pdfs:/usr/share/nginx/html/dpp_reports:ro
     depends_on:
       - nodered
       - python_api
-
-# Define named volumes for persistent data
-volumes:
-  postgres_data:
-  grafana_data:
