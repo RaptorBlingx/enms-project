@@ -5022,7 +5022,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 540,
+        "x": 480,
         "y": 340,
         "wires": [
             [
@@ -5035,15 +5035,17 @@
         "type": "postgresql",
         "z": "f7f46f6cd7efe35e",
         "name": "Save Final Energy",
-        "query": "WITH final_energy AS (\n    -- First, get the absolute latest total energy reading for this device\n    SELECT energy_total_wh\n    FROM energy_data\n    WHERE device_id = $1 -- Corresponds to msg.params[0]\n    ORDER BY timestamp DESC\n    LIMIT 1\n)\n-- Now, update the corresponding record in the print_jobs table\nUPDATE print_jobs\n-- Set our existing column to the difference between the final energy and the stored start energy\nSET session_energy_wh = final_energy.energy_total_wh - print_jobs.start_energy_wh\nFROM final_energy\n-- We only do this for the specific job that just finished\nWHERE print_jobs.device_id = $1      -- Corresponds to msg.params[0]\nAND print_jobs.filename = $2         -- Corresponds to msg.params[1]\n-- Crucially, only do this if we have a start_energy_wh to calculate from\nAND print_jobs.start_energy_wh IS NOT NULL\n-- And only if we haven't already calculated it (prevents running twice)\nAND print_jobs.session_energy_wh IS NULL;",
+        "query": "WITH final_energy AS (\n    -- First, get the absolute latest total energy reading for this device\n    SELECT energy_total_wh\n    FROM energy_data\n    WHERE device_id = $1 -- Corresponds to msg.params[0]\n    ORDER BY timestamp DESC\n    LIMIT 1\n)\n-- Now, update the corresponding record in the print_jobs table\nUPDATE print_jobs\n-- Set our existing column to the difference between the final energy and the stored start energy\nSET session_energy_wh = final_energy.energy_total_wh - print_jobs.start_energy_wh\nFROM final_energy\n-- We only do this for the specific job that just finished\nWHERE print_jobs.device_id = $1      -- Corresponds to msg.params[0]\nAND print_jobs.filename = $2         -- Corresponds to msg.params[1]\n-- Crucially, only do this if we have a start_energy_wh to calculate from\nAND print_jobs.start_energy_wh IS NOT NULL\n-- And only if we haven't already calculated it (prevents running twice)\nAND print_jobs.session_energy_wh IS NULL\nRETURNING job_id; -- <<< THIS IS THE KEY CHANGE",
         "postgreSQLConfig": "4259e91acb63e17b",
         "split": false,
         "rowsPerMsg": 1,
         "outputs": 1,
-        "x": 810,
+        "x": 730,
         "y": 400,
         "wires": [
-            []
+            [
+                "a8dd2f4a27ef1593"
+            ]
         ],
         "info": "**Purpose:** Atomically calculates and saves the final energy consumption for a completed print job.\r\n\r\n**Inputs:**\r\n- `msg.params`: An array `[device_id, filename]`.\r\n\r\n**Logic:**\r\n- The query uses a Common Table Expression (CTE) to get the *latest* `energy_total_wh` for the device.\r\n- It then performs an `UPDATE` on the `print_jobs` table.\r\n- It calculates `session_energy_wh` by subtracting the job's `start_energy_wh` from the latest reading.\r\n- The entire operation is atomic, ensuring accuracy and efficiency. Conditions prevent it from running twice on the same job."
     },
@@ -5052,9 +5054,70 @@
         "type": "comment",
         "z": "f7f46f6cd7efe35e",
         "name": "Process: Build Final Energy Query",
-        "info": "**Purpose:** Constructs a single, powerful SQL query to calculate and save the final energy consumption for a completed print job.\n\n**Triggered By:** The job completion detection logic in the main flows.\n\n**Logic:**\n- The query uses a Common Table Expression (CTE) to get the *latest* `energy_total_wh` for the device.\n- It then performs an `UPDATE` on the `print_jobs` table.\n- It calculates `session_energy_wh` by subtracting the job's `start_energy_wh` (stored at the beginning of the print) from the latest `energy_total_wh`.\n- This atomic operation ensures the calculation is accurate and efficient.",
+        "info": "**Purpose:** Atomically calculates the final energy for a completed job, saves it to the database, and triggers the generation of a PDF report.\n\n**Triggered By:** The job completion detection logic in the main `Master Ingestion Flow`.\n\n**Process:**\n1.  Receives a message with the `device_id` and `filename` for the completed job.\n2.  Executes a single, atomic SQL query against the database.\n3.  The query calculates `session_energy_wh` by subtracting the job's `start_energy_wh` from the latest available energy reading.\n4.  The query **returns the unique `job_id`** of the completed job record.\n5.  This `job_id` is then passed to a new function that prepares and triggers an API call to the external PDF generation service.",
         "x": 560,
         "y": 280,
+        "wires": []
+    },
+    {
+        "id": "a8dd2f4a27ef1593",
+        "type": "function",
+        "z": "f7f46f6cd7efe35e",
+        "name": "Prepare PDF Gen Payload",
+        "func": "// The database returns the result in msg.payload.\n// It's an array of objects, like: [{ \"job_id\": 12345 }]\n\nif (msg.payload && msg.payload.length > 0 && msg.payload[0].job_id) {\n\n    const job_id = msg.payload[0].job_id;\n    node.log(\"Extracted job_id: \" + job_id + \" for PDF generation.\");\n\n    // Overwrite msg.payload for the next node\n    msg.payload = {\n        \"job_id\": job_id\n    };\n\n    return msg;\n\n} else {\n    node.warn(\"Could not find job_id in DB response. Skipping PDF generation.\");\n    return null; // Stop the flow here\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 980,
+        "y": 400,
+        "wires": [
+            [
+                "f895144d54b45750"
+            ]
+        ]
+    },
+    {
+        "id": "f895144d54b45750",
+        "type": "http request",
+        "z": "f7f46f6cd7efe35e",
+        "name": "Generate DPP PDF",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://python_api:5000/api/generate_dpp_pdf",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1230,
+        "y": 400,
+        "wires": [
+            [
+                "ad28e0699e3bb18f"
+            ]
+        ]
+    },
+    {
+        "id": "ad28e0699e3bb18f",
+        "type": "debug",
+        "z": "f7f46f6cd7efe35e",
+        "name": "debug 7",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1420,
+        "y": 400,
         "wires": []
     }
 ]

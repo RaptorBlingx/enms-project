@@ -453,12 +453,14 @@
             "1895161b40f4b2c6",
             "a849c171e8e54fe4",
             "fa016904d46e14e2",
-            "637017bc129598ca"
+            "637017bc129598ca",
+            "00554013c989e511",
+            "8e468d1a2e629d6c"
         ],
         "x": 1434,
         "y": 619,
         "w": 752,
-        "h": 402
+        "h": 422
     },
     {
         "id": "5e9c772230c2d4b1",
@@ -4577,8 +4579,12 @@
             [
                 "637017bc129598ca"
             ],
-            [],
-            []
+            [
+                "8e468d1a2e629d6c"
+            ],
+            [
+                "00554013c989e511"
+            ]
         ],
         "info": "**Purpose:** Executes the `gcode_analyzer.py` script to extract the thumbnail and perform per-part volume analysis.\r\n**Logic:** It passes the path to the temporarily saved G-code file (`/tmp/temp_gcode.gcode`) and the `job_id` to the script."
     },
@@ -4679,6 +4685,42 @@
         "statusType": "auto",
         "x": 810,
         "y": 560,
+        "wires": []
+    },
+    {
+        "id": "00554013c989e511",
+        "type": "debug",
+        "z": "088fab733419c707",
+        "g": "ec87e2210a0fba2e",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1730,
+        "y": 960,
+        "wires": []
+    },
+    {
+        "id": "8e468d1a2e629d6c",
+        "type": "debug",
+        "z": "088fab733419c707",
+        "g": "ec87e2210a0fba2e",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1830,
+        "y": 1000,
         "wires": []
     },
     {
