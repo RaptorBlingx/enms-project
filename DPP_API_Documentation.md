@@ -218,6 +218,7 @@ Each object in the `globalHistory` array represents a single completed print job
 | `kwh`         | float                     | `print_jobs` (`session_energy_wh`)| The total energy consumed by the job, in kWh.                |
 | `completedAt` | string (ISO 8601)         | `print_jobs` (`end_time`)       | The timestamp when the job was completed.                    |
 | `thumbnailUrl`| string                    | `print_jobs` (`thumbnail_url`)  | A URL to a thumbnail image of the printed object. `null` if not available. |
+| `pdfUrl`      | string                    | `print_jobs` (`dpp_pdf_url`)    | A URL to the automatically generated PDF report for this job. `null` if the report is not yet available.|
 
 ### 4.5. Field Nullability
 
