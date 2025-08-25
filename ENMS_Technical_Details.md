@@ -43,9 +43,11 @@ This is the core of the system where data is processed, stored, and analyzed. Al
     *   **TimescaleDB Extension:** This extension transforms standard PostgreSQL tables into hypertables, which are optimized for fast ingestion and complex queries on time-series data like energy readings and sensor data.
 *   **Python Backend & Analysis Module:** This consists of a set of Python scripts that provide advanced analytical capabilities.
     *   **Flask API (`/api/dpp_summary`):** A lightweight web server that provides a real-time summary of all printers for the DPP frontend. It queries the database directly to generate this data.
+    *   **PDF Generation Service (`/api/generate_dpp_pdf`):** A new endpoint within the Flask API. Triggered by Node-RED upon job completion, it fetches final job data from PostgreSQL, renders it into an HTML template, and uses the WeasyPrint library to generate a final PDF report.
     *   **ML Analysis Scripts (`gcode_analyzer.py`, `train_model.py`):**
         *   `gcode_analyzer.py`: Executed by Node-RED to parse G-code files, extract metadata, and generate thumbnails.
         *   `train_model.py`: An offline script used to train the power prediction model. It uses the **XGBoost** algorithm to create a model file (`best_model.joblib`) that the `Live Predictor` flow in Node-RED then uses for making real-time predictions.
+      
 
 #### 1.2.4. Application Layer (The User Interface)
 
