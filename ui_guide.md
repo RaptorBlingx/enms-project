@@ -35,6 +35,20 @@ The Staff Profile is tailored for factory managers, operations staff, and team m
 *   **Description:** This is the primary overview dashboard in Grafana for the entire printer fleet. It provides high-level metrics on machine status (e.g., how many are printing, idle, or offline), recent job history, and overall energy consumption trends.
 *   **Screenshot:**
     ![Fleet Operations](docs/Fleet%20Operations.png)
+#### **Downloading Job Reports (Digital Product Passport)**
+
+A key feature of the "Recent Print Jobs" table on this dashboard is the ability to download a permanent record for any completed print.
+
+*   **PDF Report:** In the "Report" column, a <i class="fas fa-file-pdf"></i> PDF icon will appear for any job that has a generated report.
+*   **Purpose:** Clicking this icon allows you to download a detailed, single-page **Digital Product Passport** for that specific job.
+*   **Content:** This PDF contains the final, authoritative data for the print, including:
+    *   Total energy consumption and print duration.
+    *   Material used and filament quantity.
+    *   Key G-code metadata (object name, layer height, etc.).
+    *   The final "energy plant" image, providing a visual summary of the job's energy footprint.
+
+This report serves as a permanent certificate that can be kept with the physical printed object for traceability and quality assurance.
+
 
 ### 2.2. Performance Comparison
 
@@ -57,3 +71,18 @@ The DPP (Digital Product Passport) Profile is a specialized, visually-rich view 
 *   **Description:** This tab loads the custom DPP page (`dpp_page.html`). It displays the printer fleet as an interactive carousel of "cards". Each card shows the live status of a printer, its current job progress, and key energy metrics. The cards can be flipped to reveal more detailed analysis and historical data. A key feature is the live 3D rendering of the G-code for the part currently being printed.
 *   **Screenshot:**
     ![DPP Card](docs/DPP%20Card.png)
+
+#### **Downloading Job Reports (Digital Product Passport)**
+
+A key feature of the "Recent Print Jobs" table on this dashboard is the ability to download a permanent record for any completed print.
+
+*   **PDF Report:** In the "Report" column, a <i class="fas fa-file-pdf"></i> PDF icon will appear for any job that has a generated report.
+*   **Purpose:** Clicking this icon allows you to download a detailed, single-page **Digital Product Passport** for that specific job.
+*   **Content:** This PDF contains the final, authoritative data for the print, including:
+    *   Total energy consumption and print duration.
+    *   Material used and filament quantity.
+    *   Key G-code metadata (object name, layer height, etc.).
+    *   The final "energy plant" image, providing a visual summary of the job's energy footprint.
+
+This report serves as a permanent certificate that can be kept with the physical printed object for traceability and quality assurance.
+
