@@ -62,6 +62,7 @@ curl http://<your_enms_instance_ip>/api/dpp_summary
 
 The response is a JSON object containing two top-level keys: `printers` and `globalHistory`.
 
+> *This example only applies to Prusa; skip if using SimplyPrint.*
 ```json
 {
   "printers": [
@@ -123,7 +124,7 @@ The response is a JSON object containing two top-level keys: `printers` and `glo
       "lastJobKwh": 0.55,
       "currentStatus": "Idle",
       "isPrintingNow": false,
-      ...
+      "..."
     }
   ],
   "globalHistory": [
@@ -186,7 +187,7 @@ Each object in the `printers` array represents a single device and its current s
 | `jobProgressPercent`    | float   | `printer_status` (`progress_percent`)                      | The completion percentage of the current print job (0-100).                                                                              |
 | `jobTimeLeftSeconds`    | integer | `printer_status` (`time_left_seconds`)                     | The estimated time remaining for the current print job, in seconds.                                                                      |
 | `jobKwhConsumed`        | float   | Calculated from `energy_data`                              | The energy consumed by the current print job so far, in kWh.                                                                             |
-| `gcodePath`             | string  | `devices` (`gcode_preview_host`, `filename`)               | The full URL to download the G-code file for the current job. `null` if not available.                                                   |
+| `gcodePath`             | string  | `devices` (`gcode_preview_host`, `filename`)               | The full URL to download the G-code file for the current job. `null` if not available. *This only applies to Prusa; skip if using SimplyPrint.* |
 | `gcode_preview_api_key` | string  | `devices` (`gcode_preview_api_key`)                        | The API key required to access the `gcodePath`, if applicable.                                                                           |
 | `job_details`           | object  | `print_jobs` (`gcode_analysis_data`)                       | A JSONB object containing metadata from the G-code file. See section 4.3.                                                              |
 | `history`               | array   | `print_jobs`                                               | An array of objects representing the last 5 completed jobs for this specific printer.                                                    |

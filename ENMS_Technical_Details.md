@@ -18,7 +18,7 @@ The following diagram illustrates the high-level system architecture, showing th
 
 This layer consists of the physical hardware and devices that generate data.
 
-*   **Printers/Machines:** These are the primary assets being monitored. The system is designed to handle various 3D printers (e.g., Prusa MK4, Prusa Mini, Ender-3) and can be extended to other industrial machines. They provide operational data such as temperature, job progress, and state.
+*   **Printers/Machines:** These are the primary assets being monitored. The system is designed to handle various 3D printers (e.g., Prusa MK4, Prusa Mini, Ender-3) and can be extended to other industrial machines. They provide operational data such as temperature, job progress, and state. *This only applies to Prusa; skip if using SimplyPrint.*
 *   **Smart Plugs:** Shelly smart plugs are used to monitor the electrical energy consumption of each connected machine. They provide real-time data on power (Watts), total energy (Watt-hours), voltage, and current.
 *   **ESP32 Sensor Hub:** A custom environmental sensor hub based on an ESP32 microcontroller. It is equipped with sensors like the DHT22 (temperature and humidity) and MPU6050 (accelerometer/gyroscope) to capture ambient conditions and machine vibration data.
   
@@ -486,6 +486,8 @@ The system uses TimescaleDB to efficiently manage large volumes of time-series d
 This section provides a detailed look at specific, advanced modules within the ENMS project.
 
 ### 6.1. Interactive Analysis Module (`/api/analyze`)
+
+> **Note:** Interactive Analysis is designed for Prusa APIs only. For SimplyPrint, use the DPP Page and Node-RED flows under **Historical Enrichment**.
 
 The interactive analysis module is one of the most powerful features of the platform. It allows users to perform a deep-dive analysis of a specific printer's performance, correlating its energy consumption with various operational and environmental factors. This entire process is orchestrated by the `Analysis API` flow in Node-RED.
 

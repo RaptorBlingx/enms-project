@@ -516,7 +516,7 @@ https://nodered.org/docs/security.html for details.
      */
     functionGlobalContext: {
         // os:require('os'),
-    pythonPath: '/home/ubuntu/.node-red/venv/bin/python3'
+    pythonPath: 'python3'
 },
 
     /** The maximum number of messages nodes will buffer internally as part of their
