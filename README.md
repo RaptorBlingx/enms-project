@@ -63,6 +63,14 @@ MQTT_USER=mqtt_user
 MQTT_PASSWORD=mqtt_pass
 ```
 
+In addition to the `.env` file for credentials, the project uses environment variables to define paths for data, models, and Python scripts. These are set in the `docker-compose.yml` and `docker-compose.override.yml` files.
+
+| Variable      | Description                                                                                                  | Default Value           |
+|---------------|--------------------------------------------------------------------------------------------------------------|-------------------------|
+| `PROJECT_PY`  | Mounts the entire Python API source code into the `python-api` container. Essential for development.           | `./python-api`          |
+| `MODEL_DIR`   | Mounts the directory containing pre-trained machine learning models into the `node-red` container.             | `./backend/models`      |
+| `DATA_DIR`    | Mounts the directory containing raw data (like CSV files for model training) into the `node-red` container.    | `./backend/data`        |
+
 ---
 
 ## 📦 Project Structure

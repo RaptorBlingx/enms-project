@@ -58,6 +58,8 @@ This report serves as a permanent certificate that can be kept with the physical
 
 ### 2.3. Interactive Analysis
 
+> **Note:** Interactive Analysis is designed for Prusa APIs only. For SimplyPrint, use the DPP Page and Node-RED flows under **Historical Enrichment**.
+
 *   **Description:** This view loads the custom analysis page (`analysis_page.html`). It provides a powerful, user-friendly interface to run detailed backend analyses. Users can select a specific printer, a time range, and various operational "drivers" (like nozzle temperature) to see how they correlate with energy consumption. The results are displayed in a series of charts and summary tables.
 *   **Screenshot:**
     ![Interactice Analysis](docs/Interactice%20Analysis.png)

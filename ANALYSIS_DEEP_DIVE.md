@@ -6,6 +6,8 @@ It is intended for developers, system integrators, and technical partners who ne
 
 ## 1. Interactive Analysis Deep Dive
 
+> **Note:** Interactive Analysis is designed for Prusa APIs only. For SimplyPrint, use the DPP Page and Node-RED flows under **Historical Enrichment**.
+
 This section breaks down the end-to-end workflow of the Interactive Analysis page, from a user clicking a button in the UI to the results being displayed. The entire process is orchestrated by a powerful Node-RED flow that acts as a backend API, dynamically querying the database and executing a Python script to perform complex analysis.
 
 Here is a high-level overview of the data flow:
@@ -45,7 +47,7 @@ Here is a high-level overview of the data flow:
 
 The process begins with the user on the Interactive Analysis page. The user has several controls to define the scope of their analysis:
 
-*   **Device Dropdown:** Selects the target device (e.g., `PrusaMK4-1`).
+*   **Device Dropdown:** Selects the target device (e.g., `PrusaMK4-1`). *This only applies to Prusa; skip if using SimplyPrint.*
 *   **Time Range Buttons:** Chooses the time window for the analysis (e.g., `Last 24 hours`, `Last 7 days`).
 *   **Driver Checkboxes:** Selects various operational or environmental factors to correlate with energy consumption. These "drivers" correspond to columns in the database, such as `nozzle_temp_actual`, `is_printing`, and `z_height_mm`.
 
@@ -173,7 +175,7 @@ The comparison is done using **K-Fold Cross-Validation** (with 5 folds). The scr
 
 ### Step 4: Saving the Model Artifacts
 
-After successful training and evaluation, the script saves several crucial files (artifacts) to the `/home/ubuntu/monitor_ml/models` directory. This directory is mapped as a Docker volume, allowing the trained models to be persisted and accessed by other services (like Node-RED).
+After successful training and evaluation, the script saves several crucial files (artifacts) to the directory specified by the `MODEL_DIR` environment variable (e.g., `./models`). This directory is mapped as a Docker volume, allowing the trained models to be persisted and accessed by other services (like Node-RED). See the `docker-compose.yml` file for details.
 
 The following artifacts are saved:
 *   `best_model.joblib`: The trained model object itself (e.g., the trained RandomForestRegressor).
@@ -221,7 +223,7 @@ In short: **Correlation is a simple, live analysis of your selected inputs. Feat
     # Example of running inside the container
     docker compose exec enms-nodered python /usr/src/node-red/backend/train_model.py
     ```
-4.  **Verify the Output:** The script will print the new evaluation metrics and save the updated artifacts (`best_model.joblib`, `scaler.joblib`, etc.) to the mapped volume in `/home/ubuntu/monitor_ml/models`.
+4.  **Verify the Output:** The script will print the new evaluation metrics and save the updated artifacts (`best_model.joblib`, `scaler.joblib`, etc.) to the mapped volume specified by `MODEL_DIR`.
 5.  **Automatic Pickup:** The `Analysis API` and `Live Predictor` flows will automatically pick up the new model artifacts on their next execution, as they load the model from the file each time they run.
 
 #### Q4: Why do I sometimes see "N/A" or get an error for the Correlation analysis?
