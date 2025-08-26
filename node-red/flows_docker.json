@@ -449,13 +449,13 @@
             "548b0a238325e0b8",
             "70cdf05dcd27462d",
             "7ac7a420743ace0c",
-            "a6a79f6ee9526497",
             "1895161b40f4b2c6",
             "a849c171e8e54fe4",
             "fa016904d46e14e2",
             "637017bc129598ca",
             "00554013c989e511",
-            "8e468d1a2e629d6c"
+            "8e468d1a2e629d6c",
+            "c8a9510c9ac279b9"
         ],
         "x": 1434,
         "y": 619,
@@ -4471,7 +4471,7 @@
         "z": "088fab733419c707",
         "g": "ec87e2210a0fba2e",
         "name": "Build G-code Download URL",
-        "func": "// This node now builds the direct API call and PRESERVES critical data for later nodes.\n\n// --- PRESERVE DATA ---\n// We are copying the data we need into new 'preserved_' properties.\n// This protects them from being overwritten by the http request or exec nodes.\nmsg.preserved_job_id = msg.job_id;\nmsg.preserved_device_config = msg.original_device_config;\nmsg.preserved_job_details = msg.job_details;\n// -------------------\n\nconst device = msg.original_device_config;\n\nmsg.url = `https://api.simplyprint.io/${device.sp_company_id}/printers/DownloadGcode?job_uid=${msg.job_details.uid}`;\n\nmsg.headers = {\n    'X-API-KEY': device.sp_api_key\n};\n\nreturn msg;",
+        "func": "// This node now builds the direct API call and PRESERVES critical data for later nodes.\n\n// --- PRESERVE DATA ---\n// We are copying the data we need into new 'preserved_' properties.\n// This protects them from being overwritten by the http request or exec nodes.\nmsg.preserved_job_id = msg.job_id;\nmsg.preserved_device_config = msg.original_device_config;\nmsg.preserved_job_details = msg.job_details;\n// -------------------\n\nconst device = msg.original_device_config;\n\nmsg.url = `https://api.simplyprint.io/${device.sp_company_id}/jobs/${msg.job_details.uid}/gcode`;\n\nmsg.headers = {\n    'X-API-KEY': device.sp_api_key\n};\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -4528,35 +4528,7 @@
         "y": 780,
         "wires": [
             [
-                "a6a79f6ee9526497"
-            ]
-        ]
-    },
-    {
-        "id": "a6a79f6ee9526497",
-        "type": "change",
-        "z": "088fab733419c707",
-        "g": "ec87e2210a0fba2e",
-        "name": "Build Analyzer Command",
-        "rules": [
-            {
-                "t": "set",
-                "p": "payload",
-                "pt": "msg",
-                "to": "'/data/scripts/gcode_analyzer.py --file /tmp/temp_gcode.gcode --jobid ' & preserved_job_id\t",
-                "tot": "jsonata"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 1670,
-        "y": 840,
-        "wires": [
-            [
-                "1895161b40f4b2c6"
+                "c8a9510c9ac279b9"
             ]
         ]
     },
@@ -4622,7 +4594,7 @@
         "z": "088fab733419c707",
         "g": "ec87e2210a0fba2e",
         "name": "UPDATE Job with Analysis",
-        "query": "UPDATE print_jobs \nSET thumbnail_url = $1, per_part_analysis = $2 \nWHERE simplyprint_job_id = $3;",
+        "query": "UPDATE print_jobs\nSET\n  thumbnail_url     = COALESCE($1, thumbnail_url),\n  per_part_analysis = COALESCE($2, per_part_analysis)\nWHERE simplyprint_job_id = $3;\n",
         "postgreSQLConfig": "4259e91acb63e17b",
         "split": false,
         "rowsPerMsg": 1,
@@ -4722,6 +4694,27 @@
         "x": 1830,
         "y": 1000,
         "wires": []
+    },
+    {
+        "id": "c8a9510c9ac279b9",
+        "type": "function",
+        "z": "088fab733419c707",
+        "g": "ec87e2210a0fba2e",
+        "name": "Build Analyzer Command",
+        "func": "// Build exec args using env var; Exec node already runs `python3`\nconst base = env.get('PROJECT_PY') || '/opt/enms/python-api';\nconst gcodeFile = '/tmp/temp_gcode.gcode';\nconst jobid = Number(msg.preserved_job_id || msg.job_id);\n\nif (!Number.isFinite(jobid)) {\n    node.error('Missing/invalid job id', msg);\n    return null;\n}\n\n// IMPORTANT: payload must be ONLY script + args (NO \"python3\" here)\nmsg.payload = `${base}/gcode_analyzer.py --file \"${gcodeFile}\" --jobid ${jobid}`;\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1710,
+        "y": 840,
+        "wires": [
+            [
+                "1895161b40f4b2c6"
+            ]
+        ]
     },
     {
         "id": "878bdfc6b43e57cb",
@@ -5022,7 +5015,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 480,
+        "x": 540,
         "y": 340,
         "wires": [
             [
@@ -5035,17 +5028,15 @@
         "type": "postgresql",
         "z": "f7f46f6cd7efe35e",
         "name": "Save Final Energy",
-        "query": "WITH final_energy AS (\n    -- First, get the absolute latest total energy reading for this device\n    SELECT energy_total_wh\n    FROM energy_data\n    WHERE device_id = $1 -- Corresponds to msg.params[0]\n    ORDER BY timestamp DESC\n    LIMIT 1\n)\n-- Now, update the corresponding record in the print_jobs table\nUPDATE print_jobs\n-- Set our existing column to the difference between the final energy and the stored start energy\nSET session_energy_wh = final_energy.energy_total_wh - print_jobs.start_energy_wh\nFROM final_energy\n-- We only do this for the specific job that just finished\nWHERE print_jobs.device_id = $1      -- Corresponds to msg.params[0]\nAND print_jobs.filename = $2         -- Corresponds to msg.params[1]\n-- Crucially, only do this if we have a start_energy_wh to calculate from\nAND print_jobs.start_energy_wh IS NOT NULL\n-- And only if we haven't already calculated it (prevents running twice)\nAND print_jobs.session_energy_wh IS NULL\nRETURNING job_id; -- <<< THIS IS THE KEY CHANGE",
+        "query": "WITH final_energy AS (\n    -- First, get the absolute latest total energy reading for this device\n    SELECT energy_total_wh\n    FROM energy_data\n    WHERE device_id = $1 -- Corresponds to msg.params[0]\n    ORDER BY timestamp DESC\n    LIMIT 1\n)\n-- Now, update the corresponding record in the print_jobs table\nUPDATE print_jobs\n-- Set our existing column to the difference between the final energy and the stored start energy\nSET session_energy_wh = final_energy.energy_total_wh - print_jobs.start_energy_wh\nFROM final_energy\n-- We only do this for the specific job that just finished\nWHERE print_jobs.device_id = $1      -- Corresponds to msg.params[0]\nAND print_jobs.filename = $2         -- Corresponds to msg.params[1]\n-- Crucially, only do this if we have a start_energy_wh to calculate from\nAND print_jobs.start_energy_wh IS NOT NULL\n-- And only if we haven't already calculated it (prevents running twice)\nAND print_jobs.session_energy_wh IS NULL;",
         "postgreSQLConfig": "4259e91acb63e17b",
         "split": false,
         "rowsPerMsg": 1,
         "outputs": 1,
-        "x": 730,
+        "x": 810,
         "y": 400,
         "wires": [
-            [
-                "a8dd2f4a27ef1593"
-            ]
+            []
         ],
         "info": "**Purpose:** Atomically calculates and saves the final energy consumption for a completed print job.\r\n\r\n**Inputs:**\r\n- `msg.params`: An array `[device_id, filename]`.\r\n\r\n**Logic:**\r\n- The query uses a Common Table Expression (CTE) to get the *latest* `energy_total_wh` for the device.\r\n- It then performs an `UPDATE` on the `print_jobs` table.\r\n- It calculates `session_energy_wh` by subtracting the job's `start_energy_wh` from the latest reading.\r\n- The entire operation is atomic, ensuring accuracy and efficiency. Conditions prevent it from running twice on the same job."
     },
@@ -5054,70 +5045,9 @@
         "type": "comment",
         "z": "f7f46f6cd7efe35e",
         "name": "Process: Build Final Energy Query",
-        "info": "**Purpose:** Atomically calculates the final energy for a completed job, saves it to the database, and triggers the generation of a PDF report.\n\n**Triggered By:** The job completion detection logic in the main `Master Ingestion Flow`.\n\n**Process:**\n1.  Receives a message with the `device_id` and `filename` for the completed job.\n2.  Executes a single, atomic SQL query against the database.\n3.  The query calculates `session_energy_wh` by subtracting the job's `start_energy_wh` from the latest available energy reading.\n4.  The query **returns the unique `job_id`** of the completed job record.\n5.  This `job_id` is then passed to a new function that prepares and triggers an API call to the external PDF generation service.",
+        "info": "**Purpose:** Constructs a single, powerful SQL query to calculate and save the final energy consumption for a completed print job.\n\n**Triggered By:** The job completion detection logic in the main flows.\n\n**Logic:**\n- The query uses a Common Table Expression (CTE) to get the *latest* `energy_total_wh` for the device.\n- It then performs an `UPDATE` on the `print_jobs` table.\n- It calculates `session_energy_wh` by subtracting the job's `start_energy_wh` (stored at the beginning of the print) from the latest `energy_total_wh`.\n- This atomic operation ensures the calculation is accurate and efficient.",
         "x": 560,
         "y": 280,
-        "wires": []
-    },
-    {
-        "id": "a8dd2f4a27ef1593",
-        "type": "function",
-        "z": "f7f46f6cd7efe35e",
-        "name": "Prepare PDF Gen Payload",
-        "func": "// The database returns the result in msg.payload.\n// It's an array of objects, like: [{ \"job_id\": 12345 }]\n\nif (msg.payload && msg.payload.length > 0 && msg.payload[0].job_id) {\n\n    const job_id = msg.payload[0].job_id;\n    node.log(\"Extracted job_id: \" + job_id + \" for PDF generation.\");\n\n    // Overwrite msg.payload for the next node\n    msg.payload = {\n        \"job_id\": job_id\n    };\n\n    return msg;\n\n} else {\n    node.warn(\"Could not find job_id in DB response. Skipping PDF generation.\");\n    return null; // Stop the flow here\n}",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 980,
-        "y": 400,
-        "wires": [
-            [
-                "f895144d54b45750"
-            ]
-        ]
-    },
-    {
-        "id": "f895144d54b45750",
-        "type": "http request",
-        "z": "f7f46f6cd7efe35e",
-        "name": "Generate DPP PDF",
-        "method": "POST",
-        "ret": "obj",
-        "paytoqs": "ignore",
-        "url": "http://python_api:5000/api/generate_dpp_pdf",
-        "tls": "",
-        "persist": false,
-        "proxy": "",
-        "insecureHTTPParser": false,
-        "authType": "",
-        "senderr": false,
-        "headers": [],
-        "x": 1230,
-        "y": 400,
-        "wires": [
-            [
-                "ad28e0699e3bb18f"
-            ]
-        ]
-    },
-    {
-        "id": "ad28e0699e3bb18f",
-        "type": "debug",
-        "z": "f7f46f6cd7efe35e",
-        "name": "debug 7",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1420,
-        "y": 400,
         "wires": []
     }
 ]

@@ -43,9 +43,11 @@ services:
       - "1880:1880"
     volumes:
       - ./node-red:/data
+      - ./python-api:/opt/enms/python-api:ro    # <- ADDED: mount python-api into container (read-only)
     environment:
       - NODE_RED_CREDENTIAL_SECRET=enms-prod-secret-2025
       - FLOWS=flows_docker.json
+      - PROJECT_PY=/opt/enms/python-api         # <- ADDED: path inside container
     depends_on:
       - postgres
       - python_api
