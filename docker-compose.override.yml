@@ -11,6 +11,9 @@ services:
   python_api:
     volumes:
       - ./python-api:/app
+      - ./backend:/app/backend
+    environment:
+      - MODEL_DIR=/app/backend/models
 
   web_server:
     volumes:
