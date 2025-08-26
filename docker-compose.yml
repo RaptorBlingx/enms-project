@@ -44,10 +44,12 @@ services:
     volumes:
       - ./node-red:/data
       - ./python-api:/opt/enms/python-api:ro    # <- ADDED: mount python-api into container (read-only)
+      - ./backend/models:/opt/enms/backend/models:ro     # <-- mount the backend models
     environment:
       - NODE_RED_CREDENTIAL_SECRET=enms-prod-secret-2025
       - FLOWS=flows_docker.json
       - PROJECT_PY=/opt/enms/python-api         # <- ADDED: path inside container
+      - MODEL_DIR=/opt/enms/backend/models
     depends_on:
       - postgres
       - python_api
@@ -82,6 +84,8 @@ services:
     volumes:
       # <<< NEW: Mount the named volume to the path where PDFs are saved
       - generated_pdfs:/app/generated_pdfs
+      - ./python-api:/app
+      - ./backend:/app/backend:rw
     depends_on:
       - postgres
 
