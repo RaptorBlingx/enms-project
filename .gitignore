@@ -1,2 +1,4 @@
 *.sql.gz
 *-all-data.sql
+node-red/.npm/_logs/
+node-red/.flows_docker_cred.json.backup
