@@ -1,0 +1,1948 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energy Analysis Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Added modern font and icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Modern CSS Reset & Variables */
+        :root {
+            --primary: #3a5bf9;
+            --primary-dark: #2a3ef0;
+            --primary-light: #eaedff;
+            --secondary: #5d6b98;
+            --accent: #00c896;
+            --accent-light: #e4f9f3;
+            --warning: #f9a63a;
+            --danger: #ff5a75;
+            --danger-light: #ffebee;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            color: var(--gray-800);
+            background-color: var(--gray-100);
+            line-height: 1.5;
+            display: flex;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Typography */
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 1rem;
+        }
+
+        /* Layout Structure */
+        .controls {
+            width: 320px;
+            background-color: white;
+            box-shadow: var(--shadow-md);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            border-right: 1px solid var(--gray-200);
+            z-index: 10;
+        }
+
+        .results {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .info-icon {
+            margin-left: 0.5rem;
+            /* Add some space */
+            color: var(--secondary);
+            /* Use a less prominent color */
+            font-size: 0.9em;
+            /* Make it slightly smaller */
+            cursor: help;
+            /* Change cursor on hover */
+        }
+
+        /* Control Elements */
+        .control-card {
+            background-color: white;
+            border-radius: var(--radius-md);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.625rem 0.75rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--gray-300);
+            background-color: white;
+            color: var(--gray-800);
+            font-size: 0.875rem;
+            transition: var(--transition-fast);
+            margin-bottom: 1rem;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1rem;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        /* Fieldset Styling */
+        fieldset.driver-group {
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-bottom: 1.25rem;
+            background-color: var(--gray-50);
+        }
+
+        fieldset.driver-group legend {
+            padding: 0 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--gray-700);
+        }
+
+        .driver-group div {
+            display: flex;
+            align-items: center;
+            margin: 0.625rem 0;
+        }
+
+        /* Custom Checkbox Styling */
+        .driver-group input[type="checkbox"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background-color: white;
+            margin: 0;
+            width: 1.15rem;
+            height: 1.15rem;
+            border: 1px solid var(--gray-400);
+            border-radius: 3px;
+            display: grid;
+            place-content: center;
+            margin-right: 0.75rem;
+            transition: var(--transition-fast);
+        }
+
+        .driver-group input[type="checkbox"]::before {
+            content: "";
+            width: 0.65rem;
+            height: 0.65rem;
+            transform: scale(0);
+            transition: var(--transition-fast);
+            box-shadow: inset 1rem 1rem var(--primary);
+            transform-origin: center;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        }
+
+        .driver-group input[type="checkbox"]:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .driver-group input[type="checkbox"]:checked::before {
+            transform: scale(1);
+            background-color: white;
+            box-shadow: none;
+        }
+
+        .driver-group input[type="checkbox"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .driver-group label {
+            margin-bottom: 0;
+            font-weight: 400;
+            color: var(--gray-800);
+            font-size: 0.875rem;
+        }
+
+        /* Time Range Button Group */
+        /* --- Paste New Time Range CSS Here --- */
+
+        /* Time Range Component */
+        .time-range-container {
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg, 8px);
+            padding: 1rem 1.25rem;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .time-range-container:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .time-range-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            font-size: 1rem;
+            padding: 0 0.75rem;
+            /* Adjusted padding slightly */
+            margin-bottom: 0.75rem;
+            /* Increased margin */
+        }
+
+        .time-icon {
+            color: var(--primary, #4f46e5);
+            /* Use CSS variable if defined, else fallback */
+            stroke: currentColor;
+            /* Make SVG stroke use the color */
+            stroke-width: 2;
+            /* Ensure stroke width is set */
+        }
+
+        .time-range-selector {
+            display: flex;
+            flex-wrap: wrap;
+            /* Allow wrapping on small screens */
+            gap: 0.5rem;
+            /* margin-bottom: 0.75rem; */
+            /* Moved margin to title */
+        }
+
+        .time-range-btn {
+            /* This selector is reused but properties are different */
+            flex: 1;
+            /* Distribute space initially */
+            min-width: 50px;
+            /* Ensure minimum tap target */
+            padding: 0.6rem 0.25rem;
+            border-radius: var(--radius-full, 999px);
+            /* Pill shape */
+            font-weight: 500;
+            font-size: 0.8rem;
+            /* Adjusted font size */
+            border: 1px solid var(--gray-200);
+            background-color: var(--gray-50);
+            color: var(--gray-700);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            position: relative;
+            /* For ripple effect */
+            overflow: hidden;
+            /* Contain ripple */
+            text-align: center;
+            /* Center text */
+        }
+
+        .time-range-btn:hover {
+            background-color: var(--gray-100);
+            border-color: var(--gray-300);
+            /* Slightly darker border on hover */
+            transform: translateY(-1px);
+            /* Subtle lift */
+        }
+
+        .time-range-btn:active {
+            transform: translateY(0px);
+            /* Push down slightly on active */
+        }
+
+        /* Ripple Effect - Optional but nice */
+        .time-range-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            transition: transform 0.4s, opacity 0.3s;
+        }
+
+        .time-range-btn:active::after {
+            transform: translate(-50%, -50%) scale(2);
+            opacity: 1;
+            transition: 0s;
+        }
+
+        /* End Ripple */
+
+        .time-range-btn.active {
+            background-color: var(--primary, #4f46e5);
+            color: white;
+            border-color: var(--primary, #4f46e5);
+            box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+            /* Use primary color rgba for shadow */
+            font-weight: 600;
+        }
+
+        .time-range-label {
+            font-size: 0.8125rem;
+            color: var(--gray-500);
+            margin-top: 0.75rem;
+            /* Add margin above label */
+            text-align: center;
+            min-height: 1.2em;
+            /* Reserve space for text */
+        }
+
+        /* Responsive adjustments - Adapt as needed */
+        @media (max-width: 380px) {
+
+            /* Adjust breakpoint if needed */
+            .time-range-selector {
+                /* Stack buttons vertically on very small screens */
+                flex-direction: column;
+                align-items: stretch;
+                /* Make buttons full width */
+            }
+
+            .time-range-btn {
+                min-width: unset;
+                /* Remove min-width when stacked */
+            }
+        }
+
+        @media (min-width: 768px) {
+
+            /* Adjust for larger screens */
+            .time-range-selector {
+                /* justify-content: center; */
+                /* Let flex handle spacing */
+            }
+
+            .time-range-btn {
+                flex: 0 1 auto;
+                /* Don't grow, shrink if needed, basis auto */
+                min-width: 60px;
+                /* Slightly larger min-width on desktop */
+                padding-left: 0.75rem;
+                /* More horizontal padding */
+                padding-right: 0.75rem;
+            }
+        }
+
+        /* --- End New Time Range CSS --- */
+
+        /* Run Analysis Button */
+        #runAnalysisBtn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        #runAnalysisBtn:hover {
+            background-color: var(--accent-dark, #00b380);
+            box-shadow: var(--shadow-md);
+        }
+
+        #runAnalysisBtn:active {
+            transform: translateY(1px);
+        }
+
+        #runAnalysisBtn::before {
+            content: "\f544";
+            /* Font Awesome chart icon */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            margin-right: 0.5rem;
+        }
+
+        /* Results Area Styling */
+        .summary-box,
+        .grafana-panel,
+        .chart-container {
+            background-color: white;
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+        }
+
+        .summary-box:hover,
+        .grafana-panel:hover,
+        .chart-container:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .results h2 {
+            margin-bottom: 1.5rem;
+        }
+
+        .results h3 {
+            color: var(--gray-800);
+            font-size: 1.1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--gray-200);
+            margin-top: 0;
+            text-align: center;
+        }
+
+        .summary-box pre {
+            font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+            font-size: 0.875rem;
+            line-height: 1.7;
+            color: var(--gray-800);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background-color: var(--gray-50);
+            padding: 1rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--gray-200);
+            overflow: auto;
+            max-height: 400px;
+        }
+
+        /* Grafana iframe styling */
+        .grafana-panel iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+
+        /* Chart area styling */
+        .chart-container {
+            position: relative;
+            height: 350px;
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            margin-bottom: 1.9rem;
+            /* <<< ADD THIS LINE */
+        }
+
+        canvas#influenceChart {
+            flex: 1;
+        }
+
+        /* Gamification styling */
+        #gamificationContainer {
+            background-color: var(--accent-light);
+            border-left: 4px solid var(--accent);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.25rem;
+            box-shadow: var(--shadow-sm);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        #gamificationMessage {
+            color: var(--gray-800);
+            font-weight: 500;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        #gamificationMessage::before {
+            content: "🏆";
+            font-size: 1.25rem;
+            margin-right: 0.75rem;
+        }
+
+        /* Loading indicator */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-md);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--gray-200);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Media queries for responsiveness */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                overflow-y: auto;
+                height: auto;
+            }
+
+            .controls {
+                width: 100%;
+                max-height: none;
+                border-right: none;
+                border-bottom: 1px solid var(--gray-200);
+            }
+
+            .results {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Loading overlay for the entire app -->
+    <div class="loading-overlay" id="mainLoadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="controls">
+        <h2>Analysis Configuration</h2>
+
+        <label for="deviceSelect">Device</label>
+        <select id="deviceSelect" name="deviceSelect">
+            <option value="">Loading Devices...</option>
+        </select>
+
+        <!-- Start Replacement: Time Range Section -->
+        <fieldset class="time-range-container">
+            <legend class="time-range-title">
+                <svg class="time-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18"
+                    fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                Time Range
+            </legend>
+
+            <div class="time-range-selector">
+                <!-- Buttons remain the same, ensure data-range attributes are correct -->
+                <button class="time-range-btn" data-range="1h">1h</button>
+                <button class="time-range-btn" data-range="6h">6h</button>
+                <button class="time-range-btn" data-range="24h">24h</button>
+                <button class="time-range-btn" data-range="7d">7d</button>
+                <button class="time-range-btn" data-range="all">All</button>
+            </div>
+
+            <div class="time-range-label">
+                <!-- This span will be updated by JavaScript -->
+                <span id="rangeLabel">Initializing...</span>
+            </div>
+
+            <!-- Keep the hidden input, ensure value is a valid default (e.g., 24h) -->
+            <input type="hidden" id="selectedTimeRange" value="24h">
+        </fieldset>
+        <!-- End Replacement: Time Range Section -->
+
+        <fieldset class="driver-group">
+            <legend>Temperatures</legend>
+            <div>
+                <input type="checkbox" id="drive_nozzle" name="driver" value="nozzle_temp_actual">
+                <label for="drive_nozzle">Nozzle Temp (Actual)</label>
+            </div>
+            <div>
+                <input type="checkbox" id="drive_bed" name="driver" value="bed_temp_actual">
+                <label for="drive_bed">Bed Temp (Actual)</label>
+            </div>
+        </fieldset>
+
+        <fieldset class="driver-group">
+            <legend>Print State & Progress</legend>
+            <div>
+                <input type="checkbox" id="drive_printing" name="driver" value="is_printing">
+                <label for="drive_printing">Is Printing</label>
+            </div>
+            <div>
+                <input type="checkbox" id="drive_z" name="driver" value="z_height_mm">
+                <label for="drive_z">Z-Height (mm)</label>
+            </div>
+
+        </fieldset>
+        <!-- NEW: Drivers: Environment -->
+        <fieldset class="driver-group">
+            <legend>Environment (Hamburg)</legend>
+            <div>
+                <input type="checkbox" id="drive_ambient_temp" name="driver" value="temperature_c">
+                <label for="drive_ambient_temp">Ambient Temp (°C)</label>
+            </div>
+            <div>
+                <input type="checkbox" id="drive_ambient_humidity" name="driver" value="humidity_percent">
+                <!-- Value matches JS/Python expectation -->
+                <label for="drive_ambient_humidity">Ambient Humidity (%)</label>
+            </div>
+            <!-- Add weather_condition later if desired -->
+        </fieldset>
+
+        <!-- ADD THIS NEW BLOCK -->
+        <fieldset class="driver-group">
+            <legend>Print Properties</legend>
+            <div>
+                <input type="checkbox" id="drive_material" name="driver" value="material">
+                <label for="drive_material">Filament Material</label>
+            </div>
+        </fieldset>
+
+        <button id="runAnalysisBtn">Run Energy Analysis</button>
+    </div>
+
+    <div class="results">
+        <h2>Analysis Results</h2>
+
+        <!-- Summary Text Area -->
+        <div id="summaryResults" class="summary-box">
+            <div class="loading-overlay" id="summaryLoadingOverlay">
+                <div class="spinner"></div>
+            </div>
+            <h3>Analysis Insights</h3>
+
+            <div id="key-metrics-container"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 1rem; margin-bottom: 1.5rem; padding: 1rem; background-color: var(--gray-50); border-radius: var(--radius-md); border: 1px solid var(--gray-200);">
+                <div>
+                    <span style="font-size: 0.8rem; color: var(--gray-600); display: block;">Total Energy</span>
+                    <strong id="metric-total-kwh" style="font-size: 1.2rem; color: var(--primary); display: block;">-
+                        kWh</strong>
+                </div>
+                <div>
+                    <span style="font-size: 0.8rem; color: var(--gray-600); display: block;">Avg Power (Overall)</span>
+                    <strong id="metric-avg-power-overall"
+                        style="font-size: 1.2rem; color: var(--gray-800); display: block;">- W</strong>
+                </div>
+                <div>
+                    <span style="font-size: 0.8rem; color: var(--gray-600); display: block;">Avg Power (Active)</span>
+                    <strong id="metric-avg-power-active"
+                        style="font-size: 1.2rem; color: var(--gray-800); display: block;">- W</strong>
+                    <span style="font-size: 0.75rem; color: var(--gray-500);">(Power > 5W)</span>
+                </div>
+            </div>
+
+
+
+            <div id="summary-overview">
+                <p>Select a device, choose drivers, set time range and click "Run Energy Analysis" to begin.</p>
+            </div>
+
+            <!-- NEW: Placeholder for Phase Analysis -->
+            <div id="summary-phase-analysis" style="margin-top: 1.5rem; display: none;">
+                <h4><i class="fa-solid fa-chart-pie"></i> Energy Breakdown by Phase</h4>
+                <div id="phase-table-container" style="overflow-x: auto;">
+                    <!-- Table will be generated by JS -->
+                    <p style="color: var(--gray-600);">Loading phase analysis...</p>
+                </div>
+                <!-- NEW: Chart Placeholders -->
+                <div id="phase-charts-container"
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--gray-200);">
+                    <div style="position: relative; height: 300px;">
+                        <h5 style="text-align: center; margin-bottom: 0.5rem; color: var(--gray-700);">Time Spent by
+                            Phase (%)</h5>
+                        <canvas id="phaseDurationChart"></canvas>
+                        <div class="loading-overlay" id="durationChartLoading" style="border-radius: 50%;"></div>
+                        <!-- Optional loading -->
+                    </div>
+                    <div style="position: relative; height: 300px;">
+                        <h5 style="text-align: center; margin-bottom: 0.5rem; color: var(--gray-700);">Energy Used by
+                            Phase (%)</h5>
+                        <canvas id="phaseEnergyChart"></canvas>
+                        <div class="loading-overlay" id="energyChartLoading" style="border-radius: 50%;"></div>
+                        <!-- Optional loading -->
+                    </div>
+                </div>
+                <!-- END NEW -->
+            </div>
+            <!-- END NEW -->
+
+            <!-- NEW: Key Insights Section -->
+            <div id="summary-key-insights"
+                style="margin-top: 1rem; background-color: var(--primary-light); padding: 0.75rem 1rem; border-radius: var(--radius-md); border-left: 4px solid var(--primary);">
+                <h4><i class="fa-solid fa-lightbulb"></i> Key Insights</h4>
+                <ul style="list-style: disc; padding-left: 1.5rem; margin-top: 0.5rem;">
+                    <!-- Insights will be added by JS -->
+                </ul>
+            </div>
+            <!-- End Key Insights Section -->
+
+            <div id="summary-correlation" style="margin-top: 1rem; display: none;"> {/* Hidden initially */}
+                <h4>
+                    <i class="fa-solid fa-link"></i> Relationship with Power Consumption
+                    <i class="fa-solid fa-circle-info info-icon"
+                        title="Correlation shows if a factor tends to increase (+ values) or decrease (- values) along with power usage. Strength indicates how consistent the relationship is."></i>
+                </h4>
+            </div>
+
+            <!-- Toggle Button for Advanced Details -->
+            <div style="margin-top: 1.5rem; text-align: center;">
+                <button id="toggle-advanced-btn" class="time-range-btn"
+                    style="padding: 0.5rem 1rem; background-color: var(--gray-200);">
+                    <i class="fa-solid fa-chevron-down"></i> Show Advanced Details
+                </button>
+            </div>
+
+            <!-- Container for Advanced Details -->
+            <div id="advanced-details-container"
+                style="display: none; margin-top: 1rem; border-top: 1px solid var(--gray-200); padding-top: 1rem;">
+
+                <div id="summary-regression">
+                    <h4>
+                        <i class="fa-solid fa-chart-line"></i> Explaining Power with Selected Factors (Advanced)
+                        <i class="fa-solid fa-circle-info info-icon"
+                            title="Regression tries to create a simple formula (Power = Intercept + Coef1*Factor1 + ...) using only your selected factors. R-squared shows how well this simple formula fits the data (higher is better)."></i>
+                    </h4>
+                </div>
+
+                <div id="summary-model-quality" style="margin-top: 1rem;">
+                    <h4>
+                        <i class="fa-solid fa-star"></i> Overall Model Quality (Advanced)
+                        <i class="fa-solid fa-circle-info info-icon"
+                            title="These metrics (MAE, RMSE, R-squared) measure how accurate the main ML model's predictions were on test data during training. Lower error (MAE/RMSE) and higher R-squared are better."></i>
+                    </h4>
+                </div>
+
+                <!-- REPURPOSED SECTION -->
+                <div id="summary-top-drivers" style="margin-top: 1rem;"> <!-- Renamed ID, kept in Advanced -->
+                    <h4>
+                        <i class="fa-solid fa-ranking-star"></i> Top Influencing Factors (Operational)
+                        <i class="fa-solid fa-circle-info info-icon"
+                            title="Based on the ML model, these were the operational factors that had the most overall influence on predicting energy use during this period."></i>
+                    </h4>
+                    <div id="top-drivers-list">
+                        <!-- List will be generated by JS -->
+                        <p style="color: var(--gray-600);">Loading top drivers...</p>
+                    </div>
+                </div>
+                <!-- END REPURPOSED SECTION -->
+
+                <!-- DELETED CHART BLOCK -->
+
+            </div> <!-- End of #advanced-details-container -->
+
+
+
+            <!-- NEW: Suggestions Section -->
+            <div id="summary-suggestions"
+                style="margin-top: 1.5rem; display: none; background-color: var(--accent-light); padding: 0.75rem 1rem; border-radius: var(--radius-md); border-left: 4px solid var(--accent);">
+                <h4><i class="fa-solid fa-wand-magic-sparkles"></i> Potential Actions & Suggestions</h4>
+                <ul style="list-style: disc; padding-left: 1.5rem; margin-top: 0.5rem;">
+                    <!-- Suggestions will be added by JS -->
+                </ul>
+            </div>
+            <!-- End Suggestions Section -->
+
+            <!-- Gamification Message Area -->
+            <div id="gamificationContainer" style="display: none;">
+                <p id="gamificationMessage"></p>
+            </div>
+        </div>
+
+
+        <script>
+            // DOM Element References
+            const deviceSelect = document.getElementById('deviceSelect');
+            const timeRangeButtons = document.querySelectorAll('.time-range-btn');
+            const selectedTimeRangeInput = document.getElementById('selectedTimeRange');
+            const driverCheckboxes = document.querySelectorAll('input[type="checkbox"][name="driver"]');
+            const runAnalysisBtn = document.getElementById('runAnalysisBtn');
+            const grafanaPanel1Frame = document.getElementById('gPanelFrame1');
+            const influenceChartCanvas = document.getElementById('influenceChart');
+            const gamificationContainer = document.getElementById('gamificationContainer');
+            const gamificationMessageElement = document.getElementById('gamificationMessage');
+            const rangeLabel = document.getElementById('rangeLabel');
+
+            const mainLoadingOverlay = document.getElementById('mainLoadingOverlay');
+            const summaryLoadingOverlay = document.getElementById('summaryLoadingOverlay');
+            const grafanaLoadingOverlay = document.getElementById('grafanaLoadingOverlay');
+            //    const chartLoadingOverlay = document.getElementById('chartLoadingOverlay');
+            const NODE_RED_API_BASE = ''; // Adjust if your API is served from a different base path
+            let influenceChart = null;
+            // Add these lines
+            let phaseDurationPieChart = null;
+            let phaseEnergyPieChart = null;
+
+            // --- Helper Functions ---
+            function hideAllLoadingOverlays() {
+                mainLoadingOverlay.classList.remove('active');
+                summaryLoadingOverlay.classList.remove('active');
+//                grafanaLoadingOverlay.classList.remove('active');
+                //   chartLoadingOverlay.classList.remove('active');
+            }
+
+            function showLoadingOverlay(overlay) {
+                if (overlay) { overlay.classList.add('active'); }
+            }
+
+            function hideLoadingOverlay(overlay) {
+                if (overlay) { overlay.classList.remove('active'); }
+            }
+
+            async function fetchDeviceList() {
+                showLoadingOverlay(mainLoadingOverlay);
+                try {
+                    const response = await fetch(`${NODE_RED_API_BASE}/api/devices`);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    const devicesRaw = await response.json();
+                    const devicesFiltered = devicesRaw.filter(device => device.value !== 'environment');
+                    console.log("Filtered device list:", devicesFiltered);
+                    deviceSelect.innerHTML = '<option value="">-- Select a Device --</option>';
+                    devicesFiltered.forEach(device => {
+                        const option = document.createElement('option');
+                        option.value = device.value;
+                        option.textContent = device.label;
+                        deviceSelect.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error("Error fetching device list:", error);
+                    deviceSelect.innerHTML = '<option value="">Error loading devices</option>';
+                } finally {
+                    hideLoadingOverlay(mainLoadingOverlay);
+                }
+            }
+
+            function getCorrelationStrength(value) {
+                const absValue = Math.abs(value);
+                if (absValue >= 0.7) return value > 0 ? "Strong Positive" : "Strong Negative";
+                if (absValue >= 0.4) return value > 0 ? "Moderate Positive" : "Moderate Negative";
+                if (absValue >= 0.1) return value > 0 ? "Weak Positive" : "Weak Negative";
+                return "Very Weak / No Linear";
+            }
+
+            // --- ADD THIS HELPER FUNCTION ---
+            function updateRangeLabel(range) {
+                if (!rangeLabel) return; // Exit if label element not found
+                let labelText = '';
+                switch (range) {
+                    case '1h': labelText = 'Showing data for the last hour'; break;
+                    case '6h': labelText = 'Showing data for the last 6 hours'; break;
+                    case '24h': labelText = 'Showing data for the last 24 hours'; break;
+                    case '7d': labelText = 'Showing data for the last 7 days'; break;
+                    case 'all': labelText = 'Showing all available data'; break;
+                    default: labelText = 'Selected time range'; // Fallback
+                }
+                rangeLabel.textContent = labelText;
+            }
+            // --- END ADD HELPER FUNCTION ---
+
+            function updateInfluenceChart(featureImportanceData, selectedDriversMap) {
+                const driverDisplayNames = {
+                    'voltage': 'Voltage (V)', 'current_amps': 'Current (A)', 'plug_temp_c': 'Plug Temp (°C)',
+                    'is_printing': 'Is Printing', 'nozzle_temp_actual': 'Nozzle Temp (°C)',
+                    'bed_temp_actual': 'Bed Temp (°C)', 'z_height_mm': 'Z Height (mm)',
+                    'speed_multiplier_percent': 'Speed Multiplier (%)', 'temperature_c': 'Ambient Temp (°C)',
+                    'humidity_percent': 'Ambient Humidity (%)'
+                };
+                const importanceEntries = (typeof featureImportanceData === 'object' && featureImportanceData !== null)
+                    ? Object.entries(featureImportanceData)
+                    : [];
+
+                const chartData = importanceEntries
+                    .filter(([key, value]) => selectedDriversMap[key] === true && typeof value === 'number' && !isNaN(value))
+                    .map(([key, value]) => ({ driverKey: key, driverLabel: driverDisplayNames[key] || key, score: value }))
+                    .sort((a, b) => b.score - a.score);
+
+                const labels = chartData.map(d => d.driverLabel);
+                const scores = chartData.map(d => d.score);
+                let topSelectedDriverLabel = chartData.length > 0 ? chartData[0].driverLabel : null;
+
+                const topColor = 'rgba(75, 192, 192, 0.7)'; const otherColor = 'rgba(255, 159, 64, 0.7)';
+                const backgroundColors = labels.map(label => label === topSelectedDriverLabel ? topColor : otherColor);
+                const borderColors = labels.map(label => label === topSelectedDriverLabel ? 'rgba(75, 192, 192, 1)' : 'rgba(255, 159, 64, 1)');
+
+                if (influenceChart) { influenceChart.destroy(); influenceChart = null; }
+
+                if (!influenceChartCanvas) {
+                    console.error("Influence chart canvas not found!");
+                    return null;
+                }
+
+                const ctx = influenceChartCanvas.getContext('2d');
+                influenceChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: { /* ... chart data ... */
+                        labels: labels,
+                        datasets: [{
+                            label: 'ML Model Feature Importance', data: scores, backgroundColor: backgroundColors,
+                            borderColor: borderColors, borderWidth: 1, indexAxis: 'y', borderRadius: 4
+                        }]
+                    },
+                    options: { /* ... chart options ... */
+                        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                        scales: { x: { beginAtZero: true, title: { display: true, text: 'Importance Score (Higher is More Influential for Model)', font: { weight: 500 } }, grid: { color: 'rgba(0, 0, 0, 0.05)' } }, y: { title: { display: true, text: 'Selected Driver', font: { weight: 500 } }, grid: { display: false } } },
+                        plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(14, 23, 38, 0.9)', titleFont: { weight: 600, size: 13 }, bodyFont: { size: 12 }, padding: 12, cornerRadius: 8, callbacks: { label: function (context) { return ` Importance: ${context.parsed.x.toFixed(4)}`; } } } }
+                    }
+                });
+                return topSelectedDriverLabel;
+            }
+            // --- End Helper Functions ---
+
+            // --- UI Update Functions --- (Defined before handleRunAnalysis)
+            function resetUIForAnalysis() {
+                const overviewElement = document.getElementById('summary-overview');
+                // --- NEW: Get references and reset new elements ---
+                const keyMetricsContainer = document.getElementById('key-metrics-container');
+                const phaseContainer = document.getElementById('summary-phase-analysis');
+                const topDriversListContainer = document.getElementById('top-drivers-list');
+                const phaseTableContainer = document.getElementById('phase-table-container');
+                // --- END NEW References ---
+                const keyInsightsElement = document.getElementById('summary-key-insights');
+                const correlationElement = document.getElementById('summary-correlation');
+                const featureImportanceElement = document.getElementById('summary-feature-importance');
+                const suggestionsElement = document.getElementById('summary-suggestions');
+                const advancedContainer = document.getElementById('advanced-details-container');
+                const toggleBtn = document.getElementById('toggle-advanced-btn');
+
+                const chartsContainer = document.getElementById('phase-charts-container'); // Get charts container
+
+                if (overviewElement) overviewElement.innerHTML = '<p>Running analysis, please wait...</p>';
+
+                // --- NEW: Reset new elements ---
+                if (keyMetricsContainer) keyMetricsContainer.style.display = 'none'; // Hide initially
+                if (phaseContainer) phaseContainer.style.display = 'none'; // Hide initially
+                if (phaseTableContainer) phaseTableContainer.innerHTML = '<p style="color: var(--gray-600);">Loading phase analysis...</p>'; // Reset placeholder
+                // Reset text in key metrics (optional, but good practice)
+                const kwhElement = document.getElementById('metric-total-kwh');
+                const avgOverallElement = document.getElementById('metric-avg-power-overall');
+                const avgActiveElement = document.getElementById('metric-avg-power-active');
+                if (kwhElement) kwhElement.textContent = '- kWh';
+                if (avgOverallElement) avgOverallElement.textContent = '- W';
+                if (avgActiveElement) avgActiveElement.textContent = '- W';
+                // --- END NEW Reset ---
+
+                if (phaseDurationPieChart) { phaseDurationPieChart.destroy(); phaseDurationPieChart = null; }
+                if (phaseEnergyPieChart) { phaseEnergyPieChart.destroy(); phaseEnergyPieChart = null; }
+                if (chartsContainer) chartsContainer.style.display = 'none'; // Hide charts container
+
+                if (keyInsightsElement) { const ul = keyInsightsElement.querySelector('ul'); if (ul) ul.innerHTML = ''; keyInsightsElement.style.display = 'none'; }
+                if (correlationElement) { correlationElement.innerHTML = ''; correlationElement.style.display = 'none'; }
+
+                if (topDriversListContainer) topDriversListContainer.innerHTML = '<p style="color: var(--gray-600);">Loading top drivers...</p>';
+
+                if (suggestionsElement) { const ul = suggestionsElement.querySelector('ul'); if (ul) ul.innerHTML = ''; suggestionsElement.style.display = 'none'; }
+                if (advancedContainer) advancedContainer.style.display = 'none';
+                if (toggleBtn) { toggleBtn.innerHTML = '<i class="fa-solid fa-chevron-down"></i> Show Advanced Details'; toggleBtn.style.backgroundColor = 'var(--gray-200)'; }
+                if (gamificationContainer) gamificationContainer.style.display = 'none';
+                if (grafanaPanel1Frame) grafanaPanel1Frame.src = 'about:blank';
+                if (influenceChart) { influenceChart.destroy(); influenceChart = null; }
+            }
+
+            // **** ENHANCED definition for populateKeyInsights ****
+            function populateKeyInsights(element, resultsData, userSelectedDrivers, driverDisplayNames) {
+                if (!element) return; // Ensure element exists
+                let insightsHtmlList = ''; // Initialize as empty string
+
+                // Extract relevant data with fallbacks
+                const importanceData = resultsData.ml_feature_importance || {};
+                const correlationData = resultsData.correlation || {};
+                const topOverallDrivers = resultsData.ml_top_drivers || [];
+                const newMetrics = resultsData.new_metrics || {};
+                const phaseAnalysis = newMetrics.phase_analysis || {};
+                const avgPowerOverall = newMetrics.avg_power_overall;
+                const avgPowerActive = newMetrics.avg_power_active;
+                const totalKwh = newMetrics.total_kwh;
+
+                // --- Insight 1: Top Overall Influential Driver (from ML model) ---
+                const topOverallDriverKey = topOverallDrivers.length > 0 ? topOverallDrivers[0] : null;
+                const topOverallDisplayName = topOverallDriverKey ? (driverDisplayNames[topOverallDriverKey] || topOverallDriverKey) : null;
+
+                if (topOverallDisplayName) {
+                    insightsHtmlList += `<li>The model identified <strong>${topOverallDisplayName}</strong> as having the biggest overall influence on energy predictions during this period.</li>`;
+                } else {
+                    insightsHtmlList += `<li>Could not determine the single most influential factor from the model for this period.</li>`;
+                }
+
+                // --- Insight 2: Highest Consuming Phase ---
+                let highestEnergyPhase = null;
+                let maxEnergyPercent = -1;
+                for (const phaseName in phaseAnalysis) {
+                    if (phaseAnalysis[phaseName]?.energy_percent > maxEnergyPercent) {
+                        maxEnergyPercent = phaseAnalysis[phaseName].energy_percent;
+                        highestEnergyPhase = phaseName;
+                    }
+                }
+
+                if (highestEnergyPhase && maxEnergyPercent > 0) {
+                    // Get avg power for this phase
+                    const phaseAvgPower = phaseAnalysis[highestEnergyPhase]?.avg_power;
+                    let phaseDesc = `The <strong>${highestEnergyPhase}</strong> phase used the most energy (${maxEnergyPercent.toFixed(0)}%)`;
+                    if (typeof phaseAvgPower === 'number') {
+                        phaseDesc += `, averaging ${phaseAvgPower.toFixed(0)} W.`;
+                    } else {
+                        phaseDesc += ".";
+                    }
+                    insightsHtmlList += `<li>${phaseDesc}</li>`;
+                } else if (Object.keys(phaseAnalysis).length > 0) {
+                    // Handle case where all phases had 0 energy (e.g., completely idle period)
+                    insightsHtmlList += `<li>The device consumed minimal energy during this period, primarily staying in the Idle phase.</li>`;
+                }
+
+
+                // --- Insight 3: Active vs Overall Power ---
+                if (typeof avgPowerActive === 'number' && typeof avgPowerOverall === 'number' && avgPowerActive > avgPowerOverall) {
+                    // Only show if there's a noticeable difference and device wasn't always active
+                    const activeHigherRatio = avgPowerOverall > 0 ? avgPowerActive / avgPowerOverall : Infinity;
+                    if (activeHigherRatio > 1.5 && totalKwh > 0.001) { // Avoid trivial differences or near-zero consumption
+                        insightsHtmlList += `<li>When active (Power > 5W), the average power draw (<strong>${avgPowerActive.toFixed(0)} W</strong>) was significantly higher than the overall average (<strong>${avgPowerOverall.toFixed(0)} W</strong>), indicating periods of lower idle consumption.</li>`;
+                    }
+                }
+
+                // --- Insight 4: Correlation confirmation for Top Driver (if selected) ---
+                if (topOverallDriverKey && userSelectedDrivers[topOverallDriverKey] === true && correlationData[topOverallDriverKey] && typeof correlationData[topOverallDriverKey] === 'number') {
+                    const corrValue = correlationData[topOverallDriverKey];
+                    const corrStrength = getCorrelationStrength(corrValue);
+                    if (Math.abs(corrValue) >= 0.4) { // Only comment if moderate or strong correlation
+                        insightsHtmlList += `<li>Your analysis confirms a <strong>${corrStrength.toLowerCase()} relationship</strong> between the top factor (${topOverallDisplayName}) and power consumption.</li>`;
+                    }
+                }
+
+
+                // Populate the insights section if any insights were generated
+                const ul = element.querySelector('ul');
+                if (ul) {
+                    ul.innerHTML = insightsHtmlList; // Set the generated list items
+                    element.style.display = insightsHtmlList ? 'block' : 'none'; // Show only if insights exist
+                } else {
+                    element.style.display = 'none'; // Hide if UL element not found
+                }
+            }
+            // **** END ENHANCED definition ****
+
+            function populateCorrelation(element, correlationData, driverDisplayNames) {
+                if (!element) return;
+                let correlationHtml = '';
+                if (correlationData && typeof correlationData === 'object' && !correlationData.error && !correlationData.message && Object.keys(correlationData).length > 0) {
+                    correlationHtml += '<ul style="list-style: none; padding-left: 0;">';
+                    for (const driverKey in correlationData) {
+                        const corrValue = correlationData[driverKey];
+                        const displayName = driverDisplayNames[driverKey] || driverKey;
+                        correlationHtml += `<li style="margin-bottom: 0.5rem;"><strong>${displayName}:</strong> `;
+                        if (typeof corrValue === 'number' && !isNaN(corrValue)) {
+                            const strength = getCorrelationStrength(corrValue);
+                            let explanation = '';
+                            if ((driverKey === 'nozzle_temp_actual' || driverKey === 'bed_temp_actual') && corrValue < 0) {
+                                explanation = `<em style="color: var(--gray-600); font-size: 0.9em;">(Unexpected negative result - this might reflect specific phases like cooling down rather than the overall heating impact. Interpret with caution.)</em>`;
+                                correlationHtml += `${corrValue.toFixed(2)} (${strength}). ${explanation}`;
+                            } else {
+                                if (strength.includes('Positive')) explanation = 'Higher values tend to correspond with higher power usage.';
+                                else if (strength.includes('Negative')) explanation = 'Higher values tend to correspond with lower power usage.';
+                                else explanation = 'Little to no clear linear relationship with power usage.';
+                                correlationHtml += `${corrValue.toFixed(2)} (${strength}). <em style="color: var(--gray-600); font-size: 0.9em;">${explanation}</em>`;
+                            }
+                        } else if (typeof corrValue === 'string' && corrValue.startsWith('N/A')) {
+                            correlationHtml += `<em style="color: var(--gray-500);">${corrValue}</em>`;
+                        } else {
+                            correlationHtml += `<em style="color: var(--gray-500);">Result not available (${corrValue})</em>`;
+                            console.warn(`Unexpected correlation value type for ${driverKey}:`, corrValue);
+                        }
+                        correlationHtml += `</li>`;
+                    }
+                    correlationHtml += '</ul>';
+                } else if (correlationData && correlationData.error) {
+                    correlationHtml = `<p style="color: var(--danger);">Correlation Error: ${correlationData.error}</p>`;
+                } else if (correlationData && correlationData.message) {
+                    correlationHtml = `<p style="color: var(--secondary);">${correlationData.message}</p>`;
+                } else { correlationHtml = `<p style="color: var(--secondary);">Correlation data could not be displayed.</p>`; console.warn("Problematic correlationData object:", correlationData); }
+                element.innerHTML = correlationHtml;
+                element.style.display = 'block';
+            }
+
+            function populateRegression(element, regressionData, driverDisplayNames) {
+                if (!element) return;
+                let regressionHtml = '';
+                // Check if core regression data exists
+                if (regressionData && !regressionData.error && !regressionData.message && typeof regressionData.r_squared === 'number' && typeof regressionData.intercept === 'number' && regressionData.coefficients) {
+                    const rSquaredPercent = (regressionData.r_squared * 100).toFixed(1);
+                    regressionHtml += `<p>We tried to build a simple model using just the factors you selected. This model explains <strong>${rSquaredPercent}%</strong> of the variation in power consumption during this period (R-squared).</p>`;
+
+                    // --- ADDED: Sample size warning ---
+                    if (typeof regressionData.n_samples === 'number') {
+                        // We need the total number of points from somewhere else, e.g., the summary string, or pass it in.
+                        // Let's extract from summary for now (less robust but illustrates the point)
+                        const summaryText = document.getElementById('summary-overview')?.textContent || '';
+                        const match = summaryText.match(/Analysis complete for (\d+) data points/);
+                        const totalPoints = match ? parseInt(match[1], 10) : null;
+                        if (totalPoints && regressionData.n_samples < totalPoints * 0.5) { // Example threshold: < 50% of total points
+                            regressionHtml += `<p style="margin-top: 0.5rem; color: var(--warning);"><i class="fa-solid fa-triangle-exclamation"></i> Note: This regression was calculated using only <strong>${regressionData.n_samples}</strong> data points (out of ${totalPoints} total) where all selected factors were simultaneously available. Results may not be fully representative.</p>`;
+                        }
+                    }
+                    // --- END ADDED: Sample size warning ---
+
+                    regressionHtml += `<p style="margin-top: 0.75rem;">Based on this simple model:</p>`;
+                    regressionHtml += '<ul style="list-style: disc; padding-left: 1.5rem; margin-top: 0.5rem;">';
+                    regressionHtml += `<li style="margin-bottom: 0.3rem;">The estimated baseline power usage (when all selected factors are zero or 'off') is <strong>${regressionData.intercept.toFixed(2)} Watts</strong> (Intercept).</li>`;
+                    regressionHtml += `<li style="margin-bottom: 0.3rem;">How each factor influences power (Coefficients):`;
+                    regressionHtml += `<ul style="list-style: circle; padding-left: 1rem; margin-top: 0.3rem;">`;
+                    const coefficients = regressionData.coefficients;
+                    if (typeof coefficients === 'object' && Object.keys(coefficients).length > 0) {
+                        for (const driverKey in coefficients) {
+                            const coeffValue = coefficients[driverKey];
+                            const displayName = driverDisplayNames[driverKey] || driverKey;
+                            if (typeof coeffValue === 'number' && !isNaN(coeffValue)) {
+                                let unit = 'Watts';
+                                if (driverKey === 'is_printing') { unit = 'Watts (compared to not printing)'; }
+                                else if (driverKey.includes('_temp_')) { unit = 'Watts per °C increase'; }
+                                else if (driverKey === 'z_height_mm') { unit = 'Watts per mm increase'; }
+                                else if (driverKey === 'humidity_percent') { unit = 'Watts per % increase'; }
+                                else if (driverKey === 'speed_multiplier_percent') { unit = 'Watts per % increase'; }
+                                else if (driverKey === 'voltage') { unit = 'Watts per Volt increase'; }
+                                else if (driverKey === 'current_amps') { unit = 'Watts per Amp increase'; }
+
+                                regressionHtml += `<li style="margin-bottom: 0.2rem;"><strong>${displayName}:</strong> ${coeffValue.toFixed(2)} ${unit}</li>`;
+                            } else {
+                                regressionHtml += `<li style="margin-bottom: 0.2rem;"><strong>${displayName}:</strong> N/A</li>`;
+                            }
+                        }
+                    }
+                    else { regressionHtml += `<li>No specific driver coefficients were calculated.</li>`; }
+                    regressionHtml += `</ul></li>`;
+                    regressionHtml += '</ul>';
+                } else if (regressionData && regressionData.error) {
+                    regressionHtml = `<p style="color: var(--danger);">Regression Error: ${regressionData.error}</p>`;
+                } else if (regressionData && regressionData.message) {
+                    regressionHtml = `<p style="color: var(--secondary);">${regressionData.message}</p>`;
+                } else { regressionHtml = `<p style="color: var(--secondary);">Regression analysis could not be performed with the selected drivers or data.</p>`; }
+                element.innerHTML = regressionHtml;
+            }
+            function populateModelQuality(element, metricsData) {
+                if (!element) return;
+                let metricsHtml = '';
+                if (metricsData && (metricsData.error || metricsData.error_metrics || metricsData.error_model || metricsData.error_scaler)) { metricsHtml = `<p style="color: var(--danger);">Could not load model quality metrics. Error: ${metricsData.error || metricsData.error_metrics || metricsData.error_model || metricsData.error_scaler}</p>`; }
+                else if (metricsData && typeof metricsData.r_squared === 'number' && typeof metricsData.rmse === 'number' && typeof metricsData.mae === 'number') { metricsHtml += `<p>These metrics reflect how well the underlying Machine Learning model (currently: Linear Regression based on training script output) performed on a separate test dataset during its training phase:</p>`; metricsHtml += '<ul style="list-style: disc; padding-left: 1.5rem; margin-top: 0.5rem;">'; const r2Percent = (metricsData.r_squared * 100).toFixed(1); metricsHtml += `<li style="margin-bottom: 0.3rem;"><strong>Accuracy (R²): ${metricsData.r_squared.toFixed(3)}</strong> <em style="color: var(--gray-600); font-size: 0.9em;">(The model explained ${r2Percent}% of power variation in the test data. Higher is better, 1.0 is perfect.)</em></li>`; metricsHtml += `<li style="margin-bottom: 0.3rem;"><strong>Average Error (MAE): ${metricsData.mae.toFixed(2)} Watts</strong> <em style="color: var(--gray-600); font-size: 0.9em;">(On average, the model's power prediction was off by this amount in the test data.)</em></li>`; metricsHtml += `<li style="margin-bottom: 0.3rem;"><strong>Larger Error Penalty (RMSE): ${metricsData.rmse.toFixed(2)} Watts</strong> <em style="color: var(--gray-600); font-size: 0.9em;">(Similar to MAE, but gives more weight to larger prediction errors. Lower is better.)</em></li>`; metricsHtml += '</ul>'; }
+                else { metricsHtml = `<p style="color: var(--secondary);">Model quality metrics are not available or could not be loaded.</p>`; console.warn("Problematic ml_evaluation_metrics object:", metricsData); }
+                element.innerHTML = metricsHtml;
+            }
+
+            // **** ADDED definition for populateTopDrivers ****
+            function populateTopDrivers(listContainerElement, topDriversList, driverDisplayNames) {
+                if (!listContainerElement) return;
+
+                if (topDriversList && Array.isArray(topDriversList) && topDriversList.length > 0) {
+                    let listHtml = '<ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">';
+                    topDriversList.forEach(driverKey => {
+                        const displayName = driverDisplayNames[driverKey] || driverKey;
+                        // Add icons based on type (optional enhancement)
+                        let icon = 'fa-solid fa-gear'; // Default
+                        if (driverKey.includes('temp')) icon = 'fa-solid fa-temperature-half';
+                        if (driverKey.includes('printing')) icon = 'fa-solid fa-print';
+                        if (driverKey.includes('plug')) icon = 'fa-solid fa-plug';
+                        if (driverKey.includes('z_height')) icon = 'fa-solid fa-layer-group';
+
+                        listHtml += `<li style="margin-bottom: 0.4rem;"><i class="${icon}" style="margin-right: 0.5rem; color: var(--secondary);"></i><strong>${displayName}</strong></li>`;
+                    });
+                    listHtml += '</ol>';
+                    listContainerElement.innerHTML = listHtml;
+                } else {
+                    listContainerElement.innerHTML = `<p style="color: var(--gray-500);">Top influencing factors could not be determined.</p>`;
+                }
+                // Make the parent container visible (it's inside Advanced Details)
+                const parentSection = document.getElementById('summary-top-drivers');
+                if (parentSection) {
+                    // No style change needed here as it's controlled by the advanced toggle
+                }
+            }
+            // **** END ADDED definition ****
+
+            // **** ADDED definition for populateKeyMetrics ****
+            function populateKeyMetrics(elementIdPrefix, metricsData) {
+                const kwhElement = document.getElementById(`${elementIdPrefix}-total-kwh`);
+                const avgOverallElement = document.getElementById(`${elementIdPrefix}-avg-power-overall`);
+                const avgActiveElement = document.getElementById(`${elementIdPrefix}-avg-power-active`);
+
+                if (metricsData && !metricsData.error) {
+                    if (kwhElement) {
+                        kwhElement.textContent = (typeof metricsData.total_kwh === 'number') ? `${metricsData.total_kwh.toFixed(3)} kWh` : 'N/A';
+                    }
+                    if (avgOverallElement) {
+                        avgOverallElement.textContent = (typeof metricsData.avg_power_overall === 'number') ? `${metricsData.avg_power_overall.toFixed(1)} W` : 'N/A';
+                    }
+                    if (avgActiveElement) {
+                        avgActiveElement.textContent = (typeof metricsData.avg_power_active === 'number') ? `${metricsData.avg_power_active.toFixed(1)} W` : 'N/A';
+                    }
+                    // Show the container if data is valid
+                    const container = document.getElementById('key-metrics-container');
+                    if (container) container.style.display = 'grid'; // Use 'grid' or initial display type
+
+                } else {
+                    // Handle error or missing data - hide or show N/A
+                    if (kwhElement) kwhElement.textContent = 'Error';
+                    if (avgOverallElement) avgOverallElement.textContent = 'Error';
+                    if (avgActiveElement) avgActiveElement.textContent = 'Error';
+                    const container = document.getElementById('key-metrics-container');
+                    if (container) container.style.display = 'none'; // Hide on error
+                    console.error("Error populating key metrics:", metricsData?.error);
+                }
+            }
+            // **** END ADDED definition ****
+
+
+            // **** ADDED function to create/update Phase Duration Pie Chart ****
+            function createPhaseDurationChart(canvasId, phaseData) {
+                const canvasElement = document.getElementById(canvasId);
+                if (!canvasElement) { console.error(`Canvas element not found: ${canvasId}`); return; }
+                const ctx = canvasElement.getContext('2d');
+
+                if (phaseDurationPieChart) { phaseDurationPieChart.destroy(); } // Clear previous chart
+
+                const labels = [];
+                const dataValues = [];
+                const backgroundColors = ['rgba(54, 162, 235, 0.7)', 'rgba(255, 159, 64, 0.7)', 'rgba(153, 102, 255, 0.7)', 'rgba(255, 99, 132, 0.7)', 'rgba(75, 192, 192, 0.7)'];
+                const borderColors = ['rgba(54, 162, 235, 1)', 'rgba(255, 159, 64, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 99, 132, 1)', 'rgba(75, 192, 192, 1)'];
+
+                // Sort phases for consistent color mapping (optional but nice)
+                const phaseOrder = ['Printing', 'Active (Other)', 'Idle'];
+                const sortedPhases = Object.keys(phaseData || {}).sort((a, b) => { /* ... same sorting logic as table ... */
+                    const indexA = phaseOrder.indexOf(a); const indexB = phaseOrder.indexOf(b);
+                    if (indexA === -1 && indexB === -1) return a.localeCompare(b); if (indexA === -1) return 1; if (indexB === -1) return -1; return indexA - indexB;
+                });
+
+                let colorIndex = 0;
+                sortedPhases.forEach(phaseName => {
+                    const durationPercent = phaseData[phaseName]?.duration_percent;
+                    if (typeof durationPercent === 'number' && durationPercent > 0.1) { // Only include phases with > 0.1% duration
+                        labels.push(phaseName);
+                        dataValues.push(durationPercent);
+                        // Assign colors cyclically
+                        // backgroundColorList.push(backgroundColors[colorIndex % backgroundColors.length]);
+                        // borderColorList.push(borderColors[colorIndex % borderColors.length]);
+                        colorIndex++;
+                    }
+                });
+
+                if (labels.length === 0) {
+                    // Handle case where no significant duration exists (maybe display a message?)
+                    console.log("No significant phase duration data to display in chart.");
+                    // Optionally display a message on the canvas or hide container
+                    const container = document.getElementById('phase-charts-container');
+                    // if (container) container.style.display = 'none'; // Or just hide this specific chart's wrapper
+                    return;
+                }
+
+                phaseDurationPieChart = new Chart(ctx, {
+                    type: 'doughnut', // Doughnut or Pie
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '% Duration',
+                            data: dataValues,
+                            backgroundColor: backgroundColors.slice(0, labels.length), // Use generated color lists
+                            borderColor: borderColors.slice(0, labels.length),
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { boxWidth: 12, font: { size: 11 } }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        let label = context.label || '';
+                                        if (label) { label += ': '; }
+                                        if (context.parsed !== null) { label += `${context.parsed.toFixed(1)}%`; }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                // Ensure chart container is visible if data exists
+                const container = document.getElementById('phase-charts-container');
+                if (container) container.style.display = 'grid';
+            }
+
+            // **** ADDED function to create/update Phase Energy Pie Chart ****
+            function createPhaseEnergyChart(canvasId, phaseData) {
+                const canvasElement = document.getElementById(canvasId);
+                if (!canvasElement) { console.error(`Canvas element not found: ${canvasId}`); return; }
+                const ctx = canvasElement.getContext('2d');
+
+                if (phaseEnergyPieChart) { phaseEnergyPieChart.destroy(); } // Clear previous chart
+
+                const labels = [];
+                const dataValues = [];
+                const backgroundColors = ['rgba(255, 99, 132, 0.7)', 'rgba(75, 192, 192, 0.7)', 'rgba(153, 102, 255, 0.7)', 'rgba(255, 159, 64, 0.7)', 'rgba(54, 162, 235, 0.7)']; // Slightly different order
+                const borderColors = ['rgba(255, 99, 132, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)', 'rgba(54, 162, 235, 1)'];
+
+                // Sort phases (same logic)
+                const phaseOrder = ['Printing', 'Active (Other)', 'Idle'];
+                const sortedPhases = Object.keys(phaseData || {}).sort((a, b) => { /* ... same sorting logic ... */
+                    const indexA = phaseOrder.indexOf(a); const indexB = phaseOrder.indexOf(b);
+                    if (indexA === -1 && indexB === -1) return a.localeCompare(b); if (indexA === -1) return 1; if (indexB === -1) return -1; return indexA - indexB;
+                });
+
+                let colorIndex = 0;
+                sortedPhases.forEach(phaseName => {
+                    const energyPercent = phaseData[phaseName]?.energy_percent;
+                    // Only include phases with actual energy consumption > 0.1%
+                    if (typeof energyPercent === 'number' && energyPercent > 0.1) {
+                        labels.push(phaseName);
+                        dataValues.push(energyPercent);
+                        // Assign colors cyclically
+                        // backgroundColorList.push(backgroundColors[colorIndex % backgroundColors.length]);
+                        // borderColorList.push(borderColors[colorIndex % borderColors.length]);
+                        colorIndex++;
+                    }
+                });
+
+                if (labels.length === 0) {
+                    console.log("No significant phase energy data to display in chart.");
+                    // Optionally display a message or hide
+                    const container = document.getElementById('phase-charts-container');
+                    // if (container) container.style.display = 'none';
+                    return;
+                }
+
+                phaseEnergyPieChart = new Chart(ctx, {
+                    type: 'doughnut', // Doughnut or Pie
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '% Energy',
+                            data: dataValues,
+                            backgroundColor: backgroundColors.slice(0, labels.length), // Use generated color lists
+                            borderColor: borderColors.slice(0, labels.length),
+                            borderWidth: 1
+                        }]
+                    },
+                    options: { // Same options as duration chart
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { boxWidth: 12, font: { size: 11 } }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        let label = context.label || '';
+                                        if (label) { label += ': '; }
+                                        if (context.parsed !== null) { label += `${context.parsed.toFixed(1)}%`; }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                // Ensure chart container is visible if data exists
+                const container = document.getElementById('phase-charts-container');
+                if (container) container.style.display = 'grid';
+            }
+
+            // **** ADDED definition for populatePhaseAnalysis ****
+            function populatePhaseAnalysis(containerElement, phaseData) {
+                if (!containerElement) return;
+
+                if (phaseData && typeof phaseData === 'object' && Object.keys(phaseData).length > 0) {
+                    let tableHtml = `
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.9em;">
+                        <thead>
+                            <tr style="background-color: var(--gray-100); border-bottom: 2px solid var(--gray-300);">
+                                <th style="padding: 0.5rem; text-align: left;">Phase</th>
+                                <th style="padding: 0.5rem; text-align: right;">Duration</th>
+                                <th style="padding: 0.5rem; text-align: right;">% Duration</th>
+                                <th style="padding: 0.5rem; text-align: right;">Energy (kWh)</th>
+                                <th style="padding: 0.5rem; text-align: right;">% Energy</th>
+                                <th style="padding: 0.5rem; text-align: right;">Avg Power (W)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                    // Sort phases for consistent display order (e.g., Printing, Active, Idle)
+                    const phaseOrder = ['Printing', 'Active (Other)', 'Idle'];
+                    const sortedPhases = Object.keys(phaseData).sort((a, b) => {
+                        const indexA = phaseOrder.indexOf(a);
+                        const indexB = phaseOrder.indexOf(b);
+                        if (indexA === -1 && indexB === -1) return a.localeCompare(b); // Alphabetical for unknown
+                        if (indexA === -1) return 1; // Unknown after known
+                        if (indexB === -1) return -1; // Known before unknown
+                        return indexA - indexB; // Sort by defined order
+                    });
+
+                    for (const phaseName of sortedPhases) {
+                        const data = phaseData[phaseName];
+                        if (!data) continue; // Skip if phase data is missing for some reason
+
+                        // Determine row style based on significance (e.g., highest energy %)
+                        let rowStyle = "border-bottom: 1px solid var(--gray-200);";
+                        // Find phase with max energy percent
+                        let maxEnergyPercent = 0;
+                        for (const pName in phaseData) { if (phaseData[pName]?.energy_percent > maxEnergyPercent) { maxEnergyPercent = phaseData[pName].energy_percent; } }
+                        if (data.energy_percent > 0 && data.energy_percent >= maxEnergyPercent * 0.9) { // Highlight if close to max
+                            rowStyle += " background-color: var(--accent-light); font-weight: 500;";
+                        }
+
+
+                        tableHtml += `
+                         <tr style="${rowStyle}">
+                             <td style="padding: 0.5rem;">${phaseName}</td>
+                             <td style="padding: 0.5rem; text-align: right;">${data.duration_minutes?.toFixed(1) ?? 'N/A'} min</td>
+                             <td style="padding: 0.5rem; text-align: right;">${data.duration_percent?.toFixed(1) ?? 'N/A'}%</td>
+                             <td style="padding: 0.5rem; text-align: right;">${data.energy_kwh?.toFixed(4) ?? 'N/A'}</td>
+                             <td style="padding: 0.5rem; text-align: right;">${data.energy_percent?.toFixed(1) ?? 'N/A'}%</td>
+                             <td style="padding: 0.5rem; text-align: right;">${data.avg_power?.toFixed(1) ?? 'N/A'}</td>
+                         </tr>
+                     `;
+                    }
+
+                    tableHtml += `
+                        </tbody>
+                    </table>
+                `;
+                    containerElement.innerHTML = tableHtml;
+                    // Show the parent container
+                    const parentSection = document.getElementById('summary-phase-analysis');
+                    if (parentSection) parentSection.style.display = 'block';
+
+                } else {
+                    containerElement.innerHTML = `<p style="color: var(--gray-500);">Phase analysis data is not available.</p>`;
+                    // Keep parent hidden or show the message
+                    const parentSection = document.getElementById('summary-phase-analysis');
+                    if (parentSection) parentSection.style.display = 'block'; // Show the 'not available' message
+                }
+            }
+            // **** END ADDED definition ****
+
+            // **** ADDED definition for populateSuggestions ****
+            // **** ENHANCED definition for populateSuggestions ****
+            function populateSuggestions(element, resultsData, driverDisplayNames) {
+                if (!element) return;
+                let suggestionsHtmlList = '';
+
+                // Extract data
+                const topDrivers = resultsData.ml_top_drivers || [];
+                const phaseAnalysis = resultsData.new_metrics?.phase_analysis || {};
+
+                // --- Determine dominant energy phase ---
+                let highestEnergyPhase = null;
+                let maxEnergyPercent = -1;
+                for (const phaseName in phaseAnalysis) {
+                    if (phaseAnalysis[phaseName]?.energy_percent > maxEnergyPercent) {
+                        maxEnergyPercent = phaseAnalysis[phaseName].energy_percent;
+                        highestEnergyPhase = phaseName;
+                    }
+                }
+
+                // --- Suggestion based on dominant phase ---
+                if (highestEnergyPhase === 'Printing' && maxEnergyPercent > 50) {
+                    suggestionsHtmlList += `<li>Since the <strong>Printing</strong> phase consumed the most energy (${maxEnergyPercent.toFixed(0)}%), consider optimizing print settings (e.g., infill, supports), combining smaller jobs, or using the most suitably sized printer for the job.</li>`;
+                } else if (highestEnergyPhase === 'Active (Other)' && maxEnergyPercent > 50) {
+                    // Check if temps were top drivers when 'Active (Other)' dominated
+                    const topDriverKey = topDrivers.length > 0 ? topDrivers[0] : null;
+                    if (topDriverKey === 'nozzle_temp_actual' || topDriverKey === 'bed_temp_actual') {
+                        suggestionsHtmlList += `<li>The <strong>Active (non-printing)</strong> phase used the most energy (${maxEnergyPercent.toFixed(0)}%), possibly due to heating. Reducing pre-heat times or ensuring the printer doesn't sit heated idly could save energy.</li>`;
+                    } else {
+                        suggestionsHtmlList += `<li>The <strong>Active (non-printing)</strong> phase used the most energy (${maxEnergyPercent.toFixed(0)}%). Monitor the 'Actual vs Expected' chart during these periods for unusual spikes.</li>`;
+                    }
+                } else if (highestEnergyPhase === 'Idle' || maxEnergyPercent < 10) { // Low overall consumption
+                    suggestionsHtmlList += `<li>Energy consumption was low during this period. Continue monitoring usage patterns during longer or more active prints.</li>`;
+                }
+
+
+                // --- Suggestion based on Top Driver (if not already covered by phase) ---
+                const topDriverKey = topDrivers.length > 0 ? topDrivers[0] : null;
+                if (topDriverKey === 'plug_temp_c' && !suggestionsHtmlList.includes("plug")) { // Avoid duplicate suggestions
+                    suggestionsHtmlList += `<li>The model indicates the <strong>plug's temperature</strong> was influential. Ensure the plug has adequate ventilation and isn't overloaded, though this often correlates with general printer activity.</li>`;
+                }
+                // Add other specific top-driver suggestions if needed, checking for duplicates
+
+                // --- Generic suggestion if few specific ones triggered ---
+                if (suggestionsHtmlList.split('<li>').length - 1 < 2) { // If fewer than 2 suggestions generated
+                    suggestionsHtmlList += `<li>Review the 'Energy Breakdown by Phase' table to understand where energy is spent. Compare different time ranges to spot trends.</li>`;
+                }
+
+                // Populate element
+                const ul = element.querySelector('ul');
+                if (ul) {
+                    // Remove duplicate suggestion entries (basic check)
+                    const uniqueSuggestions = Array.from(new Set(suggestionsHtmlList.match(/<li>.*?<\/li>/g))).join('');
+                    ul.innerHTML = uniqueSuggestions;
+                    element.style.display = uniqueSuggestions ? 'block' : 'none';
+                } else {
+                    element.style.display = 'none';
+                }
+            }
+            // **** END ENHANCED definition ****
+
+            // **** Simplified function - only updates Gamification ****
+            function updateGamification(topDriversList, driverDisplayNames) {
+                // Gamification Message Logic - Now uses the explicit top drivers list
+                if (gamificationContainer && gamificationMessageElement) {
+                    let gamificationMessage = '';
+                    let showGamification = false;
+                    const topDriverKey = topDriversList && topDriversList.length > 0 ? topDriversList[0] : null;
+                    const topDriverDisplayName = topDriverKey ? (driverDisplayNames[topDriverKey] || topDriverKey) : null;
+
+                    if (topDriverDisplayName) {
+                        gamificationMessage = `🏆 Focus Area: The model highlights <strong>${topDriverDisplayName}</strong> as a key factor influencing energy use!`;
+                        if (topDriverKey === 'nozzle_temp_actual' || topDriverKey === 'bed_temp_actual') {
+                            gamificationMessage += " Managing heating effectively is often key to saving energy.";
+                        } else if (topDriverKey === 'is_printing') {
+                            gamificationMessage += " Optimizing print times or choosing the right printer size can impact overall usage.";
+                        } else if (topDriverKey === 'plug_temp_c') {
+                            gamificationMessage += " The load on the plug itself seems influential.";
+                        }
+                        showGamification = true;
+                    } else {
+                        // Optional: Show a generic message if top drivers list is empty
+                        // gamificationMessage = `ℹ️ Monitor energy usage patterns for optimization opportunities.`;
+                        // showGamification = true;
+                    }
+                    gamificationMessageElement.innerHTML = gamificationMessage;
+                    gamificationContainer.style.display = showGamification ? 'block' : 'none';
+                } else { console.warn("Gamification container or message element not found."); }
+            }
+            // Function to manage the visual loading overlay (no longer sets src)
+            function updateGrafana(grafanaUrls) { // Parameter not really used now
+                const overlay = document.getElementById('grafanaLoadingOverlay');
+                // Hide overlay when results are ready (assuming iframe loads on its own)
+                if (overlay) {
+                    hideLoadingOverlay(overlay); // Hide loading when analysis data is ready
+                    // You might want to show it again during resetUIForAnalysis if needed
+                }
+            }
+
+            function displayErrorState(errorMessage) {
+                const overviewElement = document.getElementById('summary-overview');
+                const keyInsightsElement = document.getElementById('summary-key-insights');
+                const correlationElement = document.getElementById('summary-correlation');
+                const advancedContainer = document.getElementById('advanced-details-container');
+                const featureImportanceElement = document.getElementById('summary-feature-importance');
+                const suggestionsElement = document.getElementById('summary-suggestions');
+                const toggleBtn = document.getElementById('toggle-advanced-btn');
+                // NEW: Add references for new elements to hide on error
+                const keyMetricsContainer = document.getElementById('key-metrics-container');
+                const phaseContainer = document.getElementById('summary-phase-analysis');
+
+                if (phaseDurationPieChart) { phaseDurationPieChart.destroy(); phaseDurationPieChart = null; }
+                if (phaseEnergyPieChart) { phaseEnergyPieChart.destroy(); phaseEnergyPieChart = null; }
+                const chartsContainer = document.getElementById('phase-charts-container');
+                if (chartsContainer) chartsContainer.style.display = 'none'; // Hide charts container
+
+                if (overviewElement) { overviewElement.innerHTML = `<p style="color: var(--danger);"><strong>Error:</strong> ${errorMessage}</p>`; }
+                // Hide all other result sections
+                if (keyInsightsElement) keyInsightsElement.style.display = 'none';
+                if (correlationElement) correlationElement.style.display = 'none';
+                if (advancedContainer) advancedContainer.style.display = 'none';
+                const topDriversSection = document.getElementById('summary-top-drivers');
+                if (topDriversSection) topDriversSection.style.display = 'none'; // Or reset its content if it's inside Advanced
+
+                if (suggestionsElement) suggestionsElement.style.display = 'none';
+                if (gamificationContainer) gamificationContainer.style.display = 'none';
+                if (influenceChart) { influenceChart.destroy(); influenceChart = null; }
+                // NEW: Hide new elements on error
+                if (keyMetricsContainer) keyMetricsContainer.style.display = 'none';
+                if (phaseContainer) phaseContainer.style.display = 'none';
+                // Reset toggle button
+                if (toggleBtn) { toggleBtn.innerHTML = '<i class="fa-solid fa-chevron-down"></i> Show Advanced Details'; toggleBtn.style.backgroundColor = 'var(--gray-200)'; }
+            }
+
+            // **** Moved populateResults definition OUTSIDE/BEFORE handleRunAnalysis ****
+            function populateResults(resultsData, userSelectedDrivers) {
+                // --- Get references & Display Names ---
+                const currentOverviewElement = document.getElementById('summary-overview');
+                const currentKeyInsightsElement = document.getElementById('summary-key-insights');
+                // --- NEW: Get references for new metric elements ---
+                const currentPhaseContainer = document.getElementById('phase-table-container');
+                // --- END NEW References ---
+                const currentCorrelationElement = document.getElementById('summary-correlation');
+                const currentRegressionElement = document.getElementById('summary-regression'); // Inside advanced
+                const currentModelQualityElement = document.getElementById('summary-model-quality'); // Inside advanced
+                const currentFeatureImportanceElement = document.getElementById('summary-feature-importance');
+                const topDriversListContainer = document.getElementById('top-drivers-list');
+                const currentSuggestionsElement = document.getElementById('summary-suggestions');
+                const driverDisplayNames = { // Keep this map updated
+                    'plug_temp_c': 'Plug Temp (°C)',
+                    'is_printing': 'Is Printing',
+                    'nozzle_temp_actual': 'Nozzle Temp (°C)',
+                    'nozzle_temp_actual_missing': 'Nozzle Temp Missing',
+                    'bed_temp_actual': 'Bed Temp (°C)',
+                    'bed_temp_actual_missing': 'Bed Temp Missing',
+                    'z_height_mm': 'Z Height (mm)',
+                    'z_height_mm_missing': 'Z Height Missing',
+                    'temperature_c': 'Ambient Temp (°C)',
+                    'humidity_percent': 'Ambient Humidity (%)',
+                    'material': 'Filament Material' // <<< ADDED
+                };
+
+                // --- Populate Sections ---
+                // --- Populate UI Sections by calling helper functions ---
+                if (currentOverviewElement) { currentOverviewElement.innerHTML = `<p>${resultsData.summary || 'Analysis complete.'}</p>`; }
+
+                // Call new metric functions
+                populateKeyMetrics('metric', resultsData.new_metrics);
+                populatePhaseAnalysis(currentPhaseContainer, resultsData.new_metrics?.phase_analysis);
+
+                // Call NEW Insight/Suggestion functions
+                populateKeyInsights(currentKeyInsightsElement, resultsData, userSelectedDrivers, driverDisplayNames);
+                populateSuggestions(currentSuggestionsElement, resultsData, driverDisplayNames);
+
+                // Call existing functions (make sure they exist or remove calls)
+                populateCorrelation(currentCorrelationElement, resultsData.correlation, driverDisplayNames);
+
+                // Advanced Section Population (ensure these functions exist too)
+                populateRegression(currentRegressionElement, resultsData.regression, driverDisplayNames);
+                populateModelQuality(currentModelQualityElement, resultsData.ml_evaluation_metrics);
+                populateTopDrivers(topDriversListContainer, resultsData.ml_top_drivers, driverDisplayNames); // Use the new top drivers function
+
+                // --- ADD Chart Calls HERE ---
+                const phaseDataForCharts = resultsData.new_metrics?.phase_analysis;
+                if (phaseDataForCharts) {
+                    createPhaseDurationChart('phaseDurationChart', phaseDataForCharts);
+                    createPhaseEnergyChart('phaseEnergyChart', phaseDataForCharts);
+                } else {
+                    // Optionally clear old charts if phase data is missing
+                    if (phaseDurationPieChart) phaseDurationPieChart.destroy(); phaseDurationPieChart = null;
+                    if (phaseEnergyPieChart) phaseEnergyPieChart.destroy(); phaseEnergyPieChart = null;
+                    const chartsContainer = document.getElementById('phase-charts-container');
+                    if (chartsContainer) chartsContainer.style.display = 'none'; // Hide container if no data
+                }
+                // --- END Chart Calls ---
+
+                // Gamification & Grafana (ensure these functions exist)
+                updateGamification(resultsData.ml_top_drivers, driverDisplayNames);
+                updateGrafana(resultsData.grafanaUrls);
+
+            }
+            // --- End UI Update Functions ---
+
+            // --- Main Analysis Handler ---
+            // --- Main Analysis Handler ---
+            async function handleRunAnalysis() {
+                const selectedDeviceId = deviceSelect.value;
+                const selectedTime = selectedTimeRangeInput.value;
+                const userSelectedDrivers = {};
+                driverCheckboxes.forEach(checkbox => { if (checkbox.checked) { userSelectedDrivers[checkbox.value] = true; } });
+
+                if (!selectedDeviceId) { alert("Please select a device."); return; }
+
+                // Reset UI (ensure resetUIForAnalysis function exists and is complete)
+                resetUIForAnalysis();
+
+                // Show loading overlays
+                showLoadingOverlay(summaryLoadingOverlay);
+                showLoadingOverlay(grafanaLoadingOverlay);
+
+                // **** START REPLACE HERE ****
+                try {
+                    const response = await fetch(`${NODE_RED_API_BASE}/api/analyze`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', },
+                        body: JSON.stringify({ deviceId: selectedDeviceId, timeRange: selectedTime, selectedDrivers: userSelectedDrivers }),
+                    });
+
+                    if (!response.ok) {
+                        let errorMsg = `HTTP error! status: ${response.status}`;
+                        try { const errorData = await response.json(); errorMsg = errorData.error || errorMsg; } catch (e) { }
+                        throw new Error(errorMsg);
+                    }
+
+                    const data = await response.json(); // Outer object {success:..., results:...}
+
+                    if (data.success && data.results) {
+                        console.log("Analysis Results (raw):", data.results); // Log the received results
+
+                        // **** Call the single function to populate all results ****
+                        populateResults(data.results, userSelectedDrivers); // <-- KEY CHANGE
+
+                    } else { // Handle API success=false or missing results
+                        throw new Error(data.error || "API returned unsuccessful status or missing results.");
+                    }
+
+                } catch (error) { // Handle fetch error or error thrown from success=false
+                    console.error("Error running analysis:", error);
+                    // Display error (ensure displayErrorState function exists and is complete)
+                    displayErrorState(error.message);
+
+                } finally {
+                    // Hide loading overlays (ensure hideAllLoadingOverlays function exists)
+                    hideAllLoadingOverlays();
+                }
+                // **** END REPLACE HERE ****
+
+            } // --- End Main Analysis Handler ---
+
+            // --- End Main Analysis Handler ---
+
+            // --- Event Listener Setup ---
+            function setupEventListeners() {
+                // --- Time Range Buttons ---
+                // Get fresh NodeList inside function scope
+                const currentButtons = document.querySelectorAll('.time-range-btn');
+
+                currentButtons.forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const clickedButton = event.currentTarget; // Use currentTarget
+                        const selectedRange = clickedButton.dataset.range;
+
+                        // Update hidden input FIRST
+                        selectedTimeRangeInput.value = selectedRange;
+
+                        // Update button active states
+                        currentButtons.forEach(btn => { btn.classList.remove('active'); });
+                        clickedButton.classList.add('active');
+
+                        // Update the dynamic label
+                        updateRangeLabel(selectedRange);
+                    });
+                });
+
+                // --- Set Initial State on Load ---
+                const initialRangeValue = selectedTimeRangeInput.value; // Read default value from input
+                let foundInitial = false;
+
+                currentButtons.forEach(button => {
+                    if (button.dataset.range === initialRangeValue) {
+                        button.classList.add('active');
+                        foundInitial = true;
+                    } else {
+                        button.classList.remove('active');
+                    }
+                });
+
+                // Fallback if value in input didn't match any button
+                if (!foundInitial) {
+                    const fallbackButton = document.querySelector('.time-range-btn[data-range="24h"]'); // Default to 24h
+                    if (fallbackButton) {
+                        currentButtons.forEach(btn => { btn.classList.remove('active'); }); // Deactivate others
+                        fallbackButton.classList.add('active');
+                        selectedTimeRangeInput.value = "24h"; // Sync hidden input
+                        console.warn(`Initial time range '${initialRangeValue}' not found, defaulting to 24h.`);
+                    }
+                    // Add further fallback if needed
+                }
+                // Update label with initial/fallback value
+                updateRangeLabel(selectedTimeRangeInput.value);
+                // --- End Time Range Logic ---
+
+
+                // --- Advanced Details Toggle --- (Keep existing logic)
+                const toggleBtn = document.getElementById('toggle-advanced-btn');
+                const advancedContainer = document.getElementById('advanced-details-container');
+                if (toggleBtn && advancedContainer) {
+                    toggleBtn.addEventListener('click', () => {
+                        const isHidden = advancedContainer.style.display === 'none';
+                        if (isHidden) { /* Show */ advancedContainer.style.display = 'block'; toggleBtn.innerHTML = '<i class="fa-solid fa-chevron-up"></i> Hide Advanced Details'; toggleBtn.style.backgroundColor = 'var(--gray-300)'; }
+                        else { /* Hide */ advancedContainer.style.display = 'none'; toggleBtn.innerHTML = '<i class="fa-solid fa-chevron-down"></i> Show Advanced Details'; toggleBtn.style.backgroundColor = 'var(--gray-200)'; }
+                    });
+                } else { console.warn("Advanced details toggle button or container not found."); }
+                // --- End Advanced Details ---
+
+
+                // --- Run Analysis Button --- (Keep existing logic)
+                if (runAnalysisBtn) {
+                    // Ensure handleRunAnalysis function is defined elsewhere and accessible
+                    runAnalysisBtn.addEventListener('click', handleRunAnalysis);
+                }
+                else { console.error("Run Analysis Button not found!"); }
+                // --- End Run Analysis Button ---
+
+            } // --- End setupEventListeners function ---
+
+            // --- Initial Load ---
+            document.addEventListener('DOMContentLoaded', () => {
+                // Initial setup calls
+                fetchDeviceList().then(() => {
+                    // --- NEW: Parse URL Params and Apply Selections ---
+                    // Run this AFTER device list is fetched and populated
+                    applyUrlParameters();
+                    // --- END NEW ---
+                }); // Chain parameter application after device list fetch
+                setupEventListeners(); // Setup listeners AFTER elements are present
+
+                // --- Default state ---
+                hideAllLoadingOverlays(); // Ensure overlays hidden on load
+
+
+
+            });
+            // --- End Initial Load ---
+
+            // **** ADD THIS NEW FUNCTION DEFINITION ****
+            // Function to parse URL parameters and set controls
+            function applyUrlParameters() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const deviceIdParam = urlParams.get('device');
+                const timeRangeParam = urlParams.get('timeRange');
+                const driversParam = urlParams.get('drivers'); // e.g., "all" or comma-separated list
+
+                let settingsApplied = false; // Flag to check if we should auto-run
+
+                // 1. Set Device
+                if (deviceIdParam && deviceSelect) {
+                    // Check if the option actually exists after fetch
+                    const deviceOption = deviceSelect.querySelector(`option[value="${deviceIdParam}"]`);
+                    if (deviceOption) {
+                        deviceSelect.value = deviceIdParam;
+                        console.log(`Applied URL parameter: device = ${deviceIdParam}`);
+                        settingsApplied = true;
+                    } else {
+                        console.warn(`Device ID '${deviceIdParam}' from URL parameter not found in dropdown.`);
+                    }
+                }
+
+                // 2. Set Time Range
+                if (timeRangeParam && selectedTimeRangeInput) {
+                    const timeButton = document.querySelector(`.time-range-btn[data-range="${timeRangeParam}"]`);
+                    if (timeButton) {
+                        selectedTimeRangeInput.value = timeRangeParam; // Update hidden input
+                        // Update button classes
+                        timeRangeButtons.forEach(btn => btn.classList.remove('active'));
+                        timeButton.classList.add('active');
+                        // Update the dynamic label if using the enhanced time range UI
+                        if (typeof updateRangeLabel === 'function') { // Check if function exists
+                            updateRangeLabel(timeRangeParam);
+                        }
+                        console.log(`Applied URL parameter: timeRange = ${timeRangeParam}`);
+                        settingsApplied = true;
+                    } else {
+                        console.warn(`Time range '${timeRangeParam}' from URL parameter not found.`);
+                    }
+                }
+
+                // 3. Set Drivers
+                if (driversParam && driverCheckboxes) {
+                    console.log(`Applying URL parameter: drivers = ${driversParam}`);
+                    settingsApplied = true; // Consider applying drivers as an action warranting auto-run
+                    if (driversParam.toLowerCase() === 'all') {
+                        // Check all checkboxes
+                        driverCheckboxes.forEach(checkbox => {
+                            checkbox.checked = true;
+                        });
+                    } else {
+                        // Check specific drivers (comma-separated list)
+                        const driversToSelect = driversParam.split(',');
+                        driverCheckboxes.forEach(checkbox => {
+                            // Check if checkbox value is in the list from URL
+                            checkbox.checked = driversToSelect.includes(checkbox.value);
+                        });
+                    }
+                }
+
+                if (settingsApplied) {
+                    console.log("URL parameters applied, triggering auto-run...");
+                    // Ensure handleRunAnalysis is available before calling
+                    if (typeof handleRunAnalysis === 'function') {
+                        // Use a small timeout to allow the browser to update the UI
+                        // visually before starting the potentially blocking analysis call.
+                        setTimeout(handleRunAnalysis, 100); // Delay 100ms
+                    } else {
+                        console.error("handleRunAnalysis function not found for auto-run.");
+                    }
+                }
+            }
+            // **** END OF NEW FUNCTION ****
+
+            // --- Ensure other functions like setupEventListeners, fetchDeviceList, handleRunAnalysis etc. exist ---
+
+        </script>
+        <!-- End Script block -->
+</body>
+
+</html>

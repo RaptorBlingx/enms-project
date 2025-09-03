@@ -27,3 +27,4 @@ tzdata==2025.2
 urllib3==2.5.0
 xgboost==3.0.0
 weasyprint
+paho-mqtt
