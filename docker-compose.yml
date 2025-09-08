@@ -1,16 +1,16 @@
 # ====================================================================
-# FINAL Docker Compose for the ENMS Project (with .env file)
-# Version: 3.1
+# FINAL Docker Compose for the ENMS Project (Simplified & Corrected)
+# Version: 3.4
 # ====================================================================
 
 version: '3.8'
 
-# Define named volumes for persistent data
 volumes:
   postgres_data:
   grafana_data:
   generated_pdfs:
   mosquitto_data:
+  mosquitto_config:
 
 services:
   # 1. PostgreSQL Database
@@ -19,7 +19,6 @@ services:
     container_name: enms_postgres
     restart: unless-stopped
     environment:
-      # Reads variables from the .env file
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -27,14 +26,37 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/db_init:/docker-entrypoint-initdb.d
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT}:5432"
+    # Use a simple healthcheck for postgres
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
 
-  # 2. MQTT Broker
+  # 2. Mosquitto Config Generator (Future-Proof)
+  mosquitto_config_generator:
+    image: eclipse-mosquitto:2
+    container_name: enms_mosquitto_config
+    command: >
+      sh -c "
+        echo 'persistence true' > /mosquitto/config/mosquitto.conf && \
+        echo 'persistence_location /mosquitto/data/' >> /mosquitto/config/mosquitto.conf && \
+        echo 'log_dest stdout' >> /mosquitto/config/mosquitto.conf && \
+        echo 'allow_anonymous false' >> /mosquitto/config/mosquitto.conf && \
+        echo 'password_file /mosquitto/config/password.txt' >> /mosquitto/config/mosquitto.conf && \
+        echo 'listener 1883 0.0.0.0' >> /mosquitto/config/mosquitto.conf && \
+        mosquitto_passwd -b -c /mosquitto/config/password.txt ${MQTT_USERNAME} ${MQTT_PASSWORD} && \
+        chown root:root /mosquitto/config/mosquitto.conf && \
+        chown root:root /mosquitto/config/password.txt
+      "
+    environment:
+      - MQTT_USERNAME=${MQTT_USERNAME}
+      - MQTT_PASSWORD=${MQTT_PASSWORD}
+    volumes:
+      - mosquitto_config:/mosquitto/config
+
+  # 3. MQTT Broker (REMOVED HEALTHCHECK)
   mosquitto:
     image: eclipse-mosquitto:2
     container_name: enms_mosquitto
@@ -42,11 +64,12 @@ services:
     ports:
       - "1883:1883"
     volumes:
-      - ./node-red/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
-      - ./node-red/password.txt:/mosquitto/config/password.txt:ro
+      - mosquitto_config:/mosquitto/config
       - mosquitto_data:/mosquitto/data
+    depends_on:
+      - mosquitto_config_generator
 
-  # 3. Node-RED Service
+  # 4. Node-RED Service (Corrected Volumes & Env)
   nodered:
     build:
       context: .
@@ -56,30 +79,36 @@ services:
     ports:
       - "1880:1880"
     volumes:
-      - ./backend/models:/models
+      # This is the correct, simple way to persist all user data
       - ./node-red:/data
+      # The models volume remains separate
+      - ./backend/models:/models
     environment:
       # --- Database Credentials ---
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+
       # --- MQTT Credentials ---
-      - MQTT_BROKER_HOST=mosquitto
-      - MQTT_PORT=1883
+      - MQTT_BROKER_HOST=${MQTT_BROKER_HOST}
+      - MQTT_PORT=${MQTT_PORT}
       - MQTT_USERNAME=${MQTT_USERNAME}
       - MQTT_PASSWORD=${MQTT_PASSWORD}
       # --- ML Script Configuration ---
       - MODEL_DIR=/models
       # --- Standard Node-RED Config ---
       - NODE_RED_CREDENTIAL_SECRET=${NODE_RED_CREDENTIAL_SECRET}
-      - FLOWS=flows_docker.json
+      # --- THIS IS THE FIX ---
+      # REMOVED the 'FLOWS=flows_docker.json' variable. Node-RED will now
+      # default to using 'flows.json' inside the /data volume.
     depends_on:
       - postgres
       - mosquitto
 
-  # 4. ML Prediction Worker
+
+  # 5. ML Prediction Worker (SIMPLIFIED depends_on)
   ml_worker:
     build:
       context: .
@@ -98,22 +127,29 @@ services:
       - mosquitto
       - postgres
 
-  # 5. Grafana Service (Unchanged)
+  # 6. Grafana Service (CORRECTED)
   grafana:
     image: grafana/grafana:latest
     container_name: enms_grafana
     restart: unless-stopped
     ports:
       - "3000:3000"
-    # ... (grafana config is unchanged)
+    environment:
+      - GF_INSTALL_PLUGINS=grafana-mqtt-datasource
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
     volumes:
       - grafana_data:/var/lib/grafana
-      # ... (grafana volumes are unchanged)
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      # --- THIS LINE IS RESTORED ---
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
     depends_on:
       postgres:
         condition: service_healthy
 
-  # 6. Python API Service (Unchanged)
+  # 7. Python API Service
   python_api:
     build:
       context: ./python-api
@@ -126,7 +162,7 @@ services:
     depends_on:
       - postgres
 
-  # 7. Web Server (Nginx) (Unchanged)
+  # 8. Web Server (Nginx)
   web_server:
     image: nginx:latest
     container_name: enms_web_server

@@ -25,6 +25,7 @@
         },
         "debug": {
             "filter": "filterCurrent"
-        }
+        },
+        "menu-menu-item-palette": true
     }
 }

@@ -8,6 +8,13 @@
         "env": []
     },
     {
+        "id": "a1b2c3d4e5f6g7h8",
+        "type": "tab",
+        "label": "Manual Model Training",
+        "disabled": false,
+        "info": "### Manual Model Training Flow\n\n**Purpose:** Provides a simple one-click interface to retrain the machine learning model.\n\n**Process:**\n1.  **Trigger:** Manually click the inject node's button.\n2.  **Export Data:** Executes `export_training_data.py` to create a fresh `printer_energy_data_raw.csv` from the database.\n3.  **Train Model:** If the export is successful, it executes `train_model.py` to train a new model on the fresh data and save the assets (`best_model.joblib`, `scaler.joblib`, etc.).\n4.  **Feedback:** All output (`stdout`) and errors (`stderr`) from the scripts are logged to the Debug sidebar."
+    },
+    {
         "id": "ac9683af7e82fb53",
         "type": "tab",
         "label": "Analysis API",
@@ -16,11 +23,11 @@
         "env": []
     },
     {
-        "id": "3248d6a231f4e9d0",
+        "id": "bce1a8251b1947ed",
         "type": "tab",
-        "label": "Live Predictor",
+        "label": "Live Predictor (Optimized)",
         "disabled": false,
-        "info": "**Purpose:** This flow runs on a schedule to generate real-time power consumption predictions for all active Prusa printers. It uses a pre-trained machine learning model to make these predictions. The results are stored in the `ml_predictions` table, which allows Grafana to display a \"Predicted vs. Actual\" power graph.",
+        "info": "",
         "env": []
     },
     {
@@ -287,117 +294,6 @@
         "h": 322
     },
     {
-        "id": "97c76169fe166c15",
-        "type": "group",
-        "z": "3248d6a231f4e9d0",
-        "name": "Data Input",
-        "style": {
-            "label": true
-        },
-        "nodes": [
-            "766af32f4fe6ef26",
-            "fb200dd03d87ca0a",
-            "727ae746539a786d"
-        ],
-        "x": 54,
-        "y": 119,
-        "w": 312,
-        "h": 202
-    },
-    {
-        "id": "9c69214ff198d9d8",
-        "type": "group",
-        "z": "3248d6a231f4e9d0",
-        "name": "Data Processing",
-        "style": {
-            "label": true
-        },
-        "nodes": [
-            "5e276bfbbd3f9bb6",
-            "f3cf04893924fa13",
-            "ebffcd036e7af362",
-            "3be8ddb37a93844d"
-        ],
-        "x": 454,
-        "y": 239,
-        "w": 312,
-        "h": 262
-    },
-    {
-        "id": "ac90879e0d7b329f",
-        "type": "group",
-        "z": "3248d6a231f4e9d0",
-        "name": "Data Output",
-        "style": {
-            "label": true
-        },
-        "nodes": [
-            "fb9f1203b23b0fbc",
-            "c67612e2cda72292"
-        ],
-        "x": 834,
-        "y": 419,
-        "w": 272,
-        "h": 142
-    },
-    {
-        "id": "9e77943c233db3eb",
-        "type": "group",
-        "z": "ac9683af7e82fb53",
-        "name": "Data Input",
-        "style": {
-            "label": true
-        },
-        "nodes": [
-            "4918b67096adabfe",
-            "e0f4357542e2412b"
-        ],
-        "x": 14,
-        "y": 459,
-        "w": 532,
-        "h": 82
-    },
-    {
-        "id": "6382c2e9dcb135c5",
-        "type": "group",
-        "z": "ac9683af7e82fb53",
-        "name": "Data Processing",
-        "style": {
-            "label": true
-        },
-        "nodes": [
-            "9f67b80add894bed",
-            "fd667af16fc7af70",
-            "970bdc8e3cb051e8"
-        ],
-        "x": 594,
-        "y": 59,
-        "w": 392,
-        "h": 202
-    },
-    {
-        "id": "4080a0de8969fa04",
-        "type": "group",
-        "z": "ac9683af7e82fb53",
-        "name": "Data Output",
-        "style": {
-            "label": true,
-            "stroke": "#0070c0"
-        },
-        "nodes": [
-            "fc3e800f7322b583",
-            "d69fce717cce3024",
-            "c998f79c73ca0cda",
-            "3dad15f0c8d11ced",
-            "3592a09331fdbdbd",
-            "2dc8f0c00c0dd79f"
-        ],
-        "x": 1034,
-        "y": 239,
-        "w": 992,
-        "h": 302
-    },
-    {
         "id": "d46e71e1a4ec093a",
         "type": "group",
         "z": "088fab733419c707",
@@ -459,6 +355,73 @@
         "y": 619,
         "w": 752,
         "h": 402
+    },
+    {
+        "id": "2c5e9e023365b4b5",
+        "type": "group",
+        "z": "ac9683af7e82fb53",
+        "name": "Data Input",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "b75d3a79fce253d4",
+            "a7289e7ae8b0c5e3",
+            "bb78b48426b6d4c3",
+            "501e57230b01d4a9"
+        ],
+        "x": 14,
+        "y": 479,
+        "w": 712,
+        "h": 202
+    },
+    {
+        "id": "7ac6f6507ae14b9e",
+        "type": "group",
+        "z": "ac9683af7e82fb53",
+        "name": "Data Processing",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "2cf637958f28c7bc",
+            "7f71e9c443c55278",
+            "420db27bdf8a7af8",
+            "92a0ead919f42cc6",
+            "5da0ec23ca2508ab",
+            "18105e56e6faed86",
+            "1ae9d7f3b861588f",
+            "c37a20770849cdd1",
+            "14487a14b2feca49",
+            "be4e082899f0f3bf",
+            "47f941dc6fd62b7f"
+        ],
+        "x": 374,
+        "y": 159,
+        "w": 1432,
+        "h": 322
+    },
+    {
+        "id": "8e413dd2bca548c6",
+        "type": "group",
+        "z": "ac9683af7e82fb53",
+        "name": "Data Output",
+        "style": {
+            "label": true,
+            "stroke": "#0070c0"
+        },
+        "nodes": [
+            "55b3db24479ce37f",
+            "32e3356cddc166e6",
+            "6d1eab268ac5c82d",
+            "e10de595608c8e62",
+            "965f098d5bee013d",
+            "b4b7c081576b3e05"
+        ],
+        "x": 1934,
+        "y": 279,
+        "w": 992,
+        "h": 302
     },
     {
         "id": "5e9c772230c2d4b1",
@@ -611,11 +574,11 @@
         "id": "4259e91acb63e17b",
         "type": "postgreSQLConfig",
         "name": "",
-        "host": "localhost",
+        "host": "$(POSTGRES_HOST)",
         "hostFieldType": "str",
-        "port": 5432,
+        "port": "$(POSTGRES_PORT)",
         "portFieldType": "num",
-        "database": "reg_ml",
+        "database": "$(POSTGRES_DB)",
         "databaseFieldType": "str",
         "ssl": "false",
         "sslFieldType": "bool",
@@ -627,9 +590,9 @@
         "idleFieldType": "num",
         "connectionTimeout": 10000,
         "connectionTimeoutFieldType": "num",
-        "user": "reg_ml",
+        "user": "$(POSTGRES_USER)",
         "userFieldType": "str",
-        "password": "raptorblingx",
+        "password": "$(POSTGRES_PASSWORD)",
         "passwordFieldType": "str"
     },
     {
@@ -862,6 +825,68 @@
         "alpnprotocol": ""
     },
     {
+        "id": "ff72b847b3a5073d",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "$(MQTT_BROKER_HOST)",
+        "port": "$(MQTT_PORT)",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "cbbcb8eabf93ec6f",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "mosquitto",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
         "id": "3b44ba5a1dc552c7",
         "type": "mqtt in",
         "z": "dd55f774d9b5b325",
@@ -1011,8 +1036,8 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 400,
-        "y": 320,
+        "x": 280,
+        "y": 600,
         "wires": []
     },
     {
@@ -1024,7 +1049,8 @@
         "tosidebar": true,
         "console": false,
         "tostatus": false,
-        "complete": "false",
+        "complete": "true",
+        "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
         "x": 620,
@@ -1032,145 +1058,370 @@
         "wires": []
     },
     {
-        "id": "4918b67096adabfe",
-        "type": "http in",
-        "z": "ac9683af7e82fb53",
-        "g": "9e77943c233db3eb",
-        "name": "POST /api/analyze",
-        "url": "/api/analyze",
-        "method": "post",
-        "upload": false,
-        "swaggerDoc": "",
-        "x": 130,
-        "y": 500,
-        "wires": [
-            [
-                "e0f4357542e2412b"
-            ]
+        "id": "788224229427d665",
+        "type": "inject",
+        "z": "dd55f774d9b5b325",
+        "name": "PERMANENT TEST",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
         ],
-        "info": "**Purpose:** Defines the public HTTP endpoint that the frontend page calls when a user clicks the \"Run Energy Analysis\" button.\r\n\r\n**Endpoint:** `POST /api/analyze`\r\n\r\n**Input:**\r\n- Expects an incoming `msg.payload` containing a JSON object from the frontend, e.g., `{ \"deviceId\": \"PrusaMK4-1\", \"timeRange\": \"24h\", ... }`."
-    },
-    {
-        "id": "e0f4357542e2412b",
-        "type": "function",
-        "z": "ac9683af7e82fb53",
-        "g": "9e77943c233db3eb",
-        "name": "Parse Analyze Request",
-        "func": "// Node-RED Function Node: Parse Analyze Request\n// --- Updated: 2024-07-XX (Added 'all' time range) ---\n\n// msg.payload should contain JSON like:\n// { deviceId: \"PrusaMK4-1\", timeRange: \"24h\", selectedDrivers: {\"nozzle_temp_actual\": true, ...} }\n\nconst input = msg.payload;\n\n// --- Basic Validation ---\nif (!input || typeof input !== 'object') {\n    node.error(\"Invalid payload received. Expected JSON object.\", msg);\n    return [null, msg]; // Send to error output (output 2)\n}\nconst deviceId = input.deviceId;\n// --- Use '24h' as the default timeRange if not provided ---\nconst timeRange = input.timeRange || \"24h\";\nconst selectedDrivers = input.selectedDrivers || {}; // Default to empty object\n\nif (!deviceId || typeof deviceId !== 'string' || deviceId.trim() === '') {\n    node.error(\"Missing or invalid deviceId in payload.\", msg);\n    return [null, msg]; // Send to error output\n}\n// --- End Basic Validation ---\n\n\n// --- Calculate Start Time ---\nlet startTimeISO = null; // Initialize\n\nnode.log(`[Parse Request] Received timeRange: '${timeRange}' for device: '${deviceId}'`);\n\nif (timeRange === 'all') {\n    // For 'all time', use a very early date recognized by PostgreSQL.\n    // This effectively selects all data >= epoch start.\n    startTimeISO = '1970-01-01T00:00:00Z'; // Use Unix Epoch start as the boundary\n    node.log(`[Parse Request] Time Range is 'all', setting startTimeISO to: ${startTimeISO}`);\n} else {\n    // Calculate specific start time based on current time for other ranges\n    let targetTimeMs = new Date().getTime(); // Get current time in milliseconds UTC\n    let durationHours = 0;\n\n    switch (timeRange) {\n        case '1h':  durationHours = 1; break;\n        case '6h':  durationHours = 6; break;\n        case '7d':  durationHours = 7 * 24; break;\n        case '24h': // Fallthrough for default case\n        default:    durationHours = 24; break; // Default to 24h if invalid range provided\n    }\n    targetTimeMs -= durationHours * 60 * 60 * 1000; // Subtract duration in milliseconds\n\n    const finalStartTime = new Date(targetTimeMs); // Create Date object from calculated time\n    startTimeISO = finalStartTime.toISOString(); // Convert to ISO 8601 format (UTC)\n    node.log(`[Parse Request] Time Range: '${timeRange}', Calculated startTimeISO: ${startTimeISO}`);\n}\n// --- End Calculate Start Time ---\n\n\n// --- Prepare variables for next steps ---\n\n// Map of allowed driver keys from UI (selectedDrivers) to their DB column source\n// Keep this map updated if new selectable drivers are added or column names change.\n// REMOVED 'speed_multiplier_percent' as it's no longer used by model or UI checkbox\nconst allDriverDbColumns = {\n    'nozzle_temp_actual': 'ps.nozzle_temp_actual',\n    'bed_temp_actual': 'ps.bed_temp_actual',\n    'is_printing': 'ps.is_printing',\n    'z_height_mm': 'ps.z_height_mm',\n    // 'speed_multiplier_percent': 'ps.speed_multiplier_percent', // Removed\n    'temperature_c': 'env.temperature_c',   // From environment table\n    'humidity_percent': 'env.humidity_pct'  // From environment table (check column name)\n};\n\n// We don't strictly need columnsToSelect anymore as the SQL query fetches all relevant cols.\n// But we still need selectedDriverKeys for Correlation/Regression logic later.\nlet selectedDriverKeys = [];\nfor (const driverKey in selectedDrivers) {\n    // Check if driver is selected (value is true) AND it's a valid known driver key\n    if (selectedDrivers[driverKey] === true && allDriverDbColumns.hasOwnProperty(driverKey)) {\n        selectedDriverKeys.push(driverKey);\n    } else if (selectedDrivers[driverKey] === true) {\n        // Log if a selected key isn't in our map (maybe a typo in UI value?)\n        node.warn(`[Parse Request] Skipping unknown selected driver key '${driverKey}'.`);\n    }\n}\nnode.log(`[Parse Request] Selected Driver Keys for downstream analysis: ${selectedDriverKeys}`);\n// --- End Prepare variables ---\n\n\n// --- Pass data to the next node ---\n// The 'Build SQL for Analysis' node only needs dbParams.\n// The Python node needs analysisInputs.\n\nmsg.dbParams = [deviceId, startTimeISO]; // Params for the main SQL query node\n\nmsg.analysisInputs = {\n    deviceId: deviceId,\n    startTime: startTimeISO, // Pass the calculated start time (could be epoch start)\n    selectedDriverKeys: selectedDriverKeys // Pass the validated keys the user selected\n};\n\n// Clear payload from input node if not needed further\nmsg.payload = {};\n// Clear properties no longer needed\ndelete msg.selectColumnsSQL; // This isn't used anymore\n\nreturn [msg, null]; // Send valid requests to output 1 (main flow)",
-        "outputs": 2,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 410,
-        "y": 500,
-        "wires": [
-            [
-                "9f67b80add894bed"
-            ],
-            [
-                "2dc8f0c00c0dd79f"
-            ]
-        ],
-        "info": "**Purpose:** Validates and processes the incoming request from the user. It translates the user-friendly inputs (like \"24h\") into technical parameters for the database query.\r\n\r\n**Logic:**\r\n1.  Validates the incoming JSON payload to ensure it has the required fields (`deviceId`, etc.).\r\n2.  Calculates the correct ISO 8601 start timestamp based on the `timeRange` string (e.g., \"24h\" becomes the timestamp for 24 hours ago).\r\n3.  Creates two new message properties to pass to downstream nodes:\r\n    - `msg.dbParams`: An array `[deviceId, startTimeISO]` for the PostgreSQL query.\r\n    - `msg.analysisInputs`: An object containing all the contextual information for the final Python script."
-    },
-    {
-        "id": "9f67b80add894bed",
-        "type": "function",
-        "z": "ac9683af7e82fb53",
-        "g": "6382c2e9dcb135c5",
-        "name": "Build SQL for Analysis",
-        "func": "// Receives msg.dbParams, msg.analysisInputs\n// The static SQL query is now in the postgres node\n\nconst dbParams = msg.dbParams; // Contains [deviceId, startTimeISO]\n\nif (!dbParams || dbParams.length !== 2) {\n    node.error(\"Missing required database parameters\", msg);\n    return null; // Stop flow\n}\n\n// Prepare parameters for the static query in the postgres node\nmsg.params = dbParams;\n\n// Clear properties not needed by the SQL node\ndelete msg.dbParams;\ndelete msg.selectColumnsSQL; // Ensure this is removed\n\n// Keep msg.analysisInputs for the Python node\nmsg.payload = {};\nmsg.topic = \"\"; // Clear topic\n\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 720,
-        "y": 100,
-        "wires": [
-            [
-                "fd667af16fc7af70"
-            ]
-        ],
-        "info": "**Purpose:** A simple \"pass-through\" node that ensures the `msg` object is correctly formatted for the main database query node.\r\n**Logic:** It moves the `msg.dbParams` created in the previous step into the `msg.params` property, which is where the `postgresql` node expects its parameters."
-    },
-    {
-        "id": "fd667af16fc7af70",
-        "type": "postgresql",
-        "z": "ac9683af7e82fb53",
-        "g": "6382c2e9dcb135c5",
-        "name": "Get Data for Analysis",
-        "query": "-- Query selecting all potentially relevant columns, with improved Env join\nWITH EnergyPoints AS (\n    SELECT timestamp, device_id, power_watts, voltage, current_amps, plug_temp_c\n    FROM energy_data\n    WHERE device_id = $1 AND timestamp >= $2 -- $1=deviceId, $2=startTimeISO\n)\nSELECT\n    ep.timestamp,\n    ep.power_watts,\n    ep.voltage,\n    ep.current_amps,\n    ep.plug_temp_c,\n    ps.nozzle_temp_actual,\n    ps.bed_temp_actual,\n    ps.is_printing,\n    ps.z_height_mm,\n    ps.speed_multiplier_percent,\n    -- Environmental columns from the new join\n    env.temperature_c,\n    env.humidity_pct AS humidity_percent -- Still aliasing for consistency\nFROM EnergyPoints ep\n-- Lateral join for Printer Status (finds latest status at or before energy timestamp)\nLEFT JOIN LATERAL (\n    SELECT nozzle_temp_actual, bed_temp_actual, is_printing, z_height_mm, speed_multiplier_percent\n    FROM printer_status\n    WHERE device_id = ep.device_id AND timestamp <= ep.timestamp\n    ORDER BY timestamp DESC LIMIT 1\n) ps ON true\n-- Lateral join for Environment Data (finds closest reading within +/- 15 mins)\nLEFT JOIN LATERAL (\n    SELECT temperature_c, humidity_pct -- Select needed env columns\n    FROM environment_data\n    WHERE\n        -- Match on location or dummy device ID used for environment data\n        device_id = 'environment' -- Or use location_id = 'Hamburg_DE'\n        -- Define a reasonable time window around the energy timestamp\n        AND timestamp BETWEEN ep.timestamp - INTERVAL '15 minutes' AND ep.timestamp + INTERVAL '15 minutes'\n    -- Order by the absolute time difference to find the closest reading\n    ORDER BY ABS(EXTRACT(EPOCH FROM (ep.timestamp - timestamp))) ASC\n    LIMIT 1 -- Take only the single closest reading within the window\n) env ON true -- Always join, subquery finds closest or returns NULLs if none in window\nORDER BY ep.timestamp ASC;",
-        "postgreSQLConfig": "4259e91acb63e17b",
-        "split": false,
-        "rowsPerMsg": 1,
-        "outputs": 1,
-        "x": 780,
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 430,
         "y": 160,
         "wires": [
-            [
-                "970bdc8e3cb051e8"
-            ]
-        ],
-        "info": "**Purpose:** Executes a powerful query to fetch a complete, unified time-series dataset for the requested device and time range.\r\n\r\n**Logic:**\r\n- The query joins `energy_data` with `printer_status` and `environment_data`.\r\n- It uses `LEFT JOIN LATERAL` to efficiently find the closest matching status and environment reading for every single energy data point. This creates a rich, high-resolution dataset perfect for analysis.\r\n\r\n**Output:**\r\n- `msg.payload`: An array of objects, where each object represents a single point in time with all available sensor data."
+            []
+        ]
     },
     {
-        "id": "970bdc8e3cb051e8",
-        "type": "python-function",
-        "z": "ac9683af7e82fb53",
-        "g": "6382c2e9dcb135c5",
-        "name": "Perform Analysis (ML, Regr, Corr)",
-        "func": "# Node-RED Python Function Node: Perform Analysis (ML, Regr, Corr)\n# --- Final Version: XGBoost, 7 Features, Post-processing, Cost Removed, NumPy 2.0 Fix ---\n\n# --- Imports & Environment ---\nimport sys\nimport os\n\nimport pandas as pd\nimport numpy as np\nimport joblib\nfrom sklearn.linear_model import LinearRegression\nimport traceback\nimport warnings\nimport gc\nfrom datetime import timedelta\nimport psycopg2\n# Removed psycopg2 imports as cost fetch is removed\n\n# --- Configuration ---\n# The MODEL_DIR is now set from an environment variable for portability\nMODEL_DIR = os.getenv('MODEL_DIR', '/models')\nTARGET_COLUMN = 'power_watts'\nACTIVE_POWER_THRESHOLD = 5.0\nIMPUTE_VALUE_WHEN_API_MISSING = 0\n\n# --- Dynamic Model Selection ---\n# Get deviceId from the input message context provided by Node-RED\ndevice_id = msg.get('analysisInputs', {}).get('deviceId', '')\n\n# Default to Prusa model files\nMODEL_FILENAME = 'best_model.joblib' # Prusa XGBoost model\nSCALER_FILENAME = 'scaler.joblib'\nMETRICS_FILENAME = 'model_evaluation_metrics.joblib'\nSCALER_COLS_FILENAME = 'scaler_columns.joblib'\nMODEL_FEATURES_FILENAME = 'model_features.joblib'\nMODEL_TYPE_FOR_LOG = 'Prusa (XGBoost)'\n\n# If it's an Ender 3, switch to the Ender 3 model files\nif 'Ender-3' in device_id:\n    node.log(\"API - Ender 3 device selected. Switching to Ender 3 model assets.\")\n    MODEL_FILENAME = 'ender3_randomforest_model.joblib' # Ender RF model\n    SCALER_FILENAME = 'ender3_scaler.joblib'\n    METRICS_FILENAME = 'ender3_model_evaluation_metrics.joblib'\n    SCALER_COLS_FILENAME = 'ender3_scaler_columns.joblib'\n    MODEL_FEATURES_FILENAME = 'ender3_model_features.joblib'\n    MODEL_TYPE_FOR_LOG = 'Ender 3 (RandomForest)'\n\nnode.log(f\"API - Using Model Type: {MODEL_TYPE_FOR_LOG}\")\n\n# Build final paths based on the selected filenames\nSCALER_PATH = os.path.join(MODEL_DIR, SCALER_FILENAME)\nMODEL_PATH = os.path.join(MODEL_DIR, MODEL_FILENAME)\nMETRICS_PATH = os.path.join(MODEL_DIR, METRICS_FILENAME)\nSCALER_COLS_PATH = os.path.join(MODEL_DIR, SCALER_COLS_FILENAME)\nMODEL_FEATURES_PATH = os.path.join(MODEL_DIR, MODEL_FEATURES_FILENAME)\n\n# --- ADD Database Details Needed for Min Timestamp Query ---\nDB_NAME = \"reg_ml\"\nDB_USER = \"reg_ml\"\nDB_PASS = \"raptorblingx\" # Consider moving to flow/global context or env var later\nDB_HOST = \"localhost\"\nDB_PORT = \"5432\"\n# --- END ADD ---\n\n\n# --- Pre-load Model, Scaler, Feature Lists, and Metrics ---\nscaler = None; model = None; evaluation_metrics = {\"status\": \"Metrics pending load...\"}\nSCALER_COLUMNS = None; MODEL_FEATURES = None; loading_error_details = {}\ntry: scaler = joblib.load(SCALER_PATH); node.log(\"API - Loaded scaler.\")\nexcept Exception as e: loading_error_details[\"scaler\"] = f\"Scaler load error: {str(e)}\"; node.error(f\"API - {loading_error_details['scaler']}\")\ntry: SCALER_COLUMNS = joblib.load(SCALER_COLS_PATH); node.log(f\"API - Loaded scaler columns: {SCALER_COLUMNS}\")\nexcept Exception as e: loading_error_details[\"scaler_cols\"] = f\"Scaler columns load error: {str(e)}\"; node.error(f\"API - {loading_error_details['scaler_cols']}\")\ntry: model = joblib.load(MODEL_PATH); node.log(f\"API - Loaded model from {MODEL_FILENAME}.\")\nexcept Exception as e: loading_error_details[\"model\"] = f\"Model load error: {str(e)}\"; node.error(f\"API - {loading_error_details['model']}\")\ntry: MODEL_FEATURES = joblib.load(MODEL_FEATURES_PATH); node.log(f\"API - Loaded model features: {MODEL_FEATURES}\")\nexcept Exception as e: loading_error_details[\"model_features\"] = f\"Model features load error: {str(e)}\"; node.error(f\"API - {loading_error_details['model_features']}\")\ntry: evaluation_metrics = joblib.load(METRICS_PATH); node.log(f\"API - Loaded evaluation metrics (Type: {evaluation_metrics.get('model_type', 'Unknown')}).\")\nexcept Exception as e: error_msg = f\"Metrics load error: {str(e)}\"; node.error(f\"API - {error_msg}\"); evaluation_metrics = {\"mae\": \"N/A\", \"rmse\": \"N/A\", \"r_squared\": \"N/A\", \"error\": error_msg}; evaluation_metrics[\"error_metrics\"] = error_msg\n\nessential_components_missing = False\nif scaler is None or SCALER_COLUMNS is None or model is None or MODEL_FEATURES is None:\n    node.error(f\"API - CRITICAL: One or more ML assets failed to load. Errors: {loading_error_details}\")\n    essential_components_missing = True\n\n# --- Main Analysis Function Definition ---\ndef perform_analysis(data_list, selected_driver_keys, loaded_model, loaded_scaler, expected_scaler_cols, expected_model_features):\n    node.log(\"API - perform_analysis function started.\")\n    results = {\n        \"ml_prediction\": {\"timestamps\": [], \"actual\": [], \"predicted\": [], \"error\": None},\n        \"ml_feature_importance\": {\"error\": \"Not calculated yet.\"},\n        \"ml_top_drivers\": [],\n        # Removed cost fields\n        \"new_metrics\": {\"total_kwh\": None, \"avg_power_overall\": None, \"avg_power_active\": None, \"phase_analysis\": None, \"error\": None},\n        \"correlation\": {}, \"regression\": {}, \"summary\": \"Analysis started.\", \"error\": None\n        # Removed device_info\n    }\n    df = None; df_active = None; df_processed = None\n\n    # --- 1. Convert input list to DataFrame & Basic Prep ---\n    try:\n        if not data_list: raise ValueError(\"No data received from database query.\")\n        node.log(\"API - Creating DataFrame...\")\n        df = pd.DataFrame(data_list)\n        if TARGET_COLUMN not in df.columns: raise ValueError(f\"Target column '{TARGET_COLUMN}' missing.\")\n        if 'timestamp' not in df.columns: raise ValueError(\"'timestamp' column missing.\")\n\n        df['timestamp'] = pd.to_datetime(df['timestamp'])\n        df.set_index('timestamp', inplace=True, drop=False)\n        df.sort_index(inplace=True)\n        df.replace([np.inf, -np.inf], np.nan, inplace=True)\n        node.log(f\"API - Initial DataFrame shape: {df.shape}. Columns available: {df.columns.tolist()}\")\n\n    except Exception as e: node.error(f\"API - Error during DataFrame prep: {e}\\\\n{traceback.format_exc()}\"); results[\"error\"] = f\"Data prep error: {str(e)}\"; return results\n\n        # --- 1c. Fetch Minimum Timestamp for this Device ---\n    min_timestamp_iso = None\n    device_id_for_min_ts = msg.get('analysisInputs', {}).get('deviceId')\n\n    if device_id_for_min_ts:\n        db_conn_min_ts = None\n        try:\n            node.log(f\"API - Connecting to DB to fetch min timestamp for {device_id_for_min_ts}...\")\n            db_conn_min_ts = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST, port=DB_PORT)\n            cur_min_ts = db_conn_min_ts.cursor()\n            # Query the absolute earliest timestamp for this device from energy_data\n            cur_min_ts.execute(\"SELECT min(timestamp) FROM energy_data WHERE device_id = %s\", (device_id_for_min_ts,))\n            result_min_ts = cur_min_ts.fetchone()\n            if result_min_ts and result_min_ts[0] is not None:\n                # Format as ISO string UTC (compatible with JS Date parsing)\n                min_timestamp_iso = result_min_ts[0].strftime('%Y-%m-%dT%H:%M:%S.%fZ')\n                node.log(f\"API - Fetched min_timestamp_iso: {min_timestamp_iso}\")\n            else:\n                node.warn(f\"API - min_timestamp not found for device {device_id_for_min_ts} (no data?)\")\n            cur_min_ts.close()\n        except Exception as db_err:\n            node.error(f\"API - Failed to fetch min_timestamp: {db_err}\")\n        finally:\n            if db_conn_min_ts:\n                db_conn_min_ts.close()\n    else:\n         node.warn(\"API - Cannot fetch min_timestamp, device_id not found.\")\n\n    # Store the minimum timestamp in the results (even if None)\n    # Ensure device_info exists if cost fetch was removed\n    if \"device_info\" not in results: results[\"device_info\"] = {}\n    results[\"device_info\"][\"min_timestamp_iso\"] = min_timestamp_iso\n    # --- End Min Timestamp Fetch ---\n    \n    node.log(f\"API - Stored in results['device_info']: {results.get('device_info')}\")\n\n\n    # --- 2. Preprocessing for ML Model (7 Features) ---\n    try:\n        node.log(\"API - Starting ML Preprocessing for 7 features...\")\n        df_processed = pd.DataFrame(index=df.index)\n\n        missing_inputs = [f for f in expected_model_features if f not in df.columns]\n        if missing_inputs:\n             node.warn(f\"API - Input data missing required feature columns: {missing_inputs}. Adding as NaN before processing.\")\n             for f in missing_inputs: df[f] = np.nan\n\n        # 1. Clean z_height_mm\n        if 'z_height_mm' in df.columns and 'z_height_mm' in expected_model_features:\n            neg_mask = df['z_height_mm'] < 0\n            if neg_mask.sum() > 0: df.loc[neg_mask, 'z_height_mm'] = IMPUTE_VALUE_WHEN_API_MISSING\n\n        # 2. Process 'is_printing'\n        if 'is_printing' in expected_model_features:\n             if 'is_printing' in df.columns: df_processed['is_printing'] = pd.to_numeric(df['is_printing'], errors='coerce').fillna(IMPUTE_VALUE_WHEN_API_MISSING).astype(int)\n             else: df_processed['is_printing'] = IMPUTE_VALUE_WHEN_API_MISSING\n\n        # 3. Process and Impute other features\n        features_to_process = ['plug_temp_c', 'nozzle_temp_actual', 'bed_temp_actual', 'z_height_mm', 'nozzle_temp_target', 'bed_temp_target']\n        for col in features_to_process:\n            if col in expected_model_features:\n                 if col in df.columns: df_processed[col] = df[col].fillna(IMPUTE_VALUE_WHEN_API_MISSING)\n                 else: df_processed[col] = IMPUTE_VALUE_WHEN_API_MISSING\n\n        # 4. Final checks on df_processed\n        final_missing = [f for f in expected_model_features if f not in df_processed.columns]\n        if final_missing: raise ValueError(f\"Features missing after processing: {final_missing}\")\n        df_processed = df_processed[expected_model_features]\n        if df_processed.isnull().values.any(): node.error(\"API - CRITICAL: NaNs found after preprocessing! Filling with 0.\"); df_processed = df_processed.fillna(0)\n\n        node.log(f\"API - ML Preprocessing complete. Processed DF shape: {df_processed.shape}\")\n\n    except Exception as e: node.error(f\"API - Error during ML preprocessing: {e}\\\\n{traceback.format_exc()}\"); results[\"ml_prediction\"][\"error\"] = f\"ML Preprocessing failed: {str(e)}\"; results[\"ml_feature_importance\"][\"error\"] = \"ML Preprocessing failed\"\n\n    # --- 3. ML Prediction & Feature Importance ---\n    if essential_components_missing or results[\"ml_prediction\"][\"error\"]:\n        err_msg = results[\"ml_prediction\"][\"error\"] or \"ML components missing.\"\n        results[\"ml_prediction\"][\"error\"] = err_msg; results[\"ml_feature_importance\"][\"error\"] = err_msg; node.error(f\"API - Skipping ML prediction/FI: {err_msg}\")\n    elif df_processed is None or df_processed.empty:\n        err_msg = \"Processed data missing/empty.\"; results[\"ml_prediction\"][\"error\"] = err_msg; results[\"ml_feature_importance\"][\"error\"] = err_msg; node.error(\"API - \" + err_msg)\n    else:\n        try:\n            if list(df_processed.columns) != expected_scaler_cols: node.warn(f\"API - Reordering columns for scaler.\"); df_processed = df_processed[expected_scaler_cols]\n            X_predict = df_processed\n            if X_predict.isnull().values.any(): raise ValueError(\"NaNs detected before scaling.\")\n\n            node.log(f\"API - Scaling {X_predict.shape[0]} rows...\")\n            X_predict_scaled = loaded_scaler.transform(X_predict)\n            node.log(f\"API - Scaled. Predicting using model features: {expected_model_features}\")\n            raw_predictions = loaded_model.predict(X_predict_scaled)\n            node.log(f\"API - Raw predictions generated, count: {len(raw_predictions)}\")\n\n            # --- Post-Processing Rule for Idle State ---\n            node.log(\"API - Applying post-processing rule for idle state...\")\n            predictions = raw_predictions # Start with raw predictions\n            idle_check_cols = ['is_printing', 'nozzle_temp_actual', 'bed_temp_actual', 'nozzle_temp_target', 'bed_temp_target']\n            if all(col in df_processed.columns for col in idle_check_cols):\n                 idle_condition_mask = (df_processed['is_printing'] == 0) & \\\n                                       (df_processed['nozzle_temp_actual'] == IMPUTE_VALUE_WHEN_API_MISSING) & \\\n                                       (df_processed['bed_temp_actual'] == IMPUTE_VALUE_WHEN_API_MISSING) & \\\n                                       (df_processed['nozzle_temp_target'] == IMPUTE_VALUE_WHEN_API_MISSING) & \\\n                                       (df_processed['bed_temp_target'] == IMPUTE_VALUE_WHEN_API_MISSING)\n                 predictions = np.where(idle_condition_mask, 0.0, raw_predictions)\n                 num_zeroed = np.sum(idle_condition_mask)\n                 node.log(f\"API - Applied post-processing rule. Zeroed {num_zeroed} predictions based on idle state conditions.\")\n            else: node.warn(f\"API - Post-processing skipped: Missing columns needed for idle check.\")\n\n            predictions = np.maximum(0.0, predictions) # Ensure no negative predictions remain\n            # --- End Post-Processing Rule ---\n\n            results[\"ml_prediction\"][\"timestamps\"] = df.index.strftime('%Y-%m-%dT%H:%M:%S.%fZ').tolist()\n            results[\"ml_prediction\"][\"actual\"] = df[TARGET_COLUMN].tolist()\n            results[\"ml_prediction\"][\"predicted\"] = predictions.tolist() # Use final predictions\n            results[\"ml_prediction\"][\"error\"] = None\n\n            # --- Feature Importance ---\n            if hasattr(loaded_model, 'feature_importances_'):\n                try:\n                    importances = loaded_model.feature_importances_\n                    fi_dict = dict(zip(expected_model_features, importances))\n                    results[\"ml_feature_importance\"] = fi_dict\n                    # node.log(f\"API - Calculated Feature Importances: {fi_dict}\") # Can be verbose\n                    # Find Top Drivers\n                    operational_fi = { k: v for k, v in fi_dict.items() }\n                    if operational_fi:\n                        sorted_operational_fi = sorted(operational_fi.items(), key=lambda item: item[1], reverse=True)\n                        top_drivers = [item[0] for item in sorted_operational_fi[:3]]\n                        results[\"ml_top_drivers\"] = top_drivers\n                        node.log(f\"API - Top ML Drivers: {top_drivers}\")\n                except Exception as fi_e: node.error(f\"API - Error processing FI: {fi_e}\"); results[\"ml_feature_importance\"] = {\"error\": f\"FI Error: {str(fi_e)}\"}\n            else: results[\"ml_feature_importance\"] = {\"message\": \"FI not available.\"}; node.log(\"API - FI N/A.\")\n\n            del X_predict, X_predict_scaled, predictions, raw_predictions; gc.collect()\n\n        except ValueError as ve: node.error(f\"API - ML Value Error: {ve}\"); results[\"ml_prediction\"][\"error\"] = f\"ML Fail: {str(ve)}\"; results[\"ml_feature_importance\"][\"error\"] = \"Pred fail\"\n        except Exception as e: node.error(f\"API - ML Error: {e}\\\\n{traceback.format_exc()}\"); results[\"ml_prediction\"][\"error\"] = f\"ML Fail: {str(e)}\"; results[\"ml_feature_importance\"][\"error\"] = \"Pred fail\"\n\n    # --- 4. New Calculations ---\n    try:\n        node.log(\"API - Starting New Calculations (kWh, Avg Power, Phases)...\")\n        if not isinstance(df.index, pd.DatetimeIndex): df = df.set_index('timestamp', drop=False).sort_index()\n        if TARGET_COLUMN not in df.columns: raise ValueError(f\"Target column '{TARGET_COLUMN}' missing.\")\n        time_diff_sec = df.index.to_series().diff().dt.total_seconds().fillna(0)\n        time_elapsed_sec = (df.index - df.index.min()).total_seconds()\n        power_for_trapz = df[TARGET_COLUMN].fillna(0).values\n        if len(time_elapsed_sec) > 1: total_joules = np.trapz(y=power_for_trapz, x=time_elapsed_sec); total_kwh = total_joules / (3600 * 1000); results[\"new_metrics\"][\"total_kwh\"] = round(total_kwh, 4)\n        else: results[\"new_metrics\"][\"total_kwh\"] = 0.0; total_kwh = 0.0\n\n        # --- Cost Calculation Removed ---\n\n        results[\"new_metrics\"][\"avg_power_overall\"] = round(df[TARGET_COLUMN].mean(), 2)\n        df_active = df[df[TARGET_COLUMN] > ACTIVE_POWER_THRESHOLD]\n        results[\"new_metrics\"][\"avg_power_active\"] = round(df_active[TARGET_COLUMN].mean(), 2) if not df_active.empty else 0.0\n\n        df['phase'] = 'Idle'; df.loc[df[TARGET_COLUMN] > ACTIVE_POWER_THRESHOLD, 'phase'] = 'Active (Other)'\n        if 'is_printing' in df.columns: df.loc[(df['is_printing'] == 1) & (df[TARGET_COLUMN] > ACTIVE_POWER_THRESHOLD), 'phase'] = 'Printing'\n        phase_analysis = {}; phase_energies_kwh = {}; total_duration_sec = time_diff_sec.sum()\n        for phase_name, phase_df in df.groupby('phase'):\n             phase_duration_sec = time_diff_sec[phase_df.index].sum()\n             phase_time_elapsed = (phase_df.index - df.index.min()).total_seconds(); phase_power = phase_df[TARGET_COLUMN].fillna(0).values; phase_joules = 0.0\n             if len(phase_time_elapsed) > 1: sorted_indices = np.argsort(phase_time_elapsed); phase_joules = np.trapz(y=phase_power[sorted_indices], x=phase_time_elapsed[sorted_indices])\n             phase_kwh = phase_joules / (3600 * 1000); phase_energies_kwh[phase_name] = phase_kwh\n             phase_analysis[phase_name] = { \"duration_minutes\": round(phase_duration_sec / 60, 1), \"duration_percent\": round((phase_duration_sec / total_duration_sec * 100) if total_duration_sec > 0 else 0, 1), \"energy_kwh\": round(phase_kwh, 4), \"avg_power\": round(phase_df[TARGET_COLUMN].mean(), 1) if not phase_df.empty else 0 }\n        total_phase_energy_kwh = sum(phase_energies_kwh.values())\n        for phase_name in phase_analysis: phase_kwh = phase_energies_kwh.get(phase_name, 0); phase_analysis[phase_name][\"energy_percent\"] = round((phase_kwh / total_phase_energy_kwh * 100) if total_phase_energy_kwh > 0 else 0, 1)\n        results[\"new_metrics\"][\"phase_analysis\"] = phase_analysis; node.log(f\"API - Phase Analysis Results: {phase_analysis}\")\n\n    except Exception as e: node.error(f\"API - Error during new calculations: {e}\\\\n{traceback.format_exc()}\"); results[\"new_metrics\"][\"error\"] = f\"Failed: {str(e)}\"\n\n    # --- 5. Correlation & 6. Regression Analysis ---\n    # (Logic remains the same, uses original df_active & selected_driver_keys)\n    if df_active is not None and not df_active.empty:\n        node.log(f\"API - Starting Correlation on ACTIVE data for selected drivers: {selected_driver_keys}\")\n        # ... (Existing Correlation logic - needs df_active) ...\n        try:\n            valid_drivers_for_corr = [key for key in selected_driver_keys if key in df_active.columns and key != TARGET_COLUMN]\n            if valid_drivers_for_corr:\n                correlation_results_dict = {}\n                for driver_key in valid_drivers_for_corr:\n                    temp_df = df_active[[TARGET_COLUMN, driver_key]].copy().dropna()\n                    num_pairs = len(temp_df)\n                    if num_pairs > 1: # Check if enough pairs first\n                        target_std = temp_df[TARGET_COLUMN].std(); driver_std = temp_df[driver_key].std()\n                        if target_std == 0 or driver_std == 0: correlation_results_dict[driver_key] = \"N/A (No Variation)\"\n                        else: correlation_matrix = temp_df.corr(); corr_value = correlation_matrix.loc[TARGET_COLUMN, driver_key]; correlation_results_dict[driver_key] = corr_value if not pd.isna(corr_value) else \"N/A (Calc NaN)\"\n                    else: correlation_results_dict[driver_key] = \"N/A (Insufficient Data)\"\n                results[\"correlation\"] = correlation_results_dict\n            else: results[\"correlation\"] = {\"message\": \"No valid drivers selected/available in active data.\"}\n        except Exception as e: node.error(f\"API - Correlation Error: {e}\\\\n{traceback.format_exc()}\"); results[\"correlation\"] = {\"error\": f\"Corr error: {str(e)}\"}\n    else: results[\"correlation\"] = {\"message\": f\"No activity found (Power > {ACTIVE_POWER_THRESHOLD}W) for Correlation\"}\n\n    if df_active is not None and not df_active.empty:\n        node.log(f\"API - Starting Regression on ACTIVE data for selected drivers: {selected_driver_keys}\")\n        # ... (Existing Regression logic - needs df_active) ...\n        try:\n            valid_drivers_for_regr = [key for key in selected_driver_keys if key in df_active.columns and key != TARGET_COLUMN]\n            if valid_drivers_for_regr:\n                regr_df = df_active[[TARGET_COLUMN] + valid_drivers_for_regr].copy().dropna()\n                if len(regr_df) >= len(valid_drivers_for_regr) + 2:\n                    X_regr = regr_df[valid_drivers_for_regr]; y_regr = regr_df[TARGET_COLUMN]\n                    regr_model = LinearRegression(); regr_model.fit(X_regr, y_regr)\n                    results[\"regression\"] = { \"drivers\": valid_drivers_for_regr, \"coefficients\": dict(zip(valid_drivers_for_regr, np.round(regr_model.coef_, 3))), \"intercept\": round(regr_model.intercept_, 3), \"r_squared\": round(regr_model.score(X_regr, y_regr), 3), \"n_samples\": len(regr_df) }\n                    del X_regr, y_regr, regr_model, regr_df\n                else: results[\"regression\"] = {\"message\": f\"Not enough valid points after NaNs dropped ({len(regr_df)} points).\"}\n            else: results[\"regression\"] = {\"message\": \"No valid drivers selected/available for Regression.\"}\n        except Exception as e: node.error(f\"API - Regression Error: {e}\\\\n{traceback.format_exc()}\"); results[\"regression\"] = {\"error\": f\"Regr error: {str(e)}\"}\n    else: results[\"regression\"] = {\"message\": f\"No activity found (Power > {ACTIVE_POWER_THRESHOLD}W) for Regression\"}\n\n    # --- 7. Generate Final Summary ---\n    total_points = len(df) if df is not None else 'unknown'; active_points = len(df_active) if df_active is not None else 0\n    summary_parts = [f\"Analysis complete for {total_points} total data points ({active_points} considered active with Power > {ACTIVE_POWER_THRESHOLD}W).\"]\n    if results[\"new_metrics\"].get(\"total_kwh\") is not None: summary_parts.append(f\"Energy: {results['new_metrics']['total_kwh']:.3f} kWh.\")\n    if not results[\"ml_prediction\"].get(\"error\"): pred_count = len(results['ml_prediction'].get('predicted',[])); summary_parts.append(f\"ML Pred({pred_count} pts).\")\n    else: summary_parts.append(\"ML Pred failed.\")\n    if not results[\"ml_feature_importance\"].get(\"error\") and not results[\"ml_feature_importance\"].get(\"message\"): summary_parts.append(\"FI calculated.\")\n    if results[\"correlation\"] and not results[\"correlation\"].get(\"error\") and not results[\"correlation\"].get(\"message\"): num_corr_drivers = len([k for k in results[\"correlation\"] if not str(results[\"correlation\"].get(k,'N/A')).startswith('N/A')]);\n    if num_corr_drivers > 0: summary_parts.append(f\"Corr({num_corr_drivers} drivers).\")\n    if results[\"regression\"] and results[\"regression\"].get(\"r_squared\") is not None: summary_parts.append(f\"Regr R²:{results['regression']['r_squared']:.2f}.\")\n    if results.get(\"error\"): summary_parts.append(f\"ERR:{results['error']}\")\n    results[\"summary\"] = \" \".join(summary_parts)\n\n    node.log(\"API - perform_analysis function finished.\")\n    if 'df' in locals(): del df;\n    if 'df_active' in locals(): del df_active;\n    if 'df_processed' in locals(): del df_processed;\n    gc.collect()\n    \n    node.log(f\"API - Returning from perform_analysis. results['device_info'] is: {results.get('device_info')}\")\n\n\n    return results\n# --- End of perform_analysis Function Definition ---\n\n\n# === Main Execution Block (Called by Node-RED) ===\nif essential_components_missing:\n    final_response_results = { \"summary\": \"Analysis failed: Critical model components could not be loaded.\", \"error\": \"Model component loading error.\", # ... other error fields ...\n                              \"ml_evaluation_metrics\": evaluation_metrics }\n    predictions_to_store = []\nelse:\n    input_data = msg.get('payload', [])\n    selected_keys = msg.get('analysisInputs', {}).get('selectedDriverKeys', [])\n    analysis_results = perform_analysis( input_data, selected_keys, model, scaler, SCALER_COLUMNS, MODEL_FEATURES )\n    \n    node.log(f\"API - analysis_results['device_info'] after function call: {analysis_results.get('device_info')}\")\n    \n    \n    predictions_to_store = []\n    ml_pred_results = analysis_results.get(\"ml_prediction\", {})\n    if isinstance(ml_pred_results, dict) and not ml_pred_results.get(\"error\"):\n        timestamps = ml_pred_results.get(\"timestamps\", []); predicted_values = ml_pred_results.get(\"predicted\", [])\n        if isinstance(timestamps, list) and isinstance(predicted_values, list) and len(timestamps) == len(predicted_values):\n            node.log(f\"API - Preparing {len(timestamps)} predictions for storage.\")\n            device_id = msg.get('analysisInputs', {}).get('deviceId', 'unknown'); model_version = evaluation_metrics.get('model_type', 'unknown_model')\n            for i in range(len(timestamps)):\n                 pred_val = predicted_values[i]\n                 if isinstance(pred_val, (int, float)) and not np.isnan(pred_val): predictions_to_store.append({ \"timestamp\": timestamps[i], \"device_id\": device_id, \"predicted_power_watts\": float(pred_val), \"model_version\": model_version })\n                 else: node.warn(f\"API - Skipping prediction storage index {i}, invalid value: {pred_val}\")\n        else: node.error(f\"Timestamp/prediction counts mismatch or not lists.\")\n    else: node.warn(f\"ML Prediction results invalid/errored. Skipping storage.\")\n\n    # Prepare final results, converting numpy types\n    final_response_results = {\n        \"summary\": analysis_results.get(\"summary\", \"Summary unavailable.\"),\n        \"new_metrics\": analysis_results.get(\"new_metrics\", {\"error\": \"Metrics unavailable\"}),\n        \"device_info\": analysis_results.get(\"device_info\", {}),\n        \"correlation\": analysis_results.get(\"correlation\", {}),\n        \"correlation\": analysis_results.get(\"correlation\", {}),\n        \"regression\": analysis_results.get(\"regression\", {}),\n        \"ml_evaluation_metrics\": evaluation_metrics,\n        \"ml_prediction_summary\": analysis_results.get(\"ml_prediction\",{}).get(\"error\") or f\"{len(predictions_to_store)} points processed.\",\n        \"ml_feature_importance\": analysis_results.get(\"ml_feature_importance\", {}),\n        \"ml_top_drivers\": analysis_results.get(\"ml_top_drivers\", [])\n    }\n    if analysis_results.get(\"error\"): final_response_results[\"error\"] = analysis_results.get(\"error\")\n\n    # --- Convert NumPy types to standard Python types for JSON ---\n    def convert_numpy_types(obj):\n        if isinstance(obj, dict):\n            return {k: convert_numpy_types(v) for k, v in obj.items()}\n        elif isinstance(obj, list):\n            return [convert_numpy_types(i) for i in obj]\n        # --- Use np.floating and np.integer for broader compatibility ---\n        elif isinstance(obj, np.floating):\n            if np.isnan(obj): return None\n            if np.isinf(obj): return None # Or 'Infinity' string\n            return float(obj)\n        elif isinstance(obj, np.integer):\n            return int(obj)\n        # --- End NumPy specific types ---\n        elif isinstance(obj, (np.ndarray,)): # Handle arrays\n             return convert_numpy_types(obj.tolist())\n        elif isinstance(obj, np.bool_):\n             return bool(obj)\n        elif pd.isna(obj): # Handle Pandas NaT or other nulls\n             return None\n        return obj\n\n    final_response_results = convert_numpy_types(final_response_results)\n    # --- END TYPE CONVERSION ---\n\n# --- Set Node-RED message outputs ---\nresponse_payload = final_response_results; predictions_list = predictions_to_store\nkeys_to_keep = ['analysisInputs', '_msgid']; original_msg_keys = list(msg.keys())\nfor key in original_msg_keys:\n     if key not in keys_to_keep: del msg[key]\nmsg['payload'] = response_payload; msg['predictions'] = predictions_list\n\n# Logging before return\nnode.log(f\"API - Final Python Output Payload Type: {type(msg['payload'])}\")\nif isinstance(msg['payload'], dict): node.log(f\"API - Final Python Output Keys: {list(msg['payload'].keys())}\")\n\n# Cleanup and Return\nif 'analysis_results' in locals(): del analysis_results\nif 'final_response_results' in locals(): del final_response_results\nif 'input_data' in locals(): del input_data; gc.collect()\nreturn msg",
-        "outputs": 1,
-        "x": 820,
-        "y": 220,
-        "wires": [
-            [
-                "fc3e800f7322b583"
-            ]
+        "id": "8a5e6ec8d2abc278",
+        "type": "inject",
+        "z": "dd55f774d9b5b325",
+        "name": "FINAL PERMANENT TEST",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
         ],
-        "info": "**Purpose:** The main \"brain\" of the analysis. It takes the large dataset from the database and performs all the statistical and machine learning calculations requested by the user.\r\n\r\n**Logic:**\r\n1.  **Prediction:** Runs the pre-trained ML model over the entire dataset to generate \"Predicted vs. Actual\" power values.\r\n2.  **Metrics Calculation:** Computes key metrics like Total kWh, Average Power, and performs a detailed phase analysis (time/energy spent Printing vs. Idle vs. Active).\r\n3.  **Statistical Analysis:** Calculates the correlation and a simple linear regression between the user-selected \"drivers\" (e.g., nozzle temperature) and the power consumption.\r\n4.  **Feature Importance:** Extracts the feature importances from the ML model to identify the top three most influential factors.\r\n\r\n**Outputs:**\r\n- **Output 1 (`msg.payload`):** A large JSON object containing all the calculated results, ready to be sent to the frontend.\r\n- **Output 2 (`msg.predictions`):** An array of all the predictions made, which is sent to a separate branch to be saved in the database."
-    },
-    {
-        "id": "3592a09331fdbdbd",
-        "type": "function",
-        "z": "ac9683af7e82fb53",
-        "g": "4080a0de8969fa04",
-        "name": "Format API Response",
-        "func": "// Node-RED Function Node: Format API Response\n// --- Updated: 2024-07-XX (Handle 'all' time range for Grafana, include new metrics/drivers) ---\n\n// --- Add this log at the START ---\nnode.log(`Format Response - Received msg.payload type: ${typeof msg.payload}`);\nif (typeof msg.payload === 'object' && msg.payload !== null) {\n    node.log(`Format Response - Received payload keys: ${Object.keys(msg.payload)}`);\n    const receivedMetrics = msg.payload.new_metrics;\n    node.log(`Format Response - Received new_metrics type: ${typeof receivedMetrics}`);\n    // Limit stringify length for potentially large phase data\n    // node.log(`Format Response - Received new_metrics content: ${JSON.stringify(receivedMetrics)?.substring(0, 500)}...`);\n}\n// --- End Log ---\n\n// msg.payload contains the analysis results from Python node\n// msg.analysisInputs contains deviceId, startTime, selectedDriverKeys\nconst results = msg.payload; // These are the results calculated by Python\nconst analysisInputs = msg.analysisInputs; // These are the original inputs to the analysis\n\n// Initialize default payload for error cases or missing inputs\nlet responsePayload = { success: false, error: \"Unknown error occurred before formatting.\" };\nmsg.statusCode = 500; // Default to Internal Server Error\n\n// Check if analysis seems to have run and required inputs are available\nconst deviceId = analysisInputs?.deviceId;\nconst startTime = analysisInputs?.startTime; // Can be ISO string or '1970-01-01T00:00:00Z'\n\nif (results && typeof results === 'object' && !results.error && deviceId && startTime) {\n    // Proceed if Python didn't return a top-level error and we have device/start info\n    try {\n        node.log(`Format Response: Formatting for device: ${deviceId}, startTime marker: ${startTime}`);\n\n        // --- Generate Grafana Panel URLs ---\n        const grafanaBaseUrl = \"https://lauds.intel50001.com\"; // Your Grafana public URL\n        const dashboardUID = \"dej62anu0b3swf\";             // Your Dashboard UID\n        const dashboardName = \"prusa\";                     // Your Dashboard Name/Slug\n\n        // --- Determine Correct Panel ID ---\n        let panel1Id = \"1\"; // Default Panel ID for Actual vs Predicted\n        if (deviceId === 'PrusaMK4-1') {\n            panel1Id = \"3\";\n            node.log(`Format Response: Using Panel ID ${panel1Id} for PrusaMK4-1`);\n        } else {\n            node.log(`Format Response: Using default Panel ID ${panel1Id} for ${deviceId}`);\n        }\n\n        // --- Determine Grafana 'from' timestamp ---\n        let fromMs = null; // Use null to indicate invalid/missing time\n        const toMs = new Date().getTime(); // Use current time for 'to'\n\n        // Get the minimum timestamp fetched by Python (might be null)\n        const minTimestampIso = results?.device_info?.min_timestamp_iso; // Use optional chaining\n\n        if (startTime) { // Check if startTime marker exists\n            if (startTime === '1970-01-01T00:00:00Z') {\n                // Handle the 'all time' marker\n                if (minTimestampIso) { // If we successfully fetched the actual min timestamp\n                    const minDate = new Date(minTimestampIso);\n                    if (!isNaN(minDate)) {\n                        fromMs = minDate.getTime();\n                        node.log(`Format Response: 'All Time' range - using actual min_timestamp, fromMs: ${fromMs}`);\n                    } else {\n                        node.warn(`Format Response: Could not parse min_timestamp_iso: ${minTimestampIso}. Defaulting 'from' to epoch.`);\n                        fromMs = 0; // Fallback to epoch if min ts parsing fails\n                    }\n                } else {\n                    // Fallback if min_timestamp couldn't be fetched (e.g., no data for device)\n                    node.warn(\"Format Response: 'All Time' range - min_timestamp not available. Defaulting 'from' to epoch.\");\n                    fromMs = 0; // Default to epoch start if no actual min timestamp found\n                }\n            } else {\n                // Handle specific time ranges (1h, 6h, etc.)\n                const startDate = new Date(startTime);\n                if (!isNaN(startDate)) {\n                    fromMs = startDate.getTime();\n                    // node.log(`Format Response: Specific startTime parsed: ${startTime}, fromMs: ${fromMs}`); // Optional log\n                } else {\n                    node.error(`Format Response: Invalid non-'all' startTime format: ${startTime}.`);\n                    // fromMs remains null\n                }\n            }\n        } else {\n            // startTime itself was missing\n            node.error(`Format Response: Missing startTime in analysisInputs.`);\n            // fromMs remains null\n        }\n    // --- END Determine Grafana 'from' timestamp ---\n\n    // --- Construct URLs ONLY if fromMs is valid (not null) ---\n\n        let urlPanel1 = null;\n        if (fromMs !== null) {\n            urlPanel1 = `${grafanaBaseUrl}/d-solo/${dashboardUID}/${dashboardName}?orgId=1&theme=light&panelId=${panel1Id}&from=${fromMs}&to=${toMs}&var-deviceId=${encodeURIComponent(deviceId)}`;\n            node.log(`Format Response: Generated Panel 1 URL: ${urlPanel1}`);\n        } else {\n            node.log(\"Format Response: Skipping Grafana URL generation due to invalid 'from' time.\");\n        }\n\n        // --- Prepare final success payload ---\n        // Ensure ALL expected keys from the Python output (results) are included here\n        responsePayload = {\n            success: true,\n            error: null, // No top-level error from Python node\n            results: {\n                summary: results.summary || \"Summary unavailable.\",\n                new_metrics: results.new_metrics || { \"error\": \"Metrics missing from backend\" }, // Include new metrics\n                correlation: results.correlation || {},\n                regression: results.regression || {},\n                ml_prediction_summary: results.ml_prediction_summary || \"Prediction status unknown.\",\n                ml_evaluation_metrics: results.ml_evaluation_metrics || { status: \"Metrics could not be loaded.\" }, // Use correct key\n                ml_feature_importance: results.ml_feature_importance || {},\n                ml_top_drivers: results.ml_top_drivers || [], // Include top drivers\n                grafanaUrls: {\n                    panel1: urlPanel1 // Pass the potentially null URL\n                    // panel2: urlPanel2 // Add panel 2 URL here if used\n                }\n            }\n        };\n        msg.statusCode = 200; // OK\n\n    } catch (e) {\n        // Catch errors during the formatting process itself\n        node.error(`Format Response: Error during formatting: ${e}\\n${e.stack}`, msg);\n        responsePayload = { success: false, error: `Internal formatting error: ${e.message}` };\n        msg.statusCode = 500;\n    }\n\n} else {\n    // Handle cases where Python node failed or required inputs were missing before formatting\n    let errorReason = results?.error || \"Analysis failed or inputs missing.\";\n    if (!deviceId) errorReason += \" Missing deviceId.\";\n    if (!startTime) errorReason += \" Missing startTime.\";\n    node.error(`Format Response: Pre-check failed. Reason: ${errorReason}`, msg);\n    responsePayload = { success: false, error: errorReason }; // Use more specific error\n    // msg.statusCode remains 500 (default)\n}\n\n// Set the final payload to be sent back to the UI\nmsg.payload = responsePayload;\n\n// Clean up intermediate properties from the message object\ndelete msg.analysisInputs;\ndelete msg.predictions;\ndelete msg.topic;\ndelete msg.params;\n// delete msg.dbParams; // Usually safe to delete\n\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1620,
-        "y": 380,
-        "wires": [
-            [
-                "2dc8f0c00c0dd79f"
-            ]
-        ],
-        "info": "**Purpose:** The final step before sending the data back to the user. It formats the raw results from the Python script into the final, clean JSON structure that the `analysis_page.html` frontend expects.\r\n**Logic:** It builds the final response object, including the summary text, metrics, correlation results, and dynamically generated Grafana URLs."
-    },
-    {
-        "id": "2dc8f0c00c0dd79f",
-        "type": "http response",
-        "z": "ac9683af7e82fb53",
-        "g": "4080a0de8969fa04",
-        "name": "Send API Response",
-        "statusCode": "",
-        "headers": {},
-        "x": 1900,
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 510,
         "y": 500,
-        "wires": [],
-        "info": "**Purpose:** Sends the final, formatted JSON response back to the `analysis_page.html` frontend.\r\n**Logic:** Sets the HTTP status code to `200 OK` and sends the `msg.payload`."
+        "wires": [
+            []
+        ]
     },
     {
-        "id": "de086ea3e0127637",
+        "id": "b1c2d3e4f5g6h7i8",
+        "type": "inject",
+        "z": "a1b2c3d4e5f6g7h8",
+        "name": "Start Model Retraining",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "retrain_model",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 160,
+        "y": 80,
+        "wires": [
+            [
+                "c1d2e3f4g5h6i7j8"
+            ]
+        ]
+    },
+    {
+        "id": "c1d2e3f4g5h6i7j8",
+        "type": "exec",
+        "z": "a1b2c3d4e5f6g7h8",
+        "command": "python /usr/src/node-red/backend_scripts/export_training_data.py",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "1. Run export_training_data.py",
+        "x": 210,
+        "y": 140,
+        "wires": [
+            [
+                "h1i2j3k4l5m6n7o8"
+            ],
+            [
+                "i1j2k3l4m5n6o7p8"
+            ],
+            [
+                "d1e2f3g4h5i6j7k8"
+            ]
+        ]
+    },
+    {
+        "id": "d1e2f3g4h5i6j7k8",
+        "type": "switch",
+        "z": "a1b2c3d4e5f6g7h8",
+        "name": "Check Export Success",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 220,
+        "y": 200,
+        "wires": [
+            [
+                "e1f2g3h4i5j6k7l8"
+            ],
+            [
+                "f1g2h3i4j5k6l7m8"
+            ]
+        ]
+    },
+    {
+        "id": "e1f2g3h4i5j6k7l8",
+        "type": "exec",
+        "z": "a1b2c3d4e5f6g7h8",
+        "command": "python /usr/src/node-red/backend_scripts/train_model.py",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "2. Run train_model.py",
+        "x": 540,
+        "y": 200,
+        "wires": [
+            [
+                "m1n2o3p4q5r6s7t8"
+            ],
+            [
+                "n1o2p3q4r5s6t7u8"
+            ],
+            [
+                "j1k2l3m4n5o6p7q8"
+            ]
+        ]
+    },
+    {
+        "id": "f1g2h3i4j5k6l7m8",
+        "type": "change",
+        "z": "a1b2c3d4e5f6g7h8",
+        "name": "Set Failure Message",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "Model training failed during data export. Check STDERR.",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 240,
+        "y": 260,
+        "wires": [
+            [
+                "g1h2i3j4k5l6m7n8"
+            ]
+        ]
+    },
+    {
+        "id": "g1h2i3j4k5l6m7n8",
+        "type": "debug",
+        "z": "a1b2c3d4e5f6g7h8",
+        "name": "TRAINING STATUS",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 1280,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "h1i2j3k4l5m6n7o8",
+        "type": "debug",
+        "z": "a1b2c3d4e5f6g7h8",
+        "name": "Export STDOUT",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 500,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "i1j2k3l4m5n6o7p8",
+        "type": "debug",
+        "z": "a1b2c3d4e5f6g7h8",
+        "name": "Export STDERR",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 520,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "j1k2l3m4n5o6p7q8",
+        "type": "switch",
+        "z": "a1b2c3d4e5f6g7h8",
+        "name": "Check Train Success",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 680,
+        "y": 260,
+        "wires": [
+            [
+                "k1l2m3n4o5p6q7r8"
+            ],
+            [
+                "l1m2n3o4p5q6r7s8"
+            ]
+        ]
+    },
+    {
+        "id": "k1l2m3n4o5p6q7r8",
+        "type": "change",
+        "z": "a1b2c3d4e5f6g7h8",
+        "name": "Set Success Message",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "Model retraining process completed successfully!",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 940,
+        "y": 260,
+        "wires": [
+            [
+                "g1h2i3j4k5l6m7n8"
+            ]
+        ]
+    },
+    {
+        "id": "l1m2n3o4p5q6r7s8",
+        "type": "change",
+        "z": "a1b2c3d4e5f6g7h8",
+        "name": "Set Failure Message",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "Model training failed during model training phase. Check STDERR.",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 940,
+        "y": 340,
+        "wires": [
+            [
+                "g1h2i3j4k5l6m7n8"
+            ]
+        ]
+    },
+    {
+        "id": "m1n2o3p4q5r6s7t8",
+        "type": "debug",
+        "z": "a1b2c3d4e5f6g7h8",
+        "name": "Train STDOUT",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 820,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "n1o2p3q4r5s6t7u8",
+        "type": "debug",
+        "z": "a1b2c3d4e5f6g7h8",
+        "name": "Train STDERR",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 820,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "9e38fe82bf8409de",
         "type": "http in",
         "z": "ac9683af7e82fb53",
         "name": "GET /api/devices",
@@ -1178,16 +1429,16 @@
         "method": "get",
         "upload": false,
         "swaggerDoc": "",
-        "x": 1520,
-        "y": 40,
+        "x": 1980,
+        "y": 160,
         "wires": [
             [
-                "27a2e876613b93a9"
+                "82e04a32696e99a4"
             ]
         ]
     },
     {
-        "id": "27a2e876613b93a9",
+        "id": "82e04a32696e99a4",
         "type": "postgresql",
         "z": "ac9683af7e82fb53",
         "name": "Get Devices for UI",
@@ -1196,48 +1447,338 @@
         "split": false,
         "rowsPerMsg": 1,
         "outputs": 1,
-        "x": 1570,
-        "y": 100,
+        "x": 2070,
+        "y": 200,
         "wires": [
             [
-                "61eb43d26e318c36"
+                "42ee798a1bc064b7"
             ]
         ]
     },
     {
-        "id": "61eb43d26e318c36",
+        "id": "42ee798a1bc064b7",
         "type": "http response",
         "z": "ac9683af7e82fb53",
         "name": "",
         "statusCode": "",
         "headers": {},
-        "x": 1650,
-        "y": 160,
+        "x": 2090,
+        "y": 240,
         "wires": []
     },
     {
-        "id": "3dad15f0c8d11ced",
+        "id": "b75d3a79fce253d4",
+        "type": "http in",
+        "z": "ac9683af7e82fb53",
+        "g": "2c5e9e023365b4b5",
+        "name": "POST /api/analyze",
+        "url": "/api/analyze",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 540,
+        "wires": [
+            [
+                "a7289e7ae8b0c5e3"
+            ]
+        ],
+        "info": "**Purpose:** Defines the public HTTP endpoint that the frontend page calls when a user clicks the \"Run Energy Analysis\" button.\r\n\r\n**Endpoint:** `POST /api/analyze`\r\n\r\n**Input:**\r\n- Expects an incoming `msg.payload` containing a JSON object from the frontend, e.g., `{ \"deviceId\": \"PrusaMK4-1\", \"timeRange\": \"24h\", ... }`."
+    },
+    {
+        "id": "a7289e7ae8b0c5e3",
+        "type": "function",
+        "z": "ac9683af7e82fb53",
+        "g": "2c5e9e023365b4b5",
+        "name": "Parse Analyze Request",
+        "func": "// Node-RED Function Node: Parse Analyze Request (with Downsampling Logic)\n\nconst input = msg.payload;\n\n// --- Basic Validation ---\nif (!input || typeof input !== 'object') {\n    node.error(\"Invalid payload received. Expected JSON object.\", msg);\n    return [null, msg]; // Send to error output (output 2)\n}\nconst deviceId = input.deviceId;\nconst timeRange = input.timeRange || \"24h\"; // Default\nconst selectedDrivers = input.selectedDrivers || {};\n\nif (!deviceId || typeof deviceId !== 'string' || deviceId.trim() === '') {\n    node.error(\"Missing or invalid deviceId in payload.\", msg);\n    return [null, msg];\n}\n\n// --- Downsampling Logic ---\nlet bucketInterval = null; // e.g., '5 minutes', '15 minutes', etc.\nlet useDownsampling = false;\n\nswitch (timeRange) {\n    case '1h':\n    case '6h':\n        // For short ranges, use high-resolution data\n        bucketInterval = null;\n        useDownsampling = false;\n        break;\n    case '24h':\n        bucketInterval = '2 minutes';\n        useDownsampling = true;\n        break;\n    case '7d':\n        bucketInterval = '10 minutes';\n        useDownsampling = true;\n        break;\n    case 'all':\n        bucketInterval = '30 minutes';\n        useDownsampling = true;\n        break;\n    default:\n        bucketInterval = null; // Default to high-res\n        useDownsampling = false;\n}\n\nnode.log(`[Parse Request] Time Range: '${timeRange}'. Downsampling: ${useDownsampling}, Interval: ${bucketInterval}`);\n\n// --- Calculate Start Time ---\nlet startTimeISO = null;\nif (timeRange === 'all') {\n    startTimeISO = '1970-01-01T00:00:00Z';\n} else {\n    let targetTimeMs = new Date().getTime();\n    let durationHours = 0;\n    if (timeRange.endsWith('h')) {\n        durationHours = parseInt(timeRange.replace('h', ''));\n    } else if (timeRange.endsWith('d')) {\n        durationHours = parseInt(timeRange.replace('d', '')) * 24;\n    }\n    targetTimeMs -= durationHours * 60 * 60 * 1000;\n    startTimeISO = new Date(targetTimeMs).toISOString();\n}\n\n// --- Prepare variables for next steps ---\nconst allDriverDbColumns = { 'nozzle_temp_actual': 'ps.nozzle_temp_actual', 'bed_temp_actual': 'ps.bed_temp_actual', 'is_printing': 'ps.is_printing', 'z_height_mm': 'ps.z_height_mm', 'temperature_c': 'env.temperature_c', 'humidity_percent': 'env.humidity_pct' };\nlet selectedDriverKeys = Object.keys(selectedDrivers).filter(key => selectedDrivers[key] === true && allDriverDbColumns.hasOwnProperty(key));\n\n// --- Pass data to the next nodes ---\nmsg.dbParams = [deviceId, startTimeISO, bucketInterval]; // CORRECTED: Now includes bucketInterval\nmsg.useDownsampling = useDownsampling;\n\nmsg.analysisInputs = {\n    deviceId: deviceId,\n    startTime: startTimeISO,\n    selectedDriverKeys: selectedDriverKeys\n};\n\n// Clear payload from input node if not needed further\nmsg.payload = {};\n\nreturn [msg, null]; // Send valid requests to output 1 (main flow)\n",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 540,
+        "wires": [
+            [
+                "1ae9d7f3b861588f",
+                "501e57230b01d4a9"
+            ],
+            [
+                "b4b7c081576b3e05",
+                "bb78b48426b6d4c3"
+            ]
+        ],
+        "info": "**Purpose:** Validates and processes the incoming request from the user. It translates the user-friendly inputs (like \"24h\") into technical parameters for the database query.\r\n\r\n**Logic:**\r\n1.  Validates the incoming JSON payload to ensure it has the required fields (`deviceId`, etc.).\r\n2.  Calculates the correct ISO 8601 start timestamp based on the `timeRange` string (e.g., \"24h\" becomes the timestamp for 24 hours ago).\r\n3.  Creates two new message properties to pass to downstream nodes:\r\n    - `msg.dbParams`: An array `[deviceId, startTimeISO]` for the PostgreSQL query.\r\n    - `msg.analysisInputs`: An object containing all the contextual information for the final Python script."
+    },
+    {
+        "id": "bb78b48426b6d4c3",
+        "type": "debug",
+        "z": "ac9683af7e82fb53",
+        "g": "2c5e9e023365b4b5",
+        "name": "debug 14",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 550,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "501e57230b01d4a9",
+        "type": "debug",
+        "z": "ac9683af7e82fb53",
+        "g": "2c5e9e023365b4b5",
+        "name": "debug 19",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 620,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "2cf637958f28c7bc",
+        "type": "function",
+        "z": "ac9683af7e82fb53",
+        "g": "7ac6f6507ae14b9e",
+        "name": "Prepare High-Res Params",
+        "func": "// This node prepares parameters for the high-resolution query, which only uses $1 and $2.\nconst dbParams = msg.dbParams; // Should be [deviceId, startTime, null]\n\nif (!dbParams || dbParams.length < 2) {\n    node.error(\"Missing required database parameters for high-res query\", msg);\n    return null; // Stop flow\n}\n\n// Create a new array with only the first two elements.\nmsg.params = [dbParams[0], dbParams[1]];\n\n// Clean up and pass along\ndelete msg.dbParams;\nmsg.payload = {};\nmsg.topic = \"\";\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 860,
+        "y": 440,
+        "wires": [
+            [
+                "7f71e9c443c55278",
+                "14487a14b2feca49"
+            ]
+        ],
+        "info": "**Purpose:** A simple \"pass-through\" node that ensures the `msg` object is correctly formatted for the main database query node.\r\n**Logic:** It moves the `msg.dbParams` created in the previous step into the `msg.params` property, which is where the `postgresql` node expects its parameters."
+    },
+    {
+        "id": "7f71e9c443c55278",
         "type": "postgresql",
         "z": "ac9683af7e82fb53",
-        "g": "4080a0de8969fa04",
-        "name": "Insert Prediction",
-        "query": "INSERT INTO ml_predictions (\n    timestamp, device_id, predicted_power_watts, model_version\n)\nSELECT\n    ts, -- Alias from UNNEST\n    dev, -- Alias from UNNEST\n    pwr, -- Alias from UNNEST\n    ver  -- Alias from UNNEST\nFROM UNNEST(\n    $1::TIMESTAMPTZ[], -- Parameter 1: Array of timestamps\n    $2::TEXT[],        -- Parameter 2: Array of device IDs\n    $3::FLOAT[],       -- Parameter 3: Array of predictions\n    $4::TEXT[]         -- Parameter 4: Array of model versions\n) AS t(ts, dev, pwr, ver) -- Define aliases for columns from UNNEST\nON CONFLICT DO NOTHING;",
+        "g": "7ac6f6507ae14b9e",
+        "name": "Get Data for Analysis",
+        "query": "-- CORRECTED Query selecting all required columns, with improved Env join\nWITH EnergyPoints AS (\n    SELECT timestamp, device_id, power_watts, voltage, current_amps, plug_temp_c\n    FROM energy_data\n    WHERE device_id = $1 AND timestamp >= $2 -- $1=deviceId, $2=startTimeISO\n)\nSELECT\n    ep.timestamp,\n    ep.power_watts,\n    ep.voltage,\n    ep.current_amps,\n    ep.plug_temp_c,\n    ps.nozzle_temp_actual,\n    ps.bed_temp_actual,\n    ps.nozzle_temp_target,\n    ps.bed_temp_target,   \n    ps.material,          \n    ps.is_printing,\n    ps.z_height_mm,\n    ps.speed_multiplier_percent,\n    -- Environmental columns from the new join\n    env.temperature_c,\n    env.humidity_pct AS humidity_percent -- Still aliasing for consistency\nFROM EnergyPoints ep\n-- Lateral join for Printer Status (finds latest status at or before energy timestamp)\nLEFT JOIN LATERAL (\n    -- Added the required columns to this subquery\n    SELECT nozzle_temp_actual, bed_temp_actual, nozzle_temp_target, bed_temp_target, material, is_printing, z_height_mm, speed_multiplier_percent\n    FROM printer_status\n    WHERE device_id = ep.device_id AND timestamp <= ep.timestamp\n    ORDER BY timestamp DESC LIMIT 1\n) ps ON true\n-- Lateral join for Environment Data (finds closest reading within +/- 15 mins)\nLEFT JOIN LATERAL (\n    SELECT temperature_c, humidity_pct -- Select needed env columns\n    FROM environment_data\n    WHERE\n        device_id = 'environment'\n        AND timestamp BETWEEN ep.timestamp - INTERVAL '15 minutes' AND ep.timestamp + INTERVAL '15 minutes'\n    ORDER BY ABS(EXTRACT(EPOCH FROM (ep.timestamp - timestamp))) ASC\n    LIMIT 1\n) env ON true\nORDER BY ep.timestamp ASC;",
         "postgreSQLConfig": "4259e91acb63e17b",
         "split": false,
         "rowsPerMsg": 1,
         "outputs": 1,
-        "x": 1260,
-        "y": 460,
+        "x": 1140,
+        "y": 360,
         "wires": [
-            []
+            [
+                "420db27bdf8a7af8"
+            ]
         ],
-        "info": "**Purpose:** Saves the historical predictions generated during the analysis into the `ml_predictions` table. This allows the data to be used later without re-running the analysis.\r\n**Logic:** Uses the `UNNEST` function to efficiently insert a large number of rows in a single query."
+        "info": "**Purpose:** Executes a powerful query to fetch a complete, unified time-series dataset for the requested device and time range.\r\n\r\n**Logic:**\r\n- The query joins `energy_data` with `printer_status` and `environment_data`.\r\n- It uses `LEFT JOIN LATERAL` to efficiently find the closest matching status and environment reading for every single energy data point. This creates a rich, high-resolution dataset perfect for analysis.\r\n\r\n**Output:**\r\n- `msg.payload`: An array of objects, where each object represents a single point in time with all available sensor data."
     },
     {
-        "id": "fc3e800f7322b583",
+        "id": "420db27bdf8a7af8",
+        "type": "python-function",
+        "z": "ac9683af7e82fb53",
+        "g": "7ac6f6507ae14b9e",
+        "name": "Perform Analysis (ML, Regr, Corr)",
+        "func": "# Node-RED Python Function Node: Perform Analysis (MODERNIZED)\n# --- Unified Model, Dynamic Feature Handling ---\n\n# --- Imports & Environment ---\nimport sys\nimport os\n# --- Add venv path ---\n#venv_path = '/home/ubuntu/monitor_ml/venv/lib/python3.12/site-packages'\n#if venv_path not in sys.path:\n#   sys.path.append(venv_path)\n#venv_path = '/home/ubuntu/monitor_ml/venv/bin'\n\nimport pandas as pd\nimport numpy as np\nimport joblib\nfrom sklearn.linear_model import LinearRegression\nimport traceback\nimport warnings\nimport gc\nimport psycopg2\n\n# --- Configuration ---\nMODEL_DIR = os.environ.get(\"MODEL_DIR\")\nTARGET_COLUMN = 'power_watts'\nACTIVE_POWER_THRESHOLD = 5.0\nIMPUTE_VALUE_WHEN_API_MISSING = 0\nDB_NAME = os.environ.get(\"POSTGRES_DB\")\nDB_USER = os.environ.get(\"POSTGRES_USER\")\nDB_PASS = os.environ.get(\"POSTGRES_PASSWORD\")\nDB_HOST = os.environ.get(\"POSTGRES_HOST\")\nDB_PORT = os.environ.get(\"POSTGRET_PORT\")\n\n# --- Pre-load Unified Model Assets ---\ntry:\n    model = joblib.load(os.path.join(MODEL_DIR, 'best_model.joblib'))\n    scaler = joblib.load(os.path.join(MODEL_DIR, 'scaler.joblib'))\n    evaluation_metrics = joblib.load(os.path.join(MODEL_DIR, 'model_evaluation_metrics.joblib'))\n    # This is the \"contract\": the exact list of columns the model was trained on.\n    model_features_list = joblib.load(os.path.join(MODEL_DIR, 'model_features.joblib'))\n    assets_loaded = True\n    node.log(\"API - All ML assets loaded successfully.\")\nexcept Exception as e:\n    node.error(f\"API - CRITICAL: Failed to load one or more ML assets: {e}\")\n    assets_loaded = False\n    # Create a placeholder for metrics to avoid errors later\n    evaluation_metrics = {\"error\": f\"Failed to load ML assets: {e}\"}\n\n# --- Main Analysis Function Definition ---\ndef perform_analysis(data_list, selected_driver_keys, loaded_model, loaded_scaler, expected_model_features):\n    node.log(\"API - perform_analysis function started.\")\n    # Initialize results structure\n    results = {\n        \"ml_prediction\": {\"error\": None}, \"ml_feature_importance\": {\"error\": None},\n        \"ml_top_drivers\": [], \"new_metrics\": {\"error\": None},\n        \"correlation\": {}, \"regression\": {}, \"summary\": \"Analysis pending.\", \"error\": None\n    }\n\n    # --- 1. Convert input to DataFrame & Basic Prep ---\n    try:\n        if not data_list: raise ValueError(\"No data received from database query.\")\n        df = pd.DataFrame(data_list)\n        df['timestamp'] = pd.to_datetime(df['timestamp'])\n        df.set_index('timestamp', inplace=True, drop=False)\n        df.sort_index(inplace=True)\n        node.log(f\"API - Initial DataFrame shape: {df.shape}\")\n    except Exception as e:\n        results[\"error\"] = f\"Data prep error: {str(e)}\"\n        node.error(f\"API - Error during DataFrame prep: {e}\\\\n{traceback.format_exc()}\")\n        return results\n\n    # --- 2. Preprocessing for ML Model (MUST MATCH train_model.py) ---\n    df_processed = None\n    try:\n        node.log(\"API - Starting ML Preprocessing...\")\n        # Create a working copy for ML-specific manipulations\n        df_ml = df.copy()\n\n        # Impute NaNs in numeric columns that are part of the base feature set\n        numeric_features_to_impute = ['plug_temp_c', 'nozzle_temp_actual', 'bed_temp_actual', 'z_height_mm', 'nozzle_temp_target', 'bed_temp_target', 'ambient_temp_c']\n        for col in numeric_features_to_impute:\n            if col in df_ml.columns:\n                df_ml[col].fillna(IMPUTE_VALUE_WHEN_API_MISSING, inplace=True)\n\n        # Clean negative z_height\n        if 'z_height_mm' in df_ml.columns:\n            df_ml.loc[df_ml['z_height_mm'] < 0, 'z_height_mm'] = 0\n\n        # --- Feature Engineering ---\n        df_ml['nozzle_temp_delta'] = df_ml['nozzle_temp_target'] - df_ml['nozzle_temp_actual']\n        df_ml['bed_temp_delta'] = df_ml['bed_temp_target'] - df_ml['bed_temp_actual']\n\n        # --- Handle Categorical 'material' ---\n        if 'material' in df_ml.columns:\n            df_ml['material'].fillna('Unknown', inplace=True)\n            material_dummies = pd.get_dummies(df_ml['material'], prefix='material', dtype=int)\n            df_ml = pd.concat([df_ml, material_dummies], axis=1)\n            df_ml.drop('material', axis=1, inplace=True)\n\n        # Process 'is_printing'\n        if 'is_printing' in df_ml.columns:\n            df_ml['is_printing'] = pd.to_numeric(df_ml['is_printing'], errors='coerce').fillna(IMPUTE_VALUE_WHEN_API_MISSING).astype(int)\n\n        # --- Reconcile columns with the \"contract\" from the trained model ---\n        # Create the final DataFrame for prediction, ensuring it has all required columns.\n        df_processed = pd.DataFrame(columns=expected_model_features, index=df_ml.index)\n        for col in expected_model_features:\n            if col in df_ml.columns:\n                df_processed[col] = df_ml[col]\n            else:\n                # If a column (e.g., a specific material type) was in training but not in this data slice, add it as all zeros.\n                df_processed[col] = 0\n        \n        # Final check for any remaining NaNs\n        df_processed.fillna(0, inplace=True)\n        node.log(f\"API - ML Preprocessing complete. Processed DF shape: {df_processed.shape}\")\n\n    except Exception as e:\n        err_msg = f\"ML Preprocessing failed: {str(e)}\"\n        results[\"ml_prediction\"][\"error\"] = err_msg\n        results[\"ml_feature_importance\"][\"error\"] = err_msg\n        node.error(f\"API - Error during ML preprocessing: {e}\\\\n{traceback.format_exc()}\")\n\n    # --- 3. ML Prediction & Feature Importance ---\n    if df_processed is not None and results[\"ml_prediction\"][\"error\"] is None:\n        try:\n            # Ensure column order matches exactly\n            X_predict = df_processed[expected_model_features]\n            \n            node.log(\"API - Scaling and predicting...\")\n            X_predict_scaled = loaded_scaler.transform(X_predict)\n            raw_predictions = loaded_model.predict(X_predict_scaled)\n\n            # Post-Processing Rule for Idle State\n            idle_mask = (X_predict['is_printing'] == 0) & (X_predict['nozzle_temp_actual'] < 30) & (X_predict['bed_temp_actual'] < 30)\n            predictions = np.where(idle_mask, 0.0, raw_predictions)\n            predictions = np.maximum(0.0, predictions) # Ensure no negative predictions\n            \n            results[\"ml_prediction\"][\"timestamps\"] = df.index.strftime('%Y-%m-%dT%H:%M:%S.%fZ').tolist()\n            results[\"ml_prediction\"][\"actual\"] = df[TARGET_COLUMN].tolist()\n            results[\"ml_prediction\"][\"predicted\"] = predictions.tolist()\n\n            # Feature Importance\n            if hasattr(loaded_model, 'feature_importances_'):\n                fi_dict = dict(zip(expected_model_features, loaded_model.feature_importances_))\n                results[\"ml_feature_importance\"] = fi_dict\n                \n                # Determine Top 3 Drivers\n                sorted_fi = sorted(fi_dict.items(), key=lambda item: item[1], reverse=True)\n                results[\"ml_top_drivers\"] = [item[0] for item in sorted_fi[:3]]\n                node.log(f\"API - Top ML Drivers: {results['ml_top_drivers']}\")\n            else:\n                results[\"ml_feature_importance\"] = {\"message\": \"Feature importance not available for this model type.\"}\n\n        except Exception as e:\n            err_msg = f\"ML Prediction failed: {str(e)}\"\n            results[\"ml_prediction\"][\"error\"] = err_msg\n            results[\"ml_feature_importance\"][\"error\"] = err_msg\n            node.error(f\"API - Error during ML prediction: {e}\\\\n{traceback.format_exc()}\")\n\n    # --- 4. New Calculations (Phase Analysis, etc.) ---\n    try:\n        node.log(\"API - Starting New Calculations (kWh, Avg Power, Phases)...\")\n        if df.empty: raise ValueError(\"Original DataFrame is empty.\")\n        \n        # --- Total Energy Calculation (This part was correct) ---\n        time_elapsed_sec = (df.index - df.index.min()).total_seconds()\n        if len(time_elapsed_sec) > 1:\n            total_joules = np.trapz(y=df[TARGET_COLUMN].fillna(0).values, x=time_elapsed_sec)\n            total_kwh = total_joules / (3600 * 1000)\n        else:\n            total_kwh = 0.0\n        \n        results[\"new_metrics\"][\"total_kwh\"] = total_kwh\n        \n        # --- Phase Definition (with REFINEMENT) ---\n        # Refinement: Add a condition that 'is_printing' must be 1 for the 'Printing' phase.\n        df['phase'] = 'Idle'\n        df.loc[df[TARGET_COLUMN] > ACTIVE_POWER_THRESHOLD, 'phase'] = 'Active (Other)'\n        if 'is_printing' in df.columns:\n            # Only classify as 'Printing' if the flag is true AND power is active.\n            df.loc[(df['is_printing'] == 1) & (df[TARGET_COLUMN] > ACTIVE_POWER_THRESHOLD), 'phase'] = 'Printing'\n\n        # Calculate overall and active averages from the main DataFrame\n        df_active = df[df['phase'] != 'Idle']\n        results[\"new_metrics\"][\"avg_power_overall\"] = df[TARGET_COLUMN].mean()\n        results[\"new_metrics\"][\"avg_power_active\"] = df_active[TARGET_COLUMN].mean() if not df_active.empty else 0.0\n\n        # --- Phase Analysis Calculation (with CRITICAL FIX) ---\n        phase_analysis = {}\n        time_diff_sec = df.index.to_series().diff().dt.total_seconds().fillna(0)\n        total_duration_sec = time_diff_sec.sum()\n        \n        for phase_name, phase_df in df.groupby('phase'):\n            if phase_df.empty: continue\n\n            phase_duration_sec = time_diff_sec[phase_df.index].sum()\n            \n            # CRITICAL FIX: The time axis for integration must be continuous for each phase.\n            # We calculate energy by summing up (power * time_delta) for each point in the phase.\n            phase_time_deltas_sec = time_diff_sec[phase_df.index]\n            phase_power_watts = phase_df[TARGET_COLUMN].fillna(0)\n            phase_joules = np.sum(phase_power_watts * phase_time_deltas_sec)\n            phase_kwh = phase_joules / (3600 * 1000)\n            \n            phase_analysis[phase_name] = {\n                \"duration_minutes\": phase_duration_sec / 60,\n                \"duration_percent\": (phase_duration_sec / total_duration_sec * 100) if total_duration_sec > 0 else 0,\n                \"energy_kwh\": phase_kwh,\n                \"energy_percent\": (phase_kwh / total_kwh * 100) if total_kwh > 0 else 0,\n                \"avg_power\": phase_df[TARGET_COLUMN].mean() if not phase_df.empty else 0\n            }\n        results[\"new_metrics\"][\"phase_analysis\"] = phase_analysis\n\n    except Exception as e:\n        results[\"new_metrics\"][\"error\"] = f\"Failed: {str(e)}\"\n        node.error(f\"API - Error during new calculations: {e}\\\\n{traceback.format_exc()}\")\n\n        \n    # --- 5 & 6. Correlation & Regression (On user-selected drivers) ---\n    # (This section also works on `df_active` and does not need major changes)\n    if 'df_active' in locals() and not df_active.empty:\n        try:\n            # Correlation\n            valid_drivers = [key for key in selected_driver_keys if key in df_active.columns and pd.api.types.is_numeric_dtype(df_active[key])]\n            if valid_drivers:\n                corr_df = df_active[[TARGET_COLUMN] + valid_drivers].dropna()\n                if len(corr_df) > 1:\n                    results[\"correlation\"] = corr_df.corr()[TARGET_COLUMN].drop(TARGET_COLUMN).to_dict()\n            \n            # Regression\n            if valid_drivers and len(corr_df) >= len(valid_drivers) + 2:\n                X_regr = corr_df[valid_drivers]\n                y_regr = corr_df[TARGET_COLUMN]\n                regr_model = LinearRegression().fit(X_regr, y_regr)\n                results[\"regression\"] = {\n                    \"drivers\": valid_drivers, \"coefficients\": dict(zip(valid_drivers, regr_model.coef_)),\n                    \"intercept\": regr_model.intercept_, \"r_squared\": regr_model.score(X_regr, y_regr),\n                    \"n_samples\": len(corr_df)\n                }\n        except Exception as e:\n            results[\"correlation\"][\"error\"] = str(e)\n            results[\"regression\"][\"error\"] = str(e)\n            node.error(f\"API - Error during Corr/Regr: {e}\\\\n{traceback.format_exc()}\")\n    else:\n        results[\"correlation\"][\"message\"] = \"No active data for correlation.\"\n        results[\"regression\"][\"message\"] = \"No active data for regression.\"\n\n    # --- 7. Final Summary ---\n    results[\"summary\"] = f\"Analysis complete for {len(df)} data points.\"\n    return results\n\n# === Main Execution Block ===\nif not assets_loaded:\n    final_response_results = {\"summary\": \"Analysis failed: Critical model components could not be loaded.\", \"error\": evaluation_metrics[\"error\"]}\nelse:\n    # Get inputs from Node-RED message\n    input_data = msg.get('payload', [])\n    selected_keys = msg.get('analysisInputs', {}).get('selectedDriverKeys', [])\n    \n    # Run the main analysis function\n    analysis_results = perform_analysis(input_data, selected_keys, model, scaler, model_features_list)\n    \n    # Add evaluation metrics to the final response\n    analysis_results[\"ml_evaluation_metrics\"] = evaluation_metrics\n    \n    # Convert numpy types to standard Python types for JSON compatibility\n    def convert_numpy_types(obj):\n        if isinstance(obj, dict): return {k: convert_numpy_types(v) for k, v in obj.items()}\n        if isinstance(obj, list): return [convert_numpy_types(i) for i in obj]\n        if isinstance(obj, (np.integer, np.int64)): return int(obj)\n        if isinstance(obj, (np.floating, np.float64)): return float(obj) if not np.isnan(obj) else None\n        if pd.isna(obj): return None\n        return obj\n    \n    final_response_results = convert_numpy_types(analysis_results)\n\nmsg['payload'] = final_response_results\nreturn msg",
+        "outputs": 1,
+        "x": 1480,
+        "y": 320,
+        "wires": [
+            [
+                "55b3db24479ce37f",
+                "92a0ead919f42cc6"
+            ]
+        ],
+        "info": "**Purpose:** The main \"brain\" of the analysis. It takes the large dataset from the database and performs all the statistical and machine learning calculations requested by the user.\r\n\r\n**Logic:**\r\n1.  **Prediction:** Runs the pre-trained ML model over the entire dataset to generate \"Predicted vs. Actual\" power values.\r\n2.  **Metrics Calculation:** Computes key metrics like Total kWh, Average Power, and performs a detailed phase analysis (time/energy spent Printing vs. Idle vs. Active).\r\n3.  **Statistical Analysis:** Calculates the correlation and a simple linear regression between the user-selected \"drivers\" (e.g., nozzle temperature) and the power consumption.\r\n4.  **Feature Importance:** Extracts the feature importances from the ML model to identify the top three most influential factors.\r\n\r\n**Outputs:**\r\n- **Output 1 (`msg.payload`):** A large JSON object containing all the calculated results, ready to be sent to the frontend.\r\n- **Output 2 (`msg.predictions`):** An array of all the predictions made, which is sent to a separate branch to be saved in the database."
+    },
+    {
+        "id": "92a0ead919f42cc6",
+        "type": "debug",
+        "z": "ac9683af7e82fb53",
+        "g": "7ac6f6507ae14b9e",
+        "name": "debug 8",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 1700,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "5da0ec23ca2508ab",
         "type": "function",
         "z": "ac9683af7e82fb53",
-        "g": "4080a0de8969fa04",
+        "g": "7ac6f6507ae14b9e",
+        "name": "Prepare Downsample Params",
+        "func": "// This node prepares parameters for the downsampling query, which uses all three: $1, $2, and $3.\nconst dbParams = msg.dbParams; // Should be [deviceId, startTime, bucketInterval]\n\nif (!dbParams || dbParams.length < 3 || !dbParams[2]) {\n    node.error(\"Missing required database parameters for downsampling query\", msg);\n    return null; // Stop flow\n}\n\n// The full dbParams array is what we need.\nmsg.params = dbParams;\n\n// Clean up and pass along\ndelete msg.dbParams;\nmsg.payload = {};\nmsg.topic = \"\";\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 870,
+        "y": 240,
+        "wires": [
+            [
+                "18105e56e6faed86",
+                "c37a20770849cdd1"
+            ]
+        ],
+        "info": "**Purpose:** A simple \"pass-through\" node that ensures the `msg` object is correctly formatted for the main database query node.\r\n**Logic:** It moves the `msg.dbParams` created in the previous step into the `msg.params` property, which is where the `postgresql` node expects its parameters."
+    },
+    {
+        "id": "18105e56e6faed86",
+        "type": "postgresql",
+        "z": "ac9683af7e82fb53",
+        "g": "7ac6f6507ae14b9e",
+        "name": "Get Downsampled Data for Analysis",
+        "query": "-- High-Performance Downsampling Query (Aggregate First, Join Later)\nWITH AggEnergy AS (\n    -- Step 1: Bucket and aggregate the energy data first. This is very fast.\n    SELECT\n        time_bucket($3, timestamp) AS bucket,\n        AVG(power_watts) as power_watts,\n        AVG(voltage) as voltage,\n        AVG(current_amps) as current_amps,\n        AVG(plug_temp_c) as plug_temp_c\n    FROM energy_data\n    WHERE device_id = $1 AND timestamp >= $2\n    GROUP BY 1\n),\nAggStatus AS (\n    -- Step 2: Independently bucket and aggregate the status data.\n    SELECT\n        time_bucket($3, timestamp) AS bucket,\n        -- Use TimescaleDB's optimized 'last' aggregate to get the final state in each bucket.\n        LAST(nozzle_temp_actual, timestamp) as nozzle_temp_actual,\n        LAST(bed_temp_actual, timestamp) as bed_temp_actual,\n        LAST(nozzle_temp_target, timestamp) as nozzle_temp_target,\n        LAST(bed_temp_target, timestamp) as bed_temp_target,\n        MAX(is_printing::int) as is_printing, -- If it was printing at all in the bucket, count it.\n        LAST(z_height_mm, timestamp) as z_height_mm,\n        LAST(material, timestamp) as material,\n        LAST(speed_multiplier_percent, timestamp) as speed_multiplier_percent\n    FROM printer_status\n    WHERE device_id = $1 AND timestamp >= $2\n    GROUP BY 1\n)\n-- Step 3: Join the two small, pre-aggregated tables together. This is extremely fast.\nSELECT\n    ae.bucket AS timestamp,\n    ae.power_watts,\n    ae.voltage,\n    ae.current_amps,\n    ae.plug_temp_c,\n    ps.nozzle_temp_actual,\n    ps.bed_temp_actual,\n    ps.nozzle_temp_target,\n    ps.bed_temp_target,\n    ps.is_printing,\n    ps.z_height_mm,\n    ps.material,\n    ps.speed_multiplier_percent\n    -- NOTE: Environment data is omitted for now to maximize performance.\n    -- We can add it back later if needed, but it's the least critical component.\nFROM AggEnergy ae\nLEFT JOIN AggStatus ps ON ae.bucket = ps.bucket\nWHERE ae.power_watts IS NOT NULL -- Only return buckets that actually have energy data\nORDER BY ae.bucket ASC;",
+        "postgreSQLConfig": "4259e91acb63e17b",
+        "split": false,
+        "rowsPerMsg": 1,
+        "outputs": 1,
+        "x": 1090,
+        "y": 300,
+        "wires": [
+            [
+                "420db27bdf8a7af8"
+            ]
+        ],
+        "info": "**Purpose:** Executes a powerful query to fetch a complete, unified time-series dataset for the requested device and time range.\r\n\r\n**Logic:**\r\n- The query joins `energy_data` with `printer_status` and `environment_data`.\r\n- It uses `LEFT JOIN LATERAL` to efficiently find the closest matching status and environment reading for every single energy data point. This creates a rich, high-resolution dataset perfect for analysis.\r\n\r\n**Output:**\r\n- `msg.payload`: An array of objects, where each object represents a single point in time with all available sensor data."
+    },
+    {
+        "id": "1ae9d7f3b861588f",
+        "type": "switch",
+        "z": "ac9683af7e82fb53",
+        "g": "7ac6f6507ae14b9e",
+        "name": "Route by Downsampling",
+        "property": "useDownsampling",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 510,
+        "y": 360,
+        "wires": [
+            [
+                "47f941dc6fd62b7f",
+                "5da0ec23ca2508ab"
+            ],
+            [
+                "2cf637958f28c7bc",
+                "be4e082899f0f3bf"
+            ]
+        ]
+    },
+    {
+        "id": "c37a20770849cdd1",
+        "type": "debug",
+        "z": "ac9683af7e82fb53",
+        "g": "7ac6f6507ae14b9e",
+        "name": "debug 11",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 1270,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "14487a14b2feca49",
+        "type": "debug",
+        "z": "ac9683af7e82fb53",
+        "g": "7ac6f6507ae14b9e",
+        "name": "debug 12",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 1110,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "be4e082899f0f3bf",
+        "type": "debug",
+        "z": "ac9683af7e82fb53",
+        "g": "7ac6f6507ae14b9e",
+        "name": "debug 20",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 760,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "47f941dc6fd62b7f",
+        "type": "debug",
+        "z": "ac9683af7e82fb53",
+        "g": "7ac6f6507ae14b9e",
+        "name": "debug 21",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 460,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "55b3db24479ce37f",
+        "type": "function",
+        "z": "ac9683af7e82fb53",
+        "g": "8e413dd2bca548c6",
         "name": "Prepare Batched Params for UNNEST",
         "func": "// msg.payload = main analysis results\n// msg.predictions = full array of prediction objects {ts, dev_id, pred_pwr, model_ver}\n\nconst predictions = msg.predictions;\nconst batchSize = 100; // Process in chunks within this function\nlet allParams = []; // Array to hold all parameters for potentially multiple DB calls\n\nif (!Array.isArray(predictions) || predictions.length === 0) {\n    node.warn(\"No predictions array found or empty, skipping insert preparation.\");\n    // Send the original payload along the main path, but stop this insert path\n    // To do this, we need two outputs from this function node.\n    // Output 1: Main payload (passthrough)\n    // Output 2: Database parameters (or null if no predictions)\n    return [msg, null]; // Send original msg out output 1, null out output 2\n}\n\nnode.log(`Preparing ${predictions.length} predictions for batched UNNEST insert...`);\n\nlet currentBatchParams = {\n    timestamps: [],\n    device_ids: [],\n    predicted_watts: [],\n    model_versions: []\n};\nlet batchCount = 0;\n\nfor (const pred of predictions) {\n    // Basic validation for each object\n    if (pred && pred.timestamp && pred.device_id && typeof pred.predicted_power_watts === 'number' && !isNaN(pred.predicted_power_watts) && pred.model_version) {\n        currentBatchParams.timestamps.push(pred.timestamp);\n        currentBatchParams.device_ids.push(pred.device_id);\n        currentBatchParams.predicted_watts.push(pred.predicted_power_watts);\n        currentBatchParams.model_versions.push(pred.model_version);\n        batchCount++;\n\n        // If batch size reached, prepare parameters for this batch\n        if (batchCount >= batchSize) {\n            // Create parameters array FOR ONE DB CALL for this batch\n            allParams.push({\n                params: [\n                    currentBatchParams.timestamps,\n                    currentBatchParams.device_ids,\n                    currentBatchParams.predicted_watts,\n                    currentBatchParams.model_versions\n                ],\n                // Include _msgid context if needed for debugging, but params is key\n                 _msgid_batch_start: msg._msgid + \"_batch_\" + (allParams.length * batchSize)\n            });\n            // Reset for next batch\n            currentBatchParams = { timestamps: [], device_ids: [], predicted_watts: [], model_versions: [] };\n            batchCount = 0;\n        }\n    } else {\n         node.warn(`Skipping invalid prediction object in batch: ${JSON.stringify(pred)}`);\n    }\n}\n\n// Add any remaining predictions in the last partial batch\nif (batchCount > 0) {\n     allParams.push({\n         params: [\n             currentBatchParams.timestamps,\n             currentBatchParams.device_ids,\n             currentBatchParams.predicted_watts,\n             currentBatchParams.model_versions\n         ],\n          _msgid_batch_start: msg._msgid + \"_batch_\" + (allParams.length * batchSize)\n     });\n}\n\nnode.log(`Prepared ${allParams.length} batches for insert.`);\n\n// --- IMPORTANT ---\n// Keep the original msg.payload for the main response path (Output 1)\n// Create a *new* message object containing the array of parameter batches for the DB path (Output 2)\nlet dbMsg = {\n    payload: allParams, // Array of {params: [...]} objects\n     _msgid: msg._msgid // Can reuse original msgid for this branch\n};\n\n// Output 1: Original message (minus predictions) for the HTTP response path\n// Output 2: New message with batched parameters for the DB insert path\ndelete msg.predictions; // Clean original message\nreturn [ msg, dbMsg ];",
         "outputs": 2,
@@ -1246,23 +1787,23 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1210,
-        "y": 280,
+        "x": 2110,
+        "y": 320,
         "wires": [
             [
-                "3592a09331fdbdbd"
+                "965f098d5bee013d"
             ],
             [
-                "d69fce717cce3024"
+                "32e3356cddc166e6"
             ]
         ],
         "info": "**Purpose:** Prepares the large array of predictions from the Python script for efficient insertion into the database.\r\n**Logic:** It transforms the array of prediction objects into four separate arrays (timestamps, device_ids, predicted_watts, model_versions), which is the format required for PostgreSQL's efficient `UNNEST` function. It also splits the data into batches to avoid sending a single massive query."
     },
     {
-        "id": "d69fce717cce3024",
+        "id": "32e3356cddc166e6",
         "type": "split",
         "z": "ac9683af7e82fb53",
-        "g": "4080a0de8969fa04",
+        "g": "8e413dd2bca548c6",
         "name": "Split Parameter Batches",
         "splt": "\\n",
         "spltType": "str",
@@ -1271,19 +1812,19 @@
         "stream": false,
         "addname": "",
         "property": "payload",
-        "x": 1270,
-        "y": 340,
+        "x": 2170,
+        "y": 380,
         "wires": [
             [
-                "c998f79c73ca0cda"
+                "6d1eab268ac5c82d"
             ]
         ]
     },
     {
-        "id": "c998f79c73ca0cda",
+        "id": "6d1eab268ac5c82d",
         "type": "change",
         "z": "ac9683af7e82fb53",
-        "g": "4080a0de8969fa04",
+        "g": "8e413dd2bca548c6",
         "name": "Set Batch Params",
         "rules": [
             {
@@ -1304,20 +1845,72 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1250,
-        "y": 400,
+        "x": 2150,
+        "y": 440,
         "wires": [
             [
-                "3dad15f0c8d11ced"
+                "e10de595608c8e62"
             ]
         ]
     },
     {
-        "id": "766af32f4fe6ef26",
+        "id": "e10de595608c8e62",
+        "type": "postgresql",
+        "z": "ac9683af7e82fb53",
+        "g": "8e413dd2bca548c6",
+        "name": "Insert Prediction",
+        "query": "INSERT INTO ml_predictions (\n    timestamp, device_id, predicted_power_watts, model_version\n)\nSELECT\n    ts, -- Alias from UNNEST\n    dev, -- Alias from UNNEST\n    pwr, -- Alias from UNNEST\n    ver  -- Alias from UNNEST\nFROM UNNEST(\n    $1::TIMESTAMPTZ[], -- Parameter 1: Array of timestamps\n    $2::TEXT[],        -- Parameter 2: Array of device IDs\n    $3::FLOAT[],       -- Parameter 3: Array of predictions\n    $4::TEXT[]         -- Parameter 4: Array of model versions\n) AS t(ts, dev, pwr, ver) -- Define aliases for columns from UNNEST\nON CONFLICT DO NOTHING;",
+        "postgreSQLConfig": "4259e91acb63e17b",
+        "split": false,
+        "rowsPerMsg": 1,
+        "outputs": 1,
+        "x": 2160,
+        "y": 500,
+        "wires": [
+            []
+        ],
+        "info": "**Purpose:** Saves the historical predictions generated during the analysis into the `ml_predictions` table. This allows the data to be used later without re-running the analysis.\r\n**Logic:** Uses the `UNNEST` function to efficiently insert a large number of rows in a single query."
+    },
+    {
+        "id": "965f098d5bee013d",
+        "type": "function",
+        "z": "ac9683af7e82fb53",
+        "g": "8e413dd2bca548c6",
+        "name": "Format API Response",
+        "func": "// Node-RED Function Node: Format API Response\n// --- Updated: 2024-07-XX (Handle 'all' time range for Grafana, include new metrics/drivers) ---\n\n// --- Add this log at the START ---\nnode.log(`Format Response - Received msg.payload type: ${typeof msg.payload}`);\nif (typeof msg.payload === 'object' && msg.payload !== null) {\n    node.log(`Format Response - Received payload keys: ${Object.keys(msg.payload)}`);\n    const receivedMetrics = msg.payload.new_metrics;\n    node.log(`Format Response - Received new_metrics type: ${typeof receivedMetrics}`);\n    // Limit stringify length for potentially large phase data\n    // node.log(`Format Response - Received new_metrics content: ${JSON.stringify(receivedMetrics)?.substring(0, 500)}...`);\n}\n// --- End Log ---\n\n// msg.payload contains the analysis results from Python node\n// msg.analysisInputs contains deviceId, startTime, selectedDriverKeys\nconst results = msg.payload; // These are the results calculated by Python\nconst analysisInputs = msg.analysisInputs; // These are the original inputs to the analysis\n\n// Initialize default payload for error cases or missing inputs\nlet responsePayload = { success: false, error: \"Unknown error occurred before formatting.\" };\nmsg.statusCode = 500; // Default to Internal Server Error\n\n// Check if analysis seems to have run and required inputs are available\nconst deviceId = analysisInputs?.deviceId;\nconst startTime = analysisInputs?.startTime; // Can be ISO string or '1970-01-01T00:00:00Z'\n\nif (results && typeof results === 'object' && !results.error && deviceId && startTime) {\n    // Proceed if Python didn't return a top-level error and we have device/start info\n    try {\n        node.log(`Format Response: Formatting for device: ${deviceId}, startTime marker: ${startTime}`);\n\n        // --- Generate Grafana Panel URLs ---\n        const grafanaBaseUrl = \"https://lauds.intel50001.com\"; // Your Grafana public URL\n        const dashboardUID = \"dej62anu0b3swf\";             // Your Dashboard UID\n        const dashboardName = \"prusa\";                     // Your Dashboard Name/Slug\n\n        // --- Determine Correct Panel ID ---\n        let panel1Id = \"1\"; // Default Panel ID for Actual vs Predicted\n        if (deviceId === 'PrusaMK4-1') {\n            panel1Id = \"3\";\n            node.log(`Format Response: Using Panel ID ${panel1Id} for PrusaMK4-1`);\n        } else {\n            node.log(`Format Response: Using default Panel ID ${panel1Id} for ${deviceId}`);\n        }\n\n        // --- Determine Grafana 'from' timestamp ---\n        let fromMs = null; // Use null to indicate invalid/missing time\n        const toMs = new Date().getTime(); // Use current time for 'to'\n\n        // Get the minimum timestamp fetched by Python (might be null)\n        const minTimestampIso = results?.device_info?.min_timestamp_iso; // Use optional chaining\n\n        if (startTime) { // Check if startTime marker exists\n            if (startTime === '1970-01-01T00:00:00Z') {\n                // Handle the 'all time' marker\n                if (minTimestampIso) { // If we successfully fetched the actual min timestamp\n                    const minDate = new Date(minTimestampIso);\n                    if (!isNaN(minDate)) {\n                        fromMs = minDate.getTime();\n                        node.log(`Format Response: 'All Time' range - using actual min_timestamp, fromMs: ${fromMs}`);\n                    } else {\n                        node.warn(`Format Response: Could not parse min_timestamp_iso: ${minTimestampIso}. Defaulting 'from' to epoch.`);\n                        fromMs = 0; // Fallback to epoch if min ts parsing fails\n                    }\n                } else {\n                    // Fallback if min_timestamp couldn't be fetched (e.g., no data for device)\n                    node.warn(\"Format Response: 'All Time' range - min_timestamp not available. Defaulting 'from' to epoch.\");\n                    fromMs = 0; // Default to epoch start if no actual min timestamp found\n                }\n            } else {\n                // Handle specific time ranges (1h, 6h, etc.)\n                const startDate = new Date(startTime);\n                if (!isNaN(startDate)) {\n                    fromMs = startDate.getTime();\n                    // node.log(`Format Response: Specific startTime parsed: ${startTime}, fromMs: ${fromMs}`); // Optional log\n                } else {\n                    node.error(`Format Response: Invalid non-'all' startTime format: ${startTime}.`);\n                    // fromMs remains null\n                }\n            }\n        } else {\n            // startTime itself was missing\n            node.error(`Format Response: Missing startTime in analysisInputs.`);\n            // fromMs remains null\n        }\n    // --- END Determine Grafana 'from' timestamp ---\n\n    // --- Construct URLs ONLY if fromMs is valid (not null) ---\n\n        let urlPanel1 = null;\n        if (fromMs !== null) {\n            urlPanel1 = `${grafanaBaseUrl}/d-solo/${dashboardUID}/${dashboardName}?orgId=1&theme=light&panelId=${panel1Id}&from=${fromMs}&to=${toMs}&var-deviceId=${encodeURIComponent(deviceId)}`;\n            node.log(`Format Response: Generated Panel 1 URL: ${urlPanel1}`);\n        } else {\n            node.log(\"Format Response: Skipping Grafana URL generation due to invalid 'from' time.\");\n        }\n\n        // --- Prepare final success payload ---\n        // Ensure ALL expected keys from the Python output (results) are included here\n        responsePayload = {\n            success: true,\n            error: null, // No top-level error from Python node\n            results: {\n                summary: results.summary || \"Summary unavailable.\",\n                new_metrics: results.new_metrics || { \"error\": \"Metrics missing from backend\" }, // Include new metrics\n                correlation: results.correlation || {},\n                regression: results.regression || {},\n                ml_prediction_summary: results.ml_prediction_summary || \"Prediction status unknown.\",\n                ml_evaluation_metrics: results.ml_evaluation_metrics || { status: \"Metrics could not be loaded.\" }, // Use correct key\n                ml_feature_importance: results.ml_feature_importance || {},\n                ml_top_drivers: results.ml_top_drivers || [], // Include top drivers\n                grafanaUrls: {\n                    panel1: urlPanel1 // Pass the potentially null URL\n                    // panel2: urlPanel2 // Add panel 2 URL here if used\n                }\n            }\n        };\n        msg.statusCode = 200; // OK\n\n    } catch (e) {\n        // Catch errors during the formatting process itself\n        node.error(`Format Response: Error during formatting: ${e}\\n${e.stack}`, msg);\n        responsePayload = { success: false, error: `Internal formatting error: ${e.message}` };\n        msg.statusCode = 500;\n    }\n\n} else {\n    // Handle cases where Python node failed or required inputs were missing before formatting\n    let errorReason = results?.error || \"Analysis failed or inputs missing.\";\n    if (!deviceId) errorReason += \" Missing deviceId.\";\n    if (!startTime) errorReason += \" Missing startTime.\";\n    node.error(`Format Response: Pre-check failed. Reason: ${errorReason}`, msg);\n    responsePayload = { success: false, error: errorReason }; // Use more specific error\n    // msg.statusCode remains 500 (default)\n}\n\n// Set the final payload to be sent back to the UI\nmsg.payload = responsePayload;\n\n// Clean up intermediate properties from the message object\ndelete msg.analysisInputs;\ndelete msg.predictions;\ndelete msg.topic;\ndelete msg.params;\n// delete msg.dbParams; // Usually safe to delete\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2520,
+        "y": 420,
+        "wires": [
+            [
+                "b4b7c081576b3e05"
+            ]
+        ],
+        "info": "**Purpose:** The final step before sending the data back to the user. It formats the raw results from the Python script into the final, clean JSON structure that the `analysis_page.html` frontend expects.\r\n**Logic:** It builds the final response object, including the summary text, metrics, correlation results, and dynamically generated Grafana URLs."
+    },
+    {
+        "id": "b4b7c081576b3e05",
+        "type": "http response",
+        "z": "ac9683af7e82fb53",
+        "g": "8e413dd2bca548c6",
+        "name": "Send API Response",
+        "statusCode": "",
+        "headers": {},
+        "x": 2800,
+        "y": 540,
+        "wires": [],
+        "info": "**Purpose:** Sends the final, formatted JSON response back to the `analysis_page.html` frontend.\r\n**Logic:** Sets the HTTP status code to `200 OK` and sends the `msg.payload`."
+    },
+    {
+        "id": "fdfb2f26a2fc7a77",
         "type": "inject",
-        "z": "3248d6a231f4e9d0",
-        "g": "97c76169fe166c15",
-        "name": "Trigger Predict Every 10s",
+        "z": "bce1a8251b1947ed",
+        "name": "Trigger Every 10s",
         "props": [
             {
                 "p": "payload"
@@ -1329,46 +1922,42 @@
         ],
         "repeat": "10",
         "crontab": "",
-        "once": true,
-        "onceDelay": "10",
+        "once": false,
+        "onceDelay": 0.1,
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 220,
-        "y": 160,
+        "x": 170,
+        "y": 100,
         "wires": [
             [
-                "fb200dd03d87ca0a"
+                "908d1f9e94eeaf2e"
             ]
-        ],
-        "info": "**Purpose:** The entry point for the flow. It triggers the entire prediction sequence at a fixed interval.\r\n**Frequency:** Runs every 10 seconds."
+        ]
     },
     {
-        "id": "fb200dd03d87ca0a",
+        "id": "908d1f9e94eeaf2e",
         "type": "postgresql",
-        "z": "3248d6a231f4e9d0",
-        "g": "97c76169fe166c15",
-        "name": "Get Device List for UI",
-        "query": "SELECT device_id, api_ip, api_key\nFROM devices\nWHERE api_ip IS NOT NULL AND api_ip <> ''\n  AND api_key IS NOT NULL AND api_key <> '';",
+        "z": "bce1a8251b1947ed",
+        "name": "Get Latest Data for ALL Devices",
+        "query": "WITH LatestCombined AS (\n    SELECT DISTINCT ON (d.device_id)\n        d.device_id,\n        ps.state_text, ps.is_operational, ps.is_printing, ps.is_paused, ps.is_error,\n        ps.is_busy, ps.is_sd_ready, ps.nozzle_temp_actual, ps.nozzle_temp_target,\n        ps.bed_temp_actual, ps.bed_temp_target, ps.z_height_mm, ps.speed_multiplier_percent,\n        ps.material, ps.ambient_temp_c,\n        ed.voltage, ed.current_amps, ed.plug_temp_c\n    FROM devices d\n    LEFT JOIN LATERAL (\n        SELECT * FROM printer_status WHERE device_id = d.device_id ORDER BY timestamp DESC LIMIT 1\n    ) ps ON true\n    LEFT JOIN LATERAL (\n        SELECT * FROM energy_data WHERE device_id = d.device_id ORDER BY timestamp DESC LIMIT 1\n    ) ed ON true\n    ORDER BY d.device_id, ps.timestamp DESC, ed.timestamp DESC\n)\nSELECT * FROM LatestCombined\nWHERE nozzle_temp_actual IS NOT NULL OR plug_temp_c IS NOT NULL;",
         "postgreSQLConfig": "4259e91acb63e17b",
         "split": false,
         "rowsPerMsg": 1,
         "outputs": 1,
-        "x": 240,
-        "y": 220,
+        "x": 210,
+        "y": 160,
         "wires": [
             [
-                "727ae746539a786d"
+                "22d28dcb3a13552a"
             ]
-        ],
-        "info": "**Purpose:** Fetches the list of all devices that are configured to use the local PrusaLink API (i.e., they have an `api_ip` and `api_key`).\r\n**Output:** An array of device objects."
+        ]
     },
     {
-        "id": "727ae746539a786d",
+        "id": "22d28dcb3a13552a",
         "type": "split",
-        "z": "3248d6a231f4e9d0",
-        "g": "97c76169fe166c15",
-        "name": "Split Devices",
+        "z": "bce1a8251b1947ed",
+        "name": "",
         "splt": "\\n",
         "spltType": "str",
         "arraySplt": 1,
@@ -1376,135 +1965,221 @@
         "stream": false,
         "addname": "",
         "property": "payload",
-        "x": 230,
-        "y": 280,
+        "x": 190,
+        "y": 220,
         "wires": [
             [
-                "5e276bfbbd3f9bb6"
+                "7d2d27e02b85ffe2",
+                "8e1db035a234cac1"
             ]
-        ],
-        "info": "**Purpose:** Takes the array of devices from the previous node and splits it into a sequence of individual messages, one for each device. This allows the rest of the flow to process one printer at a time."
+        ]
     },
     {
-        "id": "5e276bfbbd3f9bb6",
+        "id": "615f6e69f0b3a671",
         "type": "function",
-        "z": "3248d6a231f4e9d0",
-        "g": "9c69214ff198d9d8",
-        "name": "Prepare Latest Data Query",
-        "func": "// msg.payload contains a single printer object from the split node\n// e.g., { device_id: 'PrusaMK4-1', api_ip: '...', ... }\nconst printerInfo = msg.payload;\nconst deviceId = printerInfo.device_id;\n\nif (!deviceId) {\n    node.error(\"Missing device_id after split\", msg);\n    return null;\n}\n\n// Prepare parameters for the static SQL query in the next node\nmsg.params = [deviceId]; // Parameter $1 will be deviceId\n\n// Pass along device_id for later use when inserting prediction\nmsg.device_id = deviceId;\n\n// Clear unnecessary properties\nmsg.payload = {};\nmsg.topic = \"\";\n\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 600,
-        "y": 280,
-        "wires": [
-            [
-                "f3cf04893924fa13"
-            ]
-        ],
-        "info": "**Purpose:** Prepares the `msg` object for the database query.\r\n**Logic:** It takes the `device_id` from the incoming message and places it into `msg.params`, which is the format required by the `postgresql` node."
-    },
-    {
-        "id": "f3cf04893924fa13",
-        "type": "postgresql",
-        "z": "3248d6a231f4e9d0",
-        "g": "9c69214ff198d9d8",
-        "name": "Get Latest Data",
-        "query": "-- Static Query to get latest data for one device ($1)\nWITH LatestStatus AS (\n    SELECT * FROM printer_status\n    WHERE device_id = $1 -- Use parameter\n    ORDER BY timestamp DESC\n    LIMIT 1\n), LatestEnergy AS (\n    SELECT * FROM energy_data\n    WHERE device_id = $1 -- Use parameter\n    ORDER BY timestamp DESC\n    LIMIT 1\n)\nSELECT\n    COALESCE(ls.timestamp, le.timestamp) as latest_timestamp,\n    $1 as device_id, -- Explicitly select the device_id passed as parameter\n    ls.state_text, ls.is_operational, ls.is_printing, ls.is_paused, ls.is_error,\n    ls.is_busy, ls.is_sd_ready, ls.nozzle_temp_actual, ls.nozzle_temp_target,\n    ls.bed_temp_actual, ls.bed_temp_target, ls.z_height_mm, ls.speed_multiplier_percent,\n    le.voltage, le.current_amps, le.plug_temp_c\nFROM LatestStatus ls\nFULL OUTER JOIN LatestEnergy le ON ls.device_id = le.device_id;",
-        "postgreSQLConfig": "4259e91acb63e17b",
-        "split": false,
-        "rowsPerMsg": 1,
-        "outputs": 1,
-        "x": 600,
-        "y": 340,
-        "wires": [
-            [
-                "ebffcd036e7af362"
-            ]
-        ],
-        "info": "**Purpose:** Gathers the single most recent sensor reading from both the `printer_status` and `energy_data` tables for the specific device being processed.\r\n**Output:** A single row of combined data containing all the features needed for the model."
-    },
-    {
-        "id": "ebffcd036e7af362",
-        "type": "function",
-        "z": "3248d6a231f4e9d0",
-        "g": "9c69214ff198d9d8",
+        "z": "bce1a8251b1947ed",
         "name": "Prepare Features",
-        "func": "// msg.payload should be an array containing 0 or 1 row\n// with combined latest status and energy data.\nif (!msg.payload || !Array.isArray(msg.payload) || msg.payload.length === 0) {\n    node.warn(`No recent combined data found for device ${msg.original_payload?.device_id}. Skipping prediction.`);\n    return null; // Stop if no data\n}\n\nconst latestData = msg.payload[0];\n\n// Prepare the feature object required by the Python node\n// This structure MUST match what the Python prediction part expects\n\n// Handle boolean conversion (DB returns 0/1 after our preprocessing)\nconst isPrinting = latestData.is_printing === 1 || latestData.is_printing === true;\n\n// Create the feature object - use null if data is missing\nlet features = {\n    'voltage': latestData.voltage ?? null,\n    'current_amps': latestData.current_amps ?? null,\n    'plug_temp_c': latestData.plug_temp_c ?? null,\n    'is_printing': isPrinting ? 1 : 0, // Ensure 0/1 for model\n    'nozzle_temp_actual': latestData.nozzle_temp_actual ?? null,\n    'bed_temp_actual': latestData.bed_temp_actual ?? null,\n    'z_height_mm': latestData.z_height_mm ?? null,\n    'speed_multiplier_percent': latestData.speed_multiplier_percent ?? null\n     // Add other features if your model uses them\n};\n\n// Store device_id for inserting prediction later\nmsg.device_id = latestData.device_id || msg.original_payload?.device_id;\n// Use latest timestamp from data if available\nmsg.prediction_timestamp = latestData.latest_timestamp || new Date().toISOString();\n\n// Pass ONLY the features object as payload to Python node\nmsg.payload = features;\n\n// Clear unneeded properties\ndelete msg.topic;\ndelete msg.params;\ndelete msg.original_payload;\n\nreturn msg;",
+        "func": "const latestData = msg.payload;\nconst deviceId = latestData.device_id;\n\nif (!latestData || typeof latestData !== 'object' || !deviceId) {\n    node.warn(\"Received invalid data after split. Skipping.\");\n    return null;\n}\n\n// This part is the same, gathering only the features for the model\nlet features = {\n    'plug_temp_c': latestData.plug_temp_c,\n    'nozzle_temp_actual': latestData.nozzle_temp_actual,\n    'bed_temp_actual': latestData.bed_temp_actual,\n    'nozzle_temp_target': latestData.nozzle_temp_target,\n    'bed_temp_target': latestData.bed_temp_target,\n    'is_printing': latestData.is_printing,\n    'z_height_mm': latestData.z_height_mm,\n    'material': latestData.material,\n    'ambient_temp_c': latestData.ambient_temp_c\n};\n\n// --- THIS IS THE FIX ---\n// Instead of splitting the data, we create a single payload object\n// that matches exactly what the Python script expects to receive.\nmsg.payload = {\n    payload: features, // The nested features object\n    device_id: deviceId  // The device_id at the top level\n};\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 630,
-        "y": 400,
+        "x": 330,
+        "y": 320,
         "wires": [
             [
-                "3be8ddb37a93844d"
+                "5dda0364e6c3d1e7",
+                "69540d71c5d3d09b"
             ]
-        ],
-        "info": "**Purpose:** Transforms the raw data from the database into the exact JSON format that the Python ML model expects.\r\n**Logic:** It renames keys, handles `null` values, and ensures the structure matches the model's input requirements."
+        ]
     },
     {
-        "id": "3be8ddb37a93844d",
-        "type": "python-function",
-        "z": "3248d6a231f4e9d0",
-        "g": "9c69214ff198d9d8",
-        "name": "Generate Prediction",
-        "func": "# Node-RED Python Function Node: Generate Prediction (Live Predictor Flow)\n# --- Final Version: XGBoost, 7 Features, Post-processing ---\n\n# --- Imports & Environment ---\nimport sys\nimport os\n# --- Add venv path ---\nvenv_path = '/home/ubuntu/monitor_ml/venv/lib/python3.12/site-packages'\nif venv_path not in sys.path:\n    sys.path.append(venv_path)\n\nimport pandas as pd\nimport numpy as np\nimport joblib\nimport traceback\nimport warnings\n\n# --- Suppress Warnings ---\nwarnings.filterwarnings(\"ignore\", category=UserWarning, message=\"X does not have valid feature names\")\nwarnings.filterwarnings(\"ignore\", category=FutureWarning) # Broader future warning ignore\n\n# --- Configuration ---\nMODEL_DIR = '/home/ubuntu/monitor_ml/models'\nIMPUTE_VALUE_WHEN_API_MISSING = 0\n\n# --- Dynamic Model Selection ---\n# Get deviceId from the input message\ndevice_id = msg.get('device_id', '')\n\n# Default to Prusa model files\nMODEL_FILENAME = 'best_model.joblib'\nSCALER_FILENAME = 'scaler.joblib'\nSCALER_COLS_FILENAME = 'scaler_columns.joblib'\nMODEL_FEATURES_FILENAME = 'model_features.joblib'\nMODEL_TYPE_FOR_LOG = 'Prusa (XGBoost)'\n\n# If it's an Ender 3, switch to the Ender 3 model files\nif 'Ender-3' in device_id:\n    node.log(f\"Predictor - Ender 3 device ({device_id}) selected. Switching models.\")\n    MODEL_FILENAME = 'ender3_randomforest_model.joblib'\n    SCALER_FILENAME = 'ender3_scaler.joblib'\n    SCALER_COLS_FILENAME = 'ender3_scaler_columns.joblib'\n    MODEL_FEATURES_FILENAME = 'ender3_model_features.joblib'\n    MODEL_TYPE_FOR_LOG = 'Ender 3 (RandomForest)'\n\n# No log here to reduce noise in live predictor, unless needed for debugging\n# node.log(f\"Predictor - Using Model Type: {MODEL_TYPE_FOR_LOG}\")\n\n# Build final paths based on the selected filenames\nSCALER_PATH = os.path.join(MODEL_DIR, SCALER_FILENAME)\nMODEL_PATH = os.path.join(MODEL_DIR, MODEL_FILENAME)\nSCALER_COLS_PATH = os.path.join(MODEL_DIR, SCALER_COLS_FILENAME)\nMODEL_FEATURES_PATH = os.path.join(MODEL_DIR, MODEL_FEATURES_FILENAME)\n\n# --- Pre-load Model, Scaler, and Feature Lists ---\n# (Loads the latest artifacts saved by train_model.py)\nscaler = None; model = None; loading_error = None\nSCALER_COLUMNS = None; MODEL_FEATURES = None\nloading_error_details = {}\ntry: scaler = joblib.load(SCALER_PATH); node.log(\"Predictor - Loaded scaler.\")\nexcept Exception as e: loading_error_details[\"scaler\"] = f\"Scaler load error: {str(e)}\"; node.error(f\"Predictor - {loading_error_details['scaler']}\")\ntry: SCALER_COLUMNS = joblib.load(SCALER_COLS_PATH); node.log(f\"Predictor - Loaded scaler columns ({len(SCALER_COLUMNS) if SCALER_COLUMNS else 'None'}).\")\nexcept Exception as e: loading_error_details[\"scaler_cols\"] = f\"Scaler columns load error: {str(e)}\"; node.error(f\"Predictor - {loading_error_details['scaler_cols']}\")\ntry: model = joblib.load(MODEL_PATH); node.log(f\"Predictor - Loaded model from {MODEL_FILENAME}.\")\nexcept Exception as e: loading_error_details[\"model\"] = f\"Model load error: {str(e)}\"; node.error(f\"Predictor - {loading_error_details['model']}\")\ntry: MODEL_FEATURES = joblib.load(MODEL_FEATURES_PATH); node.log(f\"Predictor - Loaded model features ({len(MODEL_FEATURES) if MODEL_FEATURES else 'None'}).\")\nexcept Exception as e: loading_error_details[\"model_features\"] = f\"Model features load error: {str(e)}\"; node.error(f\"Predictor - {loading_error_details['model_features']}\")\n\nessential_components_missing = False\nif scaler is None or SCALER_COLUMNS is None or model is None or MODEL_FEATURES is None:\n    node.error(f\"Predictor - CRITICAL: One or more ML assets failed to load. Errors: {loading_error_details}\")\n    essential_components_missing = True\nloading_error = \"; \".join([f\"{k}: {v}\" for k, v in loading_error_details.items()]) if loading_error_details else None\n\n# === Main Execution Block (Called by Node-RED) ===\noutput_msg = None\n\nif essential_components_missing:\n    node.error(f\"Predictor - Aborting prediction due to essential component load failure: {loading_error}\")\nelse:\n    feature_dict = msg.get('payload', {}) # Input is a dictionary\n    device_id_from_input = msg.get('device_id', 'unknown_live_predictor')\n\n    if not isinstance(feature_dict, dict) or not feature_dict:\n        node.error(f\"Predictor - Input payload not a valid dictionary or empty for {device_id_from_input}.\")\n    else:\n        # node.log(f\"Predictor - Received features for {device_id_from_input}: {feature_dict}\")\n        try:\n            # --- Preprocessing for ML Model (7 Features) ---\n            # Create a single-row DataFrame from the input dictionary\n            # Ensure all expected model features exist as keys, even if value is None\n            input_data_with_all_keys = {f: feature_dict.get(f) for f in MODEL_FEATURES}\n            predict_df_processed = pd.DataFrame([input_data_with_all_keys], index=[0]) # Use index 0\n\n            # 1. Clean z_height_mm\n            if 'z_height_mm' in predict_df_processed.columns:\n                # Use .loc to modify the DataFrame slice correctly\n                predict_df_processed.loc[0, 'z_height_mm'] = pd.to_numeric(predict_df_processed.loc[0, 'z_height_mm'], errors='coerce')\n                if pd.notna(predict_df_processed.loc[0, 'z_height_mm']) and predict_df_processed.loc[0, 'z_height_mm'] < 0:\n                    predict_df_processed.loc[0, 'z_height_mm'] = IMPUTE_VALUE_WHEN_API_MISSING\n\n            # 2. Process 'is_printing'\n            if 'is_printing' in predict_df_processed.columns:\n                 processed_val = pd.to_numeric(predict_df_processed.loc[0, 'is_printing'], errors='coerce')\n                 predict_df_processed.loc[0, 'is_printing'] = int(processed_val) if pd.notna(processed_val) else IMPUTE_VALUE_WHEN_API_MISSING\n            elif 'is_printing' in MODEL_FEATURES: # Should be present now\n                 predict_df_processed['is_printing'] = IMPUTE_VALUE_WHEN_API_MISSING\n\n            # 3. Process and Impute other FINAL_MODEL_FEATURES\n            features_to_process = ['plug_temp_c', 'nozzle_temp_actual', 'bed_temp_actual', 'z_height_mm', 'nozzle_temp_target', 'bed_temp_target']\n            for col in features_to_process:\n                 if col in predict_df_processed.columns:\n                     # Impute NaNs (which includes None from .get() earlier)\n                     if pd.isna(predict_df_processed.loc[0, col]):\n                          predict_df_processed.loc[0, col] = IMPUTE_VALUE_WHEN_API_MISSING\n                 elif col in MODEL_FEATURES: # Expected but somehow still missing\n                      predict_df_processed[col] = IMPUTE_VALUE_WHEN_API_MISSING\n\n            # 4. Final checks and column ordering for scaler\n            missing_scaler_cols = [f for f in SCALER_COLUMNS if f not in predict_df_processed.columns]\n            if missing_scaler_cols:\n                 raise ValueError(f\"Scaler features missing after processing: {missing_scaler_cols}\")\n\n            # Reorder columns to match scaler order before scaling\n            X_predict = predict_df_processed[SCALER_COLUMNS]\n\n            # Final NaN check before scaling\n            if X_predict.isnull().values.any():\n                 nan_cols = X_predict.columns[X_predict.isnull().any()].tolist()\n                 node.error(f\"Predictor - CRITICAL: NaNs found before scaling in {nan_cols}! Filling with 0.\")\n                 X_predict = X_predict.fillna(0)\n\n            # --- Scaling & Prediction ---\n            # node.log(f\"Predictor - Data ready for scaling for {device_id_from_input}: {X_predict.iloc[0].to_dict()}\")\n            X_predict_scaled = scaler.transform(X_predict)\n            raw_prediction = model.predict(X_predict_scaled)[0]\n            # node.log(f\"Predictor - Raw prediction for {device_id_from_input}: {raw_prediction:.4f}\")\n\n            # --- Post-Processing Rule for Idle State ---\n            final_prediction = 0.0 # Default\n            # Check if the conditions for idle are met using the *processed* data\n            try:\n                # Retrieve processed values safely, defaulting to the imputed value if column somehow missing\n                is_printing_val = int(X_predict.get('is_printing', IMPUTE_VALUE_WHEN_API_MISSING).iloc[0])\n                nozzle_actual_val = X_predict.get('nozzle_temp_actual', IMPUTE_VALUE_WHEN_API_MISSING).iloc[0]\n                bed_actual_val = X_predict.get('bed_temp_actual', IMPUTE_VALUE_WHEN_API_MISSING).iloc[0]\n                nozzle_target_val = X_predict.get('nozzle_temp_target', IMPUTE_VALUE_WHEN_API_MISSING).iloc[0]\n                bed_target_val = X_predict.get('bed_temp_target', IMPUTE_VALUE_WHEN_API_MISSING).iloc[0]\n\n                # Check if all relevant conditions indicate idle/off\n                is_idle = (is_printing_val == 0 and\n                           nozzle_actual_val == IMPUTE_VALUE_WHEN_API_MISSING and\n                           bed_actual_val == IMPUTE_VALUE_WHEN_API_MISSING and\n                           nozzle_target_val == IMPUTE_VALUE_WHEN_API_MISSING and\n                           bed_target_val == IMPUTE_VALUE_WHEN_API_MISSING)\n\n                if is_idle:\n                    final_prediction = 0.0\n                    # node.log(f\"Predictor - Post-processing: Setting prediction to 0 for {device_id_from_input} based on idle conditions.\")\n                else:\n                    # Use model prediction, ensuring non-negative\n                    final_prediction = max(0.0, float(raw_prediction) if not np.isnan(raw_prediction) else 0.0)\n                    # node.log(f\"Predictor - Post-processing: Using model prediction {final_prediction:.4f} for {device_id_from_input}.\")\n\n            except Exception as post_proc_e:\n                 node.error(f\"Predictor - Error during post-processing logic for {device_id_from_input}: {post_proc_e}\")\n                 # Fallback to raw (non-negative) prediction if post-processing logic fails\n                 final_prediction = max(0.0, float(raw_prediction) if not np.isnan(raw_prediction) else 0.0)\n\n            # --- Format Output ---\n            output_payload = { \"predicted_power_watts\": final_prediction }\n            output_msg = {'payload': output_payload, 'device_id': device_id_from_input}\n\n        except ValueError as ve: node.error(f\"Predictor - Value error for {device_id_from_input}: {ve}\\\\n{traceback.format_exc()}\"); output_msg = None\n        except Exception as e: node.error(f\"Predictor - General error for {device_id_from_input}: {e}\\\\n{traceback.format_exc()}\"); output_msg = None\n\n# Return the final message object (or None if errors)\nreturn output_msg",
-        "outputs": 1,
-        "x": 640,
-        "y": 460,
+        "id": "58a86847005925d1",
+        "type": "change",
+        "z": "bce1a8251b1947ed",
+        "name": "Restructure Msg",
+        "rules": [
+            {
+                "t": "set",
+                "p": "device_id",
+                "pt": "msg",
+                "to": "payload.device_id",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1140,
+        "y": 420,
         "wires": [
             [
-                "fb9f1203b23b0fbc"
+                "8e63a06e0747ff53"
             ]
-        ],
-        "info": "**Purpose:** The core of the flow. It uses a pre-trained machine learning model to predict the printer's power consumption based on its live sensor readings.\r\n\r\n**Logic:**\r\n1.  **Dynamic Model Selection:** Selects the correct model file (e.g., `best_model.joblib` for Prusa, `ender3_...` for Ender 3) based on the `device_id`.\r\n2.  **Load Artifacts:** Loads the corresponding scaler, feature list, and trained model from the `/home/ubuntu/monitor_ml/models` directory.\r\n3.  **Preprocessing:** Cleans the input features from Node-RED to match the format the model was trained on (e.g., imputing missing values with 0).\r\n4.  **Prediction:** Uses the loaded model to make the `predict()` call.\r\n5.  **Post-processing:** Applies a rule to set the prediction to `0.0` if the features indicate the printer is in an idle or off state.\r\n\r\n**Output:** A `msg.payload` object containing the final prediction, e.g., `{ \"predicted_power_watts\": 85.5 }`."
+        ]
     },
     {
-        "id": "fb9f1203b23b0fbc",
+        "id": "8e63a06e0747ff53",
         "type": "function",
-        "z": "3248d6a231f4e9d0",
-        "g": "ac90879e0d7b329f",
+        "z": "bce1a8251b1947ed",
         "name": "Prepare Prediction Insert",
-        "func": "// msg.payload = { predicted_power_watts: ... } from Python node\n// msg.device_id = \"PrusaMK4-1\" (passed along from before Python node)\n\nconst predictionResult = msg.payload;\nconst deviceId = msg.device_id; // Get device_id passed along\nconst predictionValue = predictionResult?.predicted_power_watts; // Use optional chaining\nconst model_version = 'XGBoost'; // Hardcoded for now\nconst timestamp = new Date().toISOString(); // Use current time for prediction timestamp\n\n// Validation\nif (!deviceId || typeof predictionValue !== 'number' || isNaN(predictionValue)) {\n    node.error(`Invalid data for prediction insert. Device: ${deviceId}, Prediction: ${predictionValue}`, msg);\n    return null; // Stop if data is invalid\n}\n\n// Prepare parameters for the static query in the postgres node\n// Order: timestamp, device_id, predicted_power_watts, model_version\nmsg.params = [\n    timestamp,         // $1\n    deviceId,          // $2\n    predictionValue,   // $3\n    model_version      // $4\n];\n\n// Clean up message\nmsg.payload = {};\nmsg.topic = \"\";\n// delete msg.device_id; // Optional cleanup\n\nreturn msg;",
+        "func": "const predictionResult = msg.payload;\nconst deviceId = msg.device_id;\nconst predictionValue = predictionResult?.predicted_power_watts;\nconst model_version = 'RandomForest_Worker'; // New model name\nconst timestamp = new Date().toISOString();\n\nif (!deviceId || typeof predictionValue !== 'number' || isNaN(predictionValue)) {\n    node.error(`Invalid data for insert. Device: ${deviceId}, Prediction: ${predictionValue}`, msg);\n    return null;\n}\n\nmsg.params = [\n    timestamp,\n    deviceId,\n    predictionValue,\n    model_version\n];\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 970,
-        "y": 460,
+        "x": 1350,
+        "y": 420,
         "wires": [
             [
-                "c67612e2cda72292"
+                "8c32a1748c151d67",
+                "256ed2a4804df5b8"
             ]
-        ],
-        "info": "**Purpose:** Formats the prediction result into the correct structure for saving to the database.\r\n**Logic:** It creates the `msg.params` array with the `timestamp`, `device_id`, `predicted_power_watts`, and `model_version` in the correct order for the final `INSERT` query."
+        ]
     },
     {
-        "id": "c67612e2cda72292",
+        "id": "8c32a1748c151d67",
         "type": "postgresql",
-        "z": "3248d6a231f4e9d0",
-        "g": "ac90879e0d7b329f",
+        "z": "bce1a8251b1947ed",
         "name": "Insert Prediction",
-        "query": "INSERT INTO ml_predictions (\n    timestamp, device_id, predicted_power_watts, model_version\n)\nVALUES ($1, $2, $3, $4)\nON CONFLICT DO NOTHING;",
+        "query": "INSERT INTO ml_predictions (timestamp, device_id, predicted_power_watts, model_version) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING;\n",
         "postgreSQLConfig": "4259e91acb63e17b",
         "split": false,
         "rowsPerMsg": 1,
         "outputs": 1,
-        "x": 980,
-        "y": 520,
+        "x": 1580,
+        "y": 420,
         "wires": [
             []
-        ],
-        "info": "**Purpose:** Inserts the new power prediction into the `ml_predictions` table.\r\n**Logic:** Executes the final `INSERT` query. `ON CONFLICT DO NOTHING` prevents errors from duplicate timestamps."
+        ]
+    },
+    {
+        "id": "8e1db035a234cac1",
+        "type": "debug",
+        "z": "bce1a8251b1947ed",
+        "name": "debug 10",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 380,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "69540d71c5d3d09b",
+        "type": "debug",
+        "z": "bce1a8251b1947ed",
+        "name": "debug 25",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 780,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "7d2d27e02b85ffe2",
+        "type": "delay",
+        "z": "bce1a8251b1947ed",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "580",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 250,
+        "y": 280,
+        "wires": [
+            [
+                "615f6e69f0b3a671"
+            ]
+        ]
+    },
+    {
+        "id": "256ed2a4804df5b8",
+        "type": "debug",
+        "z": "bce1a8251b1947ed",
+        "name": "debug 26",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1490,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "5dda0364e6c3d1e7",
+        "type": "mqtt out",
+        "z": "bce1a8251b1947ed",
+        "name": "",
+        "topic": "predictions/request",
+        "qos": "1",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "ff72b847b3a5073d",
+        "x": 370,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "f619a682057fa1e8",
+        "type": "mqtt in",
+        "z": "bce1a8251b1947ed",
+        "name": "",
+        "topic": "predictions/result",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "ff72b847b3a5073d",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 920,
+        "y": 420,
+        "wires": [
+            [
+                "58a86847005925d1"
+            ]
+        ]
     },
     {
         "id": "fa8886be6b4eac09",

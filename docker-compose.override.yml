@@ -1,12 +1,14 @@
 version: '3.8'
 
 services:
-  nodered:
-    volumes:
-      - ./node-red/flows.json:/data/flows.json
-      - ./node-red/settings.js:/data/settings.js
-    entrypoint: []
-    command: ["npm", "start", "--", "--userDir", "/data"]
+#  nodered:
+#    volumes:
+#      - ./node-red/flows_docker.json:/data/flows_docker.json
+#      - ./node-red/settings.js:/data/settings.js
+#      - ./node-red/flows.json:/data/flows.json
+#      - ./node-red/settings.js:/data/settings.js
+#    entrypoint: []
+#    command: ["npm", "start", "--", "--userDir", "/data"]
 
   python_api:
     volumes:

@@ -1,7 +1,22 @@
+# Ignore Python cache files
+__pycache__/
+*.pyc
+
+# Large SQL 
 *.sql.gz
 *-all-data.sql
+
+# Ignore Node-RED user-specific files and credentials
 node-red/.npm/_logs/
 node-red/.flows_docker_cred.json.backup
 node-red/.npm/_logs/
 node-red/.flows_docker_cred.json.backup
+node-red/*_cred.json
+node-red/config.users.json
+node-red/.config.json
+
+# Ignore temporary backup files
+*.bak
+
+#.env file
 .env
