@@ -14,6 +14,11 @@ The Technical Profile is designed for engineers, developers, and system administ
 *   **Screenshot:**
     ![Node_RED](docs/node-red.png)
 
+#### 1.1.1. Manual Model Training
+
+*   **Description:** Within the Node-RED editor, there is a flow named "Manual Model Training." This provides a simple, one-click action to retrain the system's energy prediction AI.
+*   **Purpose:** Over time, as you print with new materials, use different slicer settings, or change your machine's configuration, the AI's predictions might become less accurate. Running this manual training updates the model with all your latest data, making its energy predictions and efficiency insights smarter and more relevant to your current operations. It's like giving the system a refresher course on how you work.
+
 ### 1.2. Industrial Hybrid Edge
 
 *   **Description:** This is a Grafana dashboard designed for at-a-glance monitoring of the low-level sensor data from the custom ESP32 hardware. It provides real-time gauges and time-series charts for metrics like hot-end temperature (from the MAX6675 thermocouple) and power consumption from the smart plug. It's useful for diagnosing hardware-level issues.
@@ -58,11 +63,15 @@ This report serves as a permanent certificate that can be kept with the physical
 
 ### 2.3. Interactive Analysis
 
-> **Note:** Interactive Analysis is designed for Prusa APIs only. For SimplyPrint, use the DPP Page and Node-RED flows under **Historical Enrichment**.
+*   **Description:** This view loads the custom analysis page (`analysis_page.html`), a powerful tool for understanding your printers' energy consumption. It works for all printers in the fleet and has been enhanced with new analytical capabilities. Users can select a printer, a time range, and various operational "drivers"—such as **Filament Material**, nozzle temperature, or print state—to see how they impact energy use.
 
-*   **Description:** This view loads the custom analysis page (`analysis_page.html`). It provides a powerful, user-friendly interface to run detailed backend analyses. Users can select a specific printer, a time range, and various operational "drivers" (like nozzle temperature) to see how they correlate with energy consumption. The results are displayed in a series of charts and summary tables.
+*   **Key Features:**
+    *   **Automated Insights:** The analysis automatically generates key insights, saving you time. For example, it will show you an "Energy Breakdown by Phase" to identify whether "Printing," "Heating," or "Idle" states consume the most energy.
+    *   **Actionable Suggestions:** Based on the analysis, the page provides a list of "Potential Actions & Suggestions" to help you improve energy efficiency.
+    *   **Identify Key Factors:** The tool helps you understand which factors have the biggest influence on power consumption for a given period.
+
 *   **Screenshot:**
-    ![Interactice Analysis](docs/Interactice%20Analysis.png)
+    [An updated screenshot of the new Interactive Analysis page will be added here.]
 
 ## 3. DPP Profile
 
