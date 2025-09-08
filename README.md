@@ -32,13 +32,22 @@ git clone https://gitlab.com/raptorblingx/enms-project.git
 cd enms-project
 ```
 
-### 2️⃣ Build & run the stack
+### 2️⃣ Create the environment file
+
+The project uses a `.env` file to manage essential variables like database credentials and secrets. Create it by copying the template:
+
+```bash
+cp .env.example .env
+```
+*This file contains default credentials. For any non-local or production use, you should update the `MQTT_PASSWORD` and `NODE_RED_CREDENTIAL_SECRET` with your own secure values.*
+
+### 3️⃣ Build & run the stack
 
 ```bash
 docker compose up --build -d
 ```
 
-### 3️⃣ Access services
+### 4️⃣ Access services
 
 | Service    | URL                                                                   |
 | ---------- | --------------------------------------------------------------------- |
@@ -50,26 +59,17 @@ docker compose up --build -d
 
 ---
 
-## ⚙ Environment Variables (TODO)
+## ⚙ Environment Variables
 
-All sensitive configs are in `.env`:
+All user-configurable variables for the project are managed in a single `.env` file in the root of the repository. This file is not checked into source control and must be created locally.
 
-```env
-POSTGRES_USER=enms_user
-POSTGRES_PASSWORD=secure_password
-POSTGRES_DB=enms_db
-NODE_RED_CREDENTIAL_SECRET=enms-prod-secret-2025
-MQTT_USER=mqtt_user
-MQTT_PASSWORD=mqtt_pass
+To get started, simply copy the provided template:
+```bash
+cp .env.example .env
 ```
+The `.env.example` file contains all the necessary variables with sensible default values for a local development environment.
 
-In addition to the `.env` file for credentials, the project uses environment variables to define paths for data, models, and Python scripts. These are set in the `docker-compose.yml` and `docker-compose.override.yml` files.
-
-| Variable      | Description                                                                                                  | Default Value           |
-|---------------|--------------------------------------------------------------------------------------------------------------|-------------------------|
-| `PROJECT_PY`  | Mounts the entire Python API source code into the `python-api` container. Essential for development.           | `./python-api`          |
-| `MODEL_DIR`   | Mounts the directory containing pre-trained machine learning models into the `node-red` container.             | `./backend/models`      |
-| `DATA_DIR`    | Mounts the directory containing raw data (like CSV files for model training) into the `node-red` container.    | `./backend/data`        |
+**Important:** The default passwords and secrets in the `.env.example` file are for convenience only. You should change `MQTT_PASSWORD` and `NODE_RED_CREDENTIAL_SECRET` to your own secure, randomly generated strings before running the project in any non-local or production setting.
 
 ---
 
@@ -99,12 +99,13 @@ enms-project/
 
 ## 🧩 Included Services
 
-* **Node-RED** – Data ingestion, processing, and automation
-* **PostgreSQL + TimescaleDB** – Optimized time-series database
-* **Grafana** – Real-time dashboards
-* **Python Flask API** – Data access for external apps
-* **Nginx** – Reverse proxy for API & web access
-* **MQTT Broker** – External or internal message broker
+* **Nginx** – Reverse proxy and web server for the frontend application.
+* **Node-RED** – Low-code environment for data ingestion, processing, and automation flows.
+* **PostgreSQL + TimescaleDB** – Optimized time-series database for storing sensor data.
+* **Grafana** – Rich, real-time dashboards for visualizing system and sensor data.
+* **Python API** – A Flask-based API for generating reports and other backend tasks.
+* **Mosquitto** – A lightweight MQTT broker for real-time messaging between services.
+* **ML Worker** – A Python service that runs machine learning models for predictive analytics.
 
 ---
 
