@@ -2,6 +2,31 @@
 
 This document provides a deep dive into the architecture, data flows, interfaces, and deployment procedures for the Energy Management System (ENMS) project.
 
+## System Architecture
+The ENMS platform is built on a modern, decoupled architecture that emphasizes stability, scalability, and maintainability. At its core, the system uses a Producer/Consumer pattern for handling intensive workloads like machine learning predictions, ensuring that no single component can jeopardize the stability of the entire platform.
+
+This section provides a high-level overview of the key services and their roles within the new architecture.
+
+### Key Services
+*   **PostgreSQL (with TimescaleDB):** The central database for storing all time-series data, device metadata, and job histories. It serves as the single source of truth for the entire system.
+*   **Node-RED:** Acts as the primary data orchestration engine. In the context of the live prediction pipeline, its role is simplified to that of a lightweight **Producer**. It periodically queries the database for the latest printer data and publishes it to the MQTT broker for processing.
+*   **Mosquitto:** A high-performance MQTT broker that serves as the central messaging bus. It decouples the data producer (Node-RED) from the data consumer (the `ml_worker`), providing a resilient and asynchronous communication channel.
+*   **`ml_worker`:** A dedicated, standalone Python service responsible for all machine learning inference. As a **Consumer**, it subscribes to prediction requests from the MQTT broker, runs the ML model, and publishes the results. This isolation is critical for system stability.
+*   **`mosquitto_config_generator`:** A utility service that runs once upon initial startup. Its sole purpose is to generate the necessary Mosquitto configuration and password files from environment variables. This enables a "zero-touch" setup, making the project highly portable and easy to deploy.
+
+### Rationale for Decoupled Architecture
+The previous architecture for live predictions was architecturally flawed and created catastrophic stability issues. In the old model, the ML prediction was executed directly within a Node-RED `python-function` node. This meant that for every active printer, Node-RED would attempt to spawn a new Python process in parallel.
+
+This led to a critical problem known as a **"spawn storm"** or **"fork bomb"**:
+*   **Resource Exhaustion:** Attempting to run multiple, heavy Python processes simultaneously led to 100% CPU usage and severe memory pressure.
+*   **System Freezes:** The host server would become unresponsive.
+*   **Cascading Failures:** The extreme resource contention would cause other critical services, including the PostgreSQL database and the Node-RED instance itself, to crash.
+
+The new **Producer/Consumer pattern** was implemented specifically to solve this resource exhaustion problem. By using a message broker (MQTT) to decouple the prediction request from the prediction execution, the system gains several key advantages:
+*   **Stability:** The `ml_worker` processes one request at a time in a sequential, controlled manner, preventing resource storms. The Node-RED producer is lightweight and never at risk of being overwhelmed.
+*   **Resilience:** If the `ml_worker` were to fail, messages would simply queue in the MQTT broker until it restarts. The rest of the system, including data ingestion and the user interface, would remain fully operational.
+*   **Scalability:** In the future, the system could be scaled to handle a massive number of devices by simply running more instances of the `ml_worker` service, each processing messages from the same queue.
+
 ## 1. Architecture Overview
 
 The ENMS platform is designed as a modular, containerized system that follows a layered architecture pattern. This allows for clear separation of concerns, from physical data acquisition at the edge to data processing, storage, and user-facing applications.
@@ -80,7 +105,25 @@ The data flow can be summarized as follows:
     *   **Grafana** directly queries the PostgreSQL database to populate its dashboards.
     *   The **Custom Frontend** makes API calls to endpoints (`/api/dpp_summary`, `/api/analyze`) which in turn query the database (either via the Python Flask API or Node-RED) to get data for visualization.
 
-### 2.2. Data Sources
+### 2.2. Live Prediction Pipeline Data Flow
+The live prediction pipeline operates on a decoupled Producer/Consumer model to ensure stability and performance.
+
+1.  **Produce Request (Node-RED):**
+    *   A flow in Node-RED triggers periodically (e.g., every 10 seconds).
+    *   It queries the PostgreSQL database to get the latest status and features for all active printers.
+    *   For each printer, it constructs a JSON payload containing the feature set required by the ML model.
+    *   It publishes this payload to the `predictions/request` MQTT topic.
+
+2.  **Consume and Predict (`ml_worker`):**
+    *   The `ml_worker` service is subscribed to the `predictions/request` topic.
+    *   Upon receiving a message, it decodes the JSON payload.
+    *   It uses its loaded ML model and scaler to perform a power prediction based on the features.
+
+3.  **Publish Result (`ml_worker`):**
+    *   The `ml_worker` service publishes the prediction result (e.g., `{"predicted_power_watts": 85.5}`) to the `predictions/result` MQTT topic.
+    *   This result is then ingested by a separate Node-RED flow, which saves it to the `ml_predictions` table in the database for historical analysis and visualization.
+
+### 2.3. Data Sources
 
 #### 2.2.1. APIs
 
@@ -326,14 +369,9 @@ Node-RED is the central nervous system of the platform, responsible for data flo
         4.  Formats the results from the Python script into a clean JSON response.
         5.  Sends the JSON response back to the frontend.
 
-*   **Live Predictor Flow:**
-    *   **Function:** Generates real-time power predictions for active printers.
-    *   **Process:**
-        1.  Triggers every 10 seconds.
-        2.  Fetches the latest status for all active Prusa printers.
-        3.  For each printer, it prepares the feature set required by the ML model.
-        4.  Executes a Python function that loads a pre-trained model and predicts the power consumption based on the live features.
-        5.  Inserts the prediction into the `ml_predictions` table.
+*   **Live Predictor Flow (Producer):**
+    *   **Function:** Acts as the **Producer** in the decoupled prediction pipeline.
+    *   **Process:** This flow is now responsible only for gathering data and sending a request. The actual ML inference is handled by the `ml_worker` service. For a detailed breakdown of the entire process, see the **Live Prediction Pipeline Data Flow** section.
 
 ### 4.2. Python Backend
 
