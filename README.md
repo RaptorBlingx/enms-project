@@ -3,73 +3,95 @@
 ## 📌 Overview
 
 The **ENMS Project** is an **IoT-based, real-time monitoring and analytics platform** designed for factories, production facilities, and IoT environments.
-It integrates **Node-RED**, **PostgreSQL**, **Grafana**, **Python Flask API**, and **Nginx** into a **zero-touch Dockerized deployment**.
+It integrates **Node-RED**, **PostgreSQL**, **Grafana**, a dedicated **Python ML Service**, and **Nginx** into a **zero-touch Dockerized deployment**.
 
 Main features:
 
-* Real-time IoT data ingestion (MQTT, Modbus, APIs).
+* Real-time IoT data ingestion via MQTT.
+* A stable, high-performance Machine Learning pipeline for live predictions.
 * PostgreSQL (TimescaleDB) storage for time-series analysis.
 * Grafana dashboards for rich visualization.
-* Node-RED automation flows.
-* Flask API for external integrations.
-* Fully containerized for easy deployment.
+* Node-RED for low-code automation and data processing flows.
+* Fully containerized with Docker Compose for easy and portable deployment.
 
 ---
 
 ## System Architecture
 
-![ENMS Architecture](docs/enms-architecture.png)
+The system is a collection of microservices managed by Docker Compose. The new architecture ensures stability and scalability, especially for the machine learning components.
 
+![ENMS Architecture](docs/enms-architecture.png)
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Getting Started
 
-### 1️⃣ Clone the repository
+Follow these steps to get the entire ENMS stack running on your local machine.
 
+### Prerequisites
+
+*   **Docker** (version 20.10.x or later)
+*   **Docker Compose** (version v2.x or later)
+*   **Git**
+
+### 1. Clone the Repository
+
+First, clone the project to your local machine:
 ```bash
 git clone https://gitlab.com/raptorblingx/enms-project.git
 cd enms-project
 ```
 
-### 2️⃣ Build & run the stack
+### 2. Configure Your Environment
 
+The project uses a `.env` file to manage all secrets and essential configuration, such as database passwords and MQTT credentials. A template is provided for you.
+
+**Crucial Step:** You must copy the example file to create your own local configuration:
+```bash
+cp .env.example .env
+```
+
+Next, open the `.env` file in a text editor and **change the default passwords** to secure values of your choice.
+
+**Example `.env` file:**
+```env
+# PostgreSQL Database Settings
+POSTGRES_USER=enms_user
+POSTGRES_PASSWORD=change_this_to_a_secure_password
+POSTGRES_DB=enms_db
+
+# Node-RED Credentials
+NODE_RED_CREDENTIAL_SECRET=change_this_to_a_long_random_secret
+
+# Mosquitto MQTT Broker Credentials
+# These will be used by the mosquitto_config_generator on first run
+MQTT_USER=mqtt_user
+MQTT_PASSWORD=change_this_to_a_secure_mqtt_password
+```
+
+### 3. Launch the Stack
+
+With your configuration in place, you can build and launch the entire stack with a single command:
 ```bash
 docker compose up --build -d
 ```
+*   `--build`: Builds the custom Docker images (for Node-RED and the ML worker) before starting.
+*   `-d`: Runs the containers in detached mode (in the background).
 
-### 3️⃣ Access services
+The first launch may take a few minutes as Docker downloads images and builds the containers.
 
-| Service    | URL                                                                   |
-| ---------- | --------------------------------------------------------------------- |
-| Node-RED   | [http://localhost:1880](http://localhost:1880)                        |
-| Grafana    | [http://localhost:3000](http://localhost:3000)                        |
-| Web Server | [http://localhost/](http://localhost/)                                |
-| Flask API  | [http://localhost/api/dpp\_summary](http://localhost/api/dpp_summary) |
-| PostgreSQL | `localhost:5432` (user/pass in `.env`)                                |
+### 4. Access the Services
 
----
+Once the containers are running, you can access the various parts of the ENMS platform:
 
-## ⚙ Environment Variables (TODO)
-
-All sensitive configs are in `.env`:
-
-```env
-POSTGRES_USER=enms_user
-POSTGRES_PASSWORD=secure_password
-POSTGRES_DB=enms_db
-NODE_RED_CREDENTIAL_SECRET=enms-prod-secret-2025
-MQTT_USER=mqtt_user
-MQTT_PASSWORD=mqtt_pass
-```
-
-In addition to the `.env` file for credentials, the project uses environment variables to define paths for data, models, and Python scripts. These are set in the `docker-compose.yml` and `docker-compose.override.yml` files.
-
-| Variable      | Description                                                                                                  | Default Value           |
-|---------------|--------------------------------------------------------------------------------------------------------------|-------------------------|
-| `PROJECT_PY`  | Mounts the entire Python API source code into the `python-api` container. Essential for development.           | `./python-api`          |
-| `MODEL_DIR`   | Mounts the directory containing pre-trained machine learning models into the `node-red` container.             | `./backend/models`      |
-| `DATA_DIR`    | Mounts the directory containing raw data (like CSV files for model training) into the `node-red` container.    | `./backend/data`        |
+| Service               | URL                                           | Default Credentials (from `.env`) |
+| --------------------- | --------------------------------------------- | --------------------------------- |
+| **Main Web UI**       | [http://localhost/](http://localhost/)        | -                                 |
+| **Node-RED**          | [http://localhost:1880](http://localhost:1880) | -                                 |
+| **Grafana**           | [http://localhost:3000](http://localhost:3000) | `admin` / `grafana` (first login) |
+| **PostgreSQL DB**     | `localhost:5432`                              | `enms_user` / (your password)     |
+| **Python API** (DPP)  | [http://localhost/api/dpp_summary](http://localhost/api/dpp_summary) | -                               |
+| **MQTT Broker**       | `localhost:1883`                              | `mqtt_user` / (your password)     |
 
 ---
 
@@ -78,14 +100,14 @@ In addition to the `.env` file for credentials, the project uses environment var
 ```
 enms-project/
 │
-├── backend/             # Backend services, including database initialization and ML model training
+├── backend/             # Backend services, including DB init, ML model, and prediction worker
 ├── docs/                # Supporting documentation and architecture diagrams
 ├── frontend/            # Frontend HTML, CSS, and JavaScript files
 ├── grafana/             # Grafana provisioning (datasources, dashboards)
 ├── nginx/               # Nginx reverse proxy configuration
-├── node-red/            # Node-RED flows, settings, and custom nodes
-├── python-api/          # Python Flask application for the DPP API
-├── artistic-resources/  # Image assets for the frontend
+├── node-red/            # Node-RED flows, settings, and custom Dockerfile
+├── python-api/          # Python Flask application for the legacy DPP API
+├── .env.example         # Example environment file
 ├── docker-compose.yml   # Main Docker Compose file for orchestrating services
 ├── ANALYSIS_DEEP_DIVE.md # Deep dive into the analysis engine & ML models
 ├── Custom Hardware.md # Details on custom sensor hardware (ESP32, etc.)
@@ -94,17 +116,6 @@ enms-project/
 ├── ENMS_Technical_Details.md # General project documentation
 └── README.md            # This file
 ```
-
----
-
-## 🧩 Included Services
-
-* **Node-RED** – Data ingestion, processing, and automation
-* **PostgreSQL + TimescaleDB** – Optimized time-series database
-* **Grafana** – Real-time dashboards
-* **Python Flask API** – Data access for external apps
-* **Nginx** – Reverse proxy for API & web access
-* **MQTT Broker** – External or internal message broker
 
 ---
 
@@ -123,5 +134,6 @@ enms-project/
 This project supports **zero-touch deployment**:
 
 * All flows, settings, and dashboards are preloaded.
-* No manual post-deployment configuration required.
+* The MQTT broker is automatically configured on first launch.
+* No manual post-deployment configuration is required.
 * Ready to use immediately after `docker compose up`.

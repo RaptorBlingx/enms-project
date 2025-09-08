@@ -14,13 +14,26 @@ The Technical Profile is designed for engineers, developers, and system administ
 *   **Screenshot:**
     ![Node_RED](docs/node-red.png)
 
-### 1.2. Industrial Hybrid Edge
+### 1.2. Manual Model Training (New Feature)
+
+*   **Description:** This is a special flow within Node-RED that allows you to retrain the system's machine learning model. The model is what powers the smart tips and energy predictions. You should run this flow whenever you make significant changes to your production environment.
+*   **When to Use:** You should trigger this flow after:
+    *   Adding a new type of printer to the fleet.
+    *   Introducing a new filament material (e.g., starting to print with PETG after only using PLA).
+    *   Collecting a significant amount of new data (e.g., after a few weeks of operation).
+*   **How to Use:**
+    1.  Navigate to the **Node-RED** tab.
+    2.  Find the flow named **"Train Model"**.
+    3.  Click the small button on the `Inject` node at the beginning of the flow to start the training process.
+*   **Purpose:** Keeping the model up-to-date ensures that the system's predictions and insights remain accurate and relevant to your specific operational context.
+
+### 1.3. Industrial Hybrid Edge
 
 *   **Description:** This is a Grafana dashboard designed for at-a-glance monitoring of the low-level sensor data from the custom ESP32 hardware. It provides real-time gauges and time-series charts for metrics like hot-end temperature (from the MAX6675 thermocouple) and power consumption from the smart plug. It's useful for diagnosing hardware-level issues.
 *   **Screenshot:**
     ![Industrial Hybird Edge](docs/Industrial%20Hybird%20Edge.png)
 
-### 1.3. Sensor Explorer
+### 1.4. Sensor Explorer
 
 *   **Description:** A detailed Grafana dashboard that allows for deep exploration of all sensor data collected from the ESP32 hubs. Users can view time-series graphs for accelerometer, gyroscope, and environmental sensor data, and correlate them to identify patterns or anomalies in machine behavior.
 *   **Screenshot:**
@@ -58,9 +71,11 @@ This report serves as a permanent certificate that can be kept with the physical
 
 ### 2.3. Interactive Analysis
 
-> **Note:** Interactive Analysis is designed for Prusa APIs only. For SimplyPrint, use the DPP Page and Node-RED flows under **Historical Enrichment**.
-
-*   **Description:** This view loads the custom analysis page (`analysis_page.html`). It provides a powerful, user-friendly interface to run detailed backend analyses. Users can select a specific printer, a time range, and various operational "drivers" (like nozzle temperature) to see how they correlate with energy consumption. The results are displayed in a series of charts and summary tables.
+*   **Description:** This view loads the custom analysis page (`analysis_page.html`). It provides a powerful, user-friendly interface to run detailed backend analyses on historical data. Users can select a specific printer, a time range, and various operational "drivers" to see how they correlate with energy consumption. The results are displayed in a series of charts and summary tables.
+*   **Key Drivers now include:**
+    *   **Operational State:** Nozzle/Bed Temperatures, Print Progress.
+    *   **Print Properties:** The **Filament Material** (e.g., PLA, PETG, ABS) being used for the print.
+    *   **Environmental:** Ambient temperature around the printer.
 *   **Screenshot:**
     ![Interactice Analysis](docs/Interactice%20Analysis.png)
 
@@ -87,4 +102,3 @@ A key feature of the "Recent Print Jobs" table on this dashboard is the ability 
     *   The final "energy plant" image, providing a visual summary of the job's energy footprint.
 
 This report serves as a permanent certificate that can be kept with the physical printed object for traceability and quality assurance.
-
