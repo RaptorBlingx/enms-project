@@ -17,7 +17,6 @@ The Technical Profile is designed for engineers, developers, and system administ
 #### 1.1.1. Manual Model Training
 
 *   **Description:** Within the Node-RED editor, there is a flow named "Manual Model Training." This provides a simple, one-click action to retrain the system's energy prediction AI.
-*   **Purpose:** Over time, as you print with new materials, use different slicer settings, or change your machine's configuration, the AI's predictions might become less accurate. Running this manual training updates the model with all your latest data, making its energy predictions and efficiency insights smarter and more relevant to your current operations. It's like giving the system a refresher course on how you work.
 
 ### 1.2. Industrial Hybrid Edge
 
@@ -71,8 +70,8 @@ This report serves as a permanent certificate that can be kept with the physical
     *   **Identify Key Factors:** The tool helps you understand which factors have the biggest influence on power consumption for a given period.
 
 *   **Screenshot:**
-    [An updated screenshot of the new Interactive Analysis page will be added here.]
-
+    ![Interactice Analysis](docs/Interactice%20Analysis.png)
+    
 ## 3. DPP Profile
 
 The DPP (Digital Product Passport) Profile is a specialized, visually-rich view designed to present a comprehensive "passport" for each machine. It is ideal for showcasing the system's capabilities or for users who need a beautiful and intuitive overview of the printers.
