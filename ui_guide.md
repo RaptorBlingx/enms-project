@@ -70,7 +70,7 @@ This report serves as a permanent certificate that can be kept with the physical
     *   **Identify Key Factors:** The tool helps you understand which factors have the biggest influence on power consumption for a given period.
 
 *   **Screenshot:**
-    ![Interactice Analysis](docs/Interactice%20Analysis.png)
+    ![Interactice Analysis](docs/image.png)
     
 ## 3. DPP Profile
 
