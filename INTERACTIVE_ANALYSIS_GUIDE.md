@@ -37,7 +37,7 @@ You can select drivers from several categories:
 - **Temperatures:** `Nozzle Temp` and `Bed Temp`. Are heating cycles a major energy user?
 - **Print State & Progress:** `Is Printing` and `Z-Height`. How much energy is used during active printing versus idle time?
 - **Environment:** `Ambient Temp` and `Ambient Humidity`. Does the room's temperature affect how much energy the printer needs to stay hot?
-- **Print Properties:** `Filament Material`. Do different materials have different energy footprints?
+- **Print Properties:** `Filament Material`. Do different materials have different energy footprints? (Note: For best results, ensure the model has been recently trained if you have introduced new material types.)
 
 **Step 4: Run the Analysis**
 Click the **Run Energy Analysis** button. The system will fetch the data and perform the analysis, which may take a few moments. The results will then populate in the panel on the right.
@@ -189,6 +189,8 @@ The training process generates several critical files (`.joblib` artifacts) that
 *   `model_features.joblib`: A list of the exact feature names in the correct order that the model expects. This acts as a "contract" to prevent errors during live prediction.
 *   `model_evaluation_metrics.joblib`: A dictionary containing the final evaluation metrics (MAE, RMSE, R²) from the hold-out test set. This data is displayed in the "Overall Model Quality" section of the UI.
 
+> **Note:** The `Live Predictor` pipeline (specifically the `ml_worker` service) also loads these same model artifacts into memory on startup to provide real-time predictions.
+
 ### Performance Optimization: Data Downsampling
 
 To ensure a responsive user experience and prevent API timeouts when analyzing large time ranges (e.g., 7 days or more), the Analysis API incorporates a dynamic data downsampling strategy. Instead of querying and processing every single raw data point over a long period, the system intelligently aggregates the data into larger time buckets.
@@ -260,12 +262,10 @@ Retraining the model is a two-step process that requires access to the server ru
 
 First, you must generate an updated `printer_energy_data_raw.csv` file from the live database. The `backend/export_training_data.py` script is provided for this purpose.
 
-1.  SSH into the host machine or open a shell in the running `enms-nodered` Docker container.
-2.  Navigate to the project directory.
-3.  Run the export script:
+1.  Open a shell on the host machine where the `enms-project` is running.
+2.  Execute the script inside the running `enms-nodered` container using this command:
     ```bash
-    # Inside the enms-nodered container
-    python /usr/src/node-red/backend/export_training_data.py
+    docker compose exec enms-nodered python /usr/src/node-red/backend/export_training_data.py
     ```
     This will connect to the database, run the query to join `energy_data` and `printer_status`, and overwrite the `backend/printer_energy_data_raw.csv` file with the latest data.
 
