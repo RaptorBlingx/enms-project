@@ -62,7 +62,7 @@ This report serves as a permanent certificate that can be kept with the physical
 
 ### 2.3. Interactive Analysis
 
-*   **Description:** This view loads the custom analysis page (`analysis_page.html`), a powerful tool for understanding your printers' energy consumption. It works for all printers in the fleet and has been enhanced with new analytical capabilities. Users can select a printer, a time range, and various operational "drivers"—such as **Filament Material**, nozzle temperature, or print state—to see how they impact energy use.
+*   **Description:** This view loads the custom analysis page (`analysis_page.html`), a powerful tool for understanding your printers' energy consumption. It works for all printers in the fleet and has been enhanced with new analytical capabilities. Users can select a printer, a time range, and various operational "drivers"—such as **Filament Material**, nozzle temperature, or print state—to see how they impact energy use. For a complete walkthrough of all features, see the [Definitive Guide to Interactive Analysis](./INTERACTIVE_ANALYSIS_GUIDE.md).
 
 *   **Key Features:**
     *   **Automated Insights:** The analysis automatically generates key insights, saving you time. For example, it will show you an "Energy Breakdown by Phase" to identify whether "Printing," "Heating," or "Idle" states consume the most energy.
