@@ -244,7 +244,7 @@ This section provides instructions for system administrators or data scientists 
 
 ### Model Retraining
 
-The machine learning model is trained on a static snapshot of data (`printer_energy_data_raw.csv`). Over time, as you collect more data or if the behavior of your printers changes, you may want to retrain the model to improve its accuracy and ensure the insights it provides are relevant.
+The machine learning model is trained on a static snapshot of data. Over time, as you collect more data or if the behavior of your printers changes, you may want to retrain the model to improve its accuracy and ensure the insights it provides are relevant.
 
 #### Why and When to Retrain
 
@@ -256,28 +256,18 @@ You should consider retraining the model if:
 
 #### The Retraining Process
 
-Retraining the model is a two-step process that requires access to the server running the ENMS project.
+Retraining the model is a simple one-click process that is handled entirely by a dedicated flow in the Node-RED UI. This flow automates the two necessary steps: exporting fresh data from the database and then training the new model.
 
-**Step 1: Export Fresh Training Data**
-
-First, you must generate an updated `printer_energy_data_raw.csv` file from the live database. The `backend/export_training_data.py` script is provided for this purpose.
-
-1.  Open a shell on the host machine where the `enms-project` is running.
-2.  Execute the script inside the running `enms-nodered` container using this command:
-    ```bash
-    docker compose exec nodered python /usr/src/node-red/backend/export_training_data.py
-    ```
-    This will connect to the database, run the query to join `energy_data` and `printer_status`, and overwrite the `backend/printer_energy_data_raw.csv` file with the latest data.
-
-**Step 2: Trigger the Manual Model Training Flow**
-
-Once the new data is in place, you can trigger the training process from the Node-RED UI.
+**How to Trigger the Retraining Flow:**
 
 1.  Open the Node-RED editor in your web browser (typically at `http://<host-ip>:1880/`).
 2.  Navigate to the **"Manual Model Training"** flow.
 3.  Click the square button on the left side of the **"Start Model Retraining"** inject node.
 
-
-This will execute the `train_model.py` script, which reads the new CSV file, automatically selects the best model type, trains it, and saves the new model artifacts (`best_model.joblib`, `scaler.joblib`, etc.) to the `models/` directory.
+This single action will:
+1.  **Export Data:** Automatically run the `backend/export_training_data.py` script to generate an up-to-date `printer_energy_data_raw.csv` file from the live database.
+2.  **Train Model:** If the export is successful, it will then run the `backend/train_model.py` script. This script reads the new CSV file, automatically selects the best model type, trains it, and saves the new model artifacts (`best_model.joblib`, `scaler.joblib`, etc.) to the `models/` directory.
 
 The `Analysis API` and `Live Predictor` flows will automatically pick up the new model on their next execution.
+
+> **Important Note:** On a fresh deployment of the ENMS system, the model training will likely fail if run immediately. This is because the database has not yet collected enough diverse data points for the `export_training_data.py` script to create a valid dataset. It is recommended to let the system run for several hours or days to collect sufficient data before attempting the first manual retraining.
