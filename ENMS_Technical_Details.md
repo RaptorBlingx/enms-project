@@ -35,8 +35,7 @@ The ENMS platform is designed as a modular, containerized system that follows a 
 
 The following diagram illustrates the high-level system architecture, showing the four main layers: Perception, Network, Platform, and Application.
 
-![ENMS Architecture](./docs/enms-architecture.png)
-
+![ENMS Architecture](./docs/Systems%20Architecture%20v2.png)
 ### 1.2. Module Descriptions
 
 #### 1.2.1. Perception Layer (The "Things")
