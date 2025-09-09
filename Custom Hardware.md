@@ -40,6 +40,7 @@ The ESP32 Sensor Hub includes the following components:
 
 *   **MAX6675 with K-Type Thermocouple:**
     *   **Purpose:** The MAX6675 is a specialized amplifier that allows the ESP32 to read temperatures from a K-type thermocouple. This provides highly accurate and responsive temperature readings, which can be used to monitor critical components like the printer's hotend or enclosure temperature.
+![Sensor Hub](docs/MAX6675.png)
 
 *   **DHT22 (Temperature & Humidity Sensor):**
     *   **Purpose:** This sensor monitors the ambient temperature and humidity of the room where the printer is located. This data is important because environmental conditions can affect print quality and filament health.
