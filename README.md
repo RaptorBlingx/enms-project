@@ -18,7 +18,7 @@ Main features:
 
 ## System Architecture
 
-![ENMS Architecture](docs/enms-architecture.png)
+![ENMS Architecture](docs/Systems%20Architecture%20v2.png)
 
 
 ---
