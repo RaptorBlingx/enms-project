@@ -265,7 +265,7 @@ First, you must generate an updated `printer_energy_data_raw.csv` file from the 
 1.  Open a shell on the host machine where the `enms-project` is running.
 2.  Execute the script inside the running `enms-nodered` container using this command:
     ```bash
-    docker compose exec enms-nodered python /usr/src/node-red/backend/export_training_data.py
+    docker compose exec nodered python /usr/src/node-red/backend/export_training_data.py
     ```
     This will connect to the database, run the query to join `energy_data` and `printer_status`, and overwrite the `backend/printer_energy_data_raw.csv` file with the latest data.
 
