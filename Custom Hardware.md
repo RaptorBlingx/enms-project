@@ -21,6 +21,7 @@ The data flow is as follows:
 It is crucial to understand that our backend system **does not** interact with the OctoPrint API. Instead, Node-RED polls the **SimplyPrint API**, which provides a unified interface for all printers. The OctoPrint instance is simply a hardware driver, making the legacy printer visible to the cloud platform we use.
 
 ## ESP32 Sensor Hub: Environmental and Operational Insights
+![Sensor Hub](docs/Sensor%20Hub.png)
 
 **Problem:** Standard printer APIs, including SimplyPrint's, provide essential data like temperatures and job progress, but they don't offer insights into the machine's physical environment or its operational vibrations.
 
