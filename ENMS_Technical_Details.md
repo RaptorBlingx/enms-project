@@ -523,7 +523,7 @@ The system uses TimescaleDB to efficiently manage large volumes of time-series d
 
 This section provides a detailed look at specific, advanced modules within the ENMS project.
 
-### 6.1. [Interactive Analysis Module (`/api/analyze`)](frontend/analysis/analysis_page.html)
+### 6.1. Interactive Analysis Module (`/api/analyze`)
 
 > **Note:** Interactive Analysis is designed for Prusa APIs only. For SimplyPrint, use the DPP Page and Node-RED flows under **Historical Enrichment**.
 
@@ -563,7 +563,7 @@ The data flow for a single analysis request is as follows:
     *   The `analysis_page.html` receives the final JSON response.
     *   Its JavaScript code parses the response and uses the Chart.js library to dynamically render the various charts and populate the tables and summary boxes with the analysis results.
 
-For an even more granular, step-by-step walkthrough of this entire workflow and an explanation of the offline machine learning model training process, please see the 🧠 **[Analysis & Machine Learning Deep Dive](./ANALYSIS_DEEP_DIVE.md)**.
+For an even more granular, step-by-step walkthrough of this entire workflow and an explanation of the offline machine learning model training process, please see the 🧠 **[Definitive Guide to Interactive Analysis](./INTERACTIVE_ANALYSIS_GUIDE.md)**.
 
 ## 7. User Interface Guide
 

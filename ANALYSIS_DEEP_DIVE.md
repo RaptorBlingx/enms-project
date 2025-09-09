@@ -4,7 +4,9 @@ This document provides a detailed, technical explanation of two of the most powe
 
 It is intended for developers, system integrators, and technical partners who need to understand how these systems work under the hood.
 
-## 1. [Interactive Analysis Deep Dive](frontend/analysis/analysis_page.html)
+> For a high-level overview and user-facing guide for this feature, please see the **[Definitive Guide to Interactive Analysis](./INTERACTIVE_ANALYSIS_GUIDE.md)**.
+
+## 1. Interactive Analysis Deep Dive
 
 > **Note:** Interactive Analysis is designed for Prusa APIs only. For SimplyPrint, use the DPP Page and Node-RED flows under **Historical Enrichment**.
 
