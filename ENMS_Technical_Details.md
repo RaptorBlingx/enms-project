@@ -523,7 +523,7 @@ The system uses TimescaleDB to efficiently manage large volumes of time-series d
 
 This section provides a detailed look at specific, advanced modules within the ENMS project.
 
-### 6.1. Interactive Analysis Module (`/api/analyze`)
+### 6.1. [Interactive Analysis Module (`/api/analyze`)](frontend/analysis/analysis_page.html)
 
 > **Note:** Interactive Analysis is designed for Prusa APIs only. For SimplyPrint, use the DPP Page and Node-RED flows under **Historical Enrichment**.
 

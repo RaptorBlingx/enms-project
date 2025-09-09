@@ -115,6 +115,7 @@ enms-project/
 *   For **Technical Details** (architecture, data flows, deployment), see: 📜 [`ENMS_Technical_Details.md`](./ENMS_Technical_Details.md)
 *   For a **Guide to the User Interface** and different user profiles, see: 👤 [`ui_guide.md`](./ui_guide.md)
 *   For a **Deep Dive into the Analysis Engine and ML Model Training**, see: 🧠 [`ANALYSIS_DEEP_DIVE.md`](./ANALYSIS_DEEP_DIVE.md)
+*   For a **Guide to the Interactive Analysis Feature**, see: 📊 [`INTERACTIVE_ANALYSIS_GUIDE.md`](./INTERACTIVE_ANALYSIS_GUIDE.md)
 *   For **Details on the Custom Sensor Hardware** and connectivity, see: 🔩 [`Custom Hardware.md`](./Custom%20Hardware.md)
 
 ---
