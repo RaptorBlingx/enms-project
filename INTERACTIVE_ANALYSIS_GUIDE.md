@@ -37,7 +37,7 @@ You can select drivers from several categories:
 - **Temperatures:** `Nozzle Temp` and `Bed Temp`. Are heating cycles a major energy user?
 - **Print State & Progress:** `Is Printing` and `Z-Height`. How much energy is used during active printing versus idle time?
 - **Environment:** `Ambient Temp` and `Ambient Humidity`. Does the room's temperature affect how much energy the printer needs to stay hot?
-- **Print Properties:** `Filament Material`. Do different materials have different energy footprints?
+- **Print Properties:** `Filament Material`. Do different materials have different energy footprints? (Note: For best results, ensure the model has been recently trained if you have introduced new material types.)
 
 **Step 4: Run the Analysis**
 Click the **Run Energy Analysis** button. The system will fetch the data and perform the analysis, which may take a few moments. The results will then populate in the panel on the right.
@@ -189,6 +189,8 @@ The training process generates several critical files (`.joblib` artifacts) that
 *   `model_features.joblib`: A list of the exact feature names in the correct order that the model expects. This acts as a "contract" to prevent errors during live prediction.
 *   `model_evaluation_metrics.joblib`: A dictionary containing the final evaluation metrics (MAE, RMSE, R²) from the hold-out test set. This data is displayed in the "Overall Model Quality" section of the UI.
 
+> **Note:** The `Live Predictor` pipeline (specifically the `ml_worker` service) also loads these same model artifacts into memory on startup to provide real-time predictions.
+
 ### Performance Optimization: Data Downsampling
 
 To ensure a responsive user experience and prevent API timeouts when analyzing large time ranges (e.g., 7 days or more), the Analysis API incorporates a dynamic data downsampling strategy. Instead of querying and processing every single raw data point over a long period, the system intelligently aggregates the data into larger time buckets.
@@ -242,7 +244,7 @@ This section provides instructions for system administrators or data scientists 
 
 ### Model Retraining
 
-The machine learning model is trained on a static snapshot of data (`printer_energy_data_raw.csv`). Over time, as you collect more data or if the behavior of your printers changes, you may want to retrain the model to improve its accuracy and ensure the insights it provides are relevant.
+The machine learning model is trained on a static snapshot of data. Over time, as you collect more data or if the behavior of your printers changes, you may want to retrain the model to improve its accuracy and ensure the insights it provides are relevant.
 
 #### Why and When to Retrain
 
@@ -254,30 +256,18 @@ You should consider retraining the model if:
 
 #### The Retraining Process
 
-Retraining the model is a two-step process that requires access to the server running the ENMS project.
+Retraining the model is a simple one-click process that is handled entirely by a dedicated flow in the Node-RED UI. This flow automates the two necessary steps: exporting fresh data from the database and then training the new model.
 
-**Step 1: Export Fresh Training Data**
-
-First, you must generate an updated `printer_energy_data_raw.csv` file from the live database. The `backend/export_training_data.py` script is provided for this purpose.
-
-1.  SSH into the host machine or open a shell in the running `enms-nodered` Docker container.
-2.  Navigate to the project directory.
-3.  Run the export script:
-    ```bash
-    # Inside the enms-nodered container
-    python /usr/src/node-red/backend/export_training_data.py
-    ```
-    This will connect to the database, run the query to join `energy_data` and `printer_status`, and overwrite the `backend/printer_energy_data_raw.csv` file with the latest data.
-
-**Step 2: Trigger the Manual Model Training Flow**
-
-Once the new data is in place, you can trigger the training process from the Node-RED UI.
+**How to Trigger the Retraining Flow:**
 
 1.  Open the Node-RED editor in your web browser (typically at `http://<host-ip>:1880/`).
 2.  Navigate to the **"Manual Model Training"** flow.
 3.  Click the square button on the left side of the **"Start Model Retraining"** inject node.
 
-
-This will execute the `train_model.py` script, which reads the new CSV file, automatically selects the best model type, trains it, and saves the new model artifacts (`best_model.joblib`, `scaler.joblib`, etc.) to the `models/` directory.
+This single action will:
+1.  **Export Data:** Automatically run the `backend/export_training_data.py` script to generate an up-to-date `printer_energy_data_raw.csv` file from the live database.
+2.  **Train Model:** If the export is successful, it will then run the `backend/train_model.py` script. This script reads the new CSV file, automatically selects the best model type, trains it, and saves the new model artifacts (`best_model.joblib`, `scaler.joblib`, etc.) to the `models/` directory.
 
 The `Analysis API` and `Live Predictor` flows will automatically pick up the new model on their next execution.
+
+> **Important Note:** On a fresh deployment of the ENMS system, the model training will likely fail if run immediately. This is because the database has not yet collected enough diverse data points for the `export_training_data.py` script to create a valid dataset. It is recommended to let the system run for several hours or days to collect sufficient data before attempting the first manual retraining.
