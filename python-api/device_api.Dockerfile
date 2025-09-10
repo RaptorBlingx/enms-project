@@ -20,10 +20,16 @@ WORKDIR /usr/src/app
 COPY --from=builder /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
 
 # Copy the rest of the application's code into the container
-COPY . .
+COPY device_api.py .
 
-# Make port 5000 available to the world outside this container
-EXPOSE 5000
+# Make port 5001 available to the world outside this container
+EXPOSE 5001
+
+# Define environment variables
+ENV DB_HOST=db \
+    DB_NAME=enms \
+    DB_USER=enms \
+    DB_PASSWORD=enms
 
 # Run app.py when the container launches
-CMD ["python", "app.py"]
+CMD ["python", "device_api.py"]

@@ -151,8 +151,7 @@ services:
 
   # 7. Python API Service
   python_api:
-    build:
-      context: ./python-api
+    image: python-api:latest
     container_name: enms_python_api
     restart: unless-stopped
     volumes:
@@ -162,7 +161,22 @@ services:
     depends_on:
       - postgres
 
-  # 8. Web Server (Nginx)
+  # 8. Device API Service
+  device_api:
+    image: device-api:latest
+    container_name: enms_device_api
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    environment:
+      - DB_HOST=postgres
+      - DB_NAME=${POSTGRES_DB}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - postgres
+
+  # 9. Web Server (Nginx)
   web_server:
     image: nginx:latest
     container_name: enms_web_server

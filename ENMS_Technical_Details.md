@@ -231,6 +231,15 @@ The system exposes two main HTTP API endpoints, which are reverse-proxied throug
 *   **`POST /api/analyze`**
     *   **Module:** Node-RED (`Analysis API` flow)
     *   **Purpose:** Executes a detailed energy and performance analysis for a specific device over a given time range. This is the backend for the "Interactive Analysis" page.
+*   **`/api/devices`**
+    *   **Module:** Python Flask API (`python-api/device_api.py`)
+    *   **Purpose:** Provides a set of endpoints for managing devices in the system (CRUD operations).
+    *   **Methods:**
+        *   `GET /api/devices`: Get all devices.
+        *   `GET /api/devices/<device_id>`: Get a specific device.
+        *   `POST /api/devices`: Add a new device.
+        *   `PUT /api/devices/<device_id>`: Update an existing device.
+        *   `DELETE /api/devices/<device_id>`: Delete a device.
     *   **Method:** `POST`
     *   **Request Body:** A JSON object specifying the analysis parameters.
         ```json

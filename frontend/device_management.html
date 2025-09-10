@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .container {
+            padding-top: 20px;
+        }
+        .table-responsive {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>Device Management</h2>
+            <button class="btn btn-primary" data-toggle="modal" data-target="#deviceModal" onclick="prepareAddDevice()">
+                <i class="fas fa-plus"></i> Add Device
+            </button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Device ID</th>
+                        <th>Model</th>
+                        <th>Friendly Name</th>
+                        <th>Location</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="deviceTableBody">
+                    <!-- Device rows will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Device Modal -->
+    <div class="modal fade" id="deviceModal" tabindex="-1" role="dialog" aria-labelledby="deviceModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deviceModalLabel">Add Device</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="deviceForm">
+                        <input type="hidden" id="deviceId">
+                        <div class="form-group">
+                            <label for="deviceModel">Device Model</label>
+                            <input type="text" class="form-control" id="deviceModel" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="friendlyName">Friendly Name</label>
+                            <input type="text" class="form-control" id="friendlyName">
+                        </div>
+                        <div class="form-group">
+                            <label for="location">Location</label>
+                            <input type="text" class="form-control" id="location">
+                        </div>
+                        <div class="form-group">
+                            <label for="shellyId">Shelly ID</label>
+                            <input type="text" class="form-control" id="shellyId">
+                        </div>
+                        <div class="form-group">
+                            <label for="apiIp">API IP</label>
+                            <input type="text" class="form-control" id="apiIp">
+                        </div>
+                        <div class="form-group">
+                            <label for="apiKey">API Key</label>
+                            <input type="text" class="form-control" id="apiKey">
+                        </div>
+                         <div class="form-group">
+                            <label for="notes">Notes</label>
+                            <textarea class="form-control" id="notes"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="saveDevice()">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        const API_URL = '/api/devices';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchDevices();
+        });
+
+        function fetchDevices() {
+            fetch(API_URL)
+                .then(response => response.json())
+                .then(devices => {
+                    const tableBody = document.getElementById('deviceTableBody');
+                    tableBody.innerHTML = '';
+                    devices.forEach(device => {
+                        const row = `
+                            <tr>
+                                <td>${device.device_id}</td>
+                                <td>${device.device_model}</td>
+                                <td>${device.friendly_name}</td>
+                                <td>${device.location}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-info" onclick="prepareEditDevice('${device.device_id}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="deleteDevice('${device.device_id}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                        tableBody.innerHTML += row;
+                    });
+                })
+                .catch(error => console.error('Error fetching devices:', error));
+        }
+
+        function prepareAddDevice() {
+            document.getElementById('deviceForm').reset();
+            document.getElementById('deviceId').value = '';
+            document.getElementById('deviceModalLabel').innerText = 'Add Device';
+        }
+
+        function prepareEditDevice(deviceId) {
+            fetch(`${API_URL}/${deviceId}`)
+                .then(response => response.json())
+                .then(device => {
+                    document.getElementById('deviceId').value = device.device_id;
+                    document.getElementById('deviceModel').value = device.device_model;
+                    document.getElementById('friendlyName').value = device.friendly_name;
+                    document.getElementById('location').value = device.location;
+                    document.getElementById('shellyId').value = device.shelly_id;
+                    document.getElementById('apiIp').value = device.api_ip;
+                    document.getElementById('apiKey').value = device.api_key;
+                    document.getElementById('notes').value = device.notes;
+                    document.getElementById('deviceModalLabel').innerText = 'Edit Device';
+                    $('#deviceModal').modal('show');
+                })
+                .catch(error => console.error('Error fetching device:', error));
+        }
+
+        function saveDevice() {
+            const deviceId = document.getElementById('deviceId').value;
+            const deviceData = {
+                device_model: document.getElementById('deviceModel').value,
+                friendly_name: document.getElementById('friendlyName').value,
+                location: document.getElementById('location').value,
+                shelly_id: document.getElementById('shellyId').value,
+                api_ip: document.getElementById('apiIp').value,
+                api_key: document.getElementById('apiKey').value,
+                notes: document.getElementById('notes').value
+            };
+
+            const method = deviceId ? 'PUT' : 'POST';
+            const url = deviceId ? `${API_URL}/${deviceId}` : API_URL;
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(deviceData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                } else {
+                    $('#deviceModal').modal('hide');
+                    fetchDevices();
+                }
+            })
+            .catch(error => console.error('Error saving device:', error));
+        }
+
+        function deleteDevice(deviceId) {
+            if (confirm('Are you sure you want to delete this device?')) {
+                fetch(`${API_URL}/${deviceId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert('Error: ' + data.error);
+                    } else {
+                        fetchDevices();
+                    }
+                })
+                .catch(error => console.error('Error deleting device:', error));
+            }
+        }
+    </script>
+</body>
+</html>

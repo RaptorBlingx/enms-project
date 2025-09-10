@@ -30,6 +30,12 @@ The Technical Profile is designed for engineers, developers, and system administ
 *   **Screenshot:**
     ![Sensor Explorer](docs/Sensor%20Explorer.png)
 
+### 1.4. Device Management
+
+*   **Description:** This tab provides a CRUD (Create, Read, Update, Delete) interface for managing the devices in the system. Users can add new devices, edit existing ones, and remove devices that are no longer in use.
+*   **Screenshot:**
+    ![Device Management](docs/device-management.png)
+
 ## 2. Staff Profile
 
 The Staff Profile is tailored for factory managers, operations staff, and team members who need to monitor fleet performance, compare machine efficiency, and analyze energy usage without needing to see the underlying system configuration.

@@ -2,6 +2,8 @@
 
 import traceback
 from flask import Flask, jsonify, request
+import requests
+import traceback
 
 # Import our existing function for the summary
 from dpp_simulator import get_live_dpp_data
@@ -10,6 +12,26 @@ from pdf_service import generate_pdf_for_job
 
 app = Flask(__name__)
 
+# Device API configuration
+DEVICE_API_URL = "http://localhost:5001"
+
+@app.route('/api/devices', defaults={'path': ''})
+@app.route('/api/devices/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def proxy_device_api(path):
+    """Proxy requests to the device API."""
+    try:
+        url = f"{DEVICE_API_URL}/api/devices/{path}"
+        response = requests.request(
+            method=request.method,
+            url=url,
+            headers={key: value for (key, value) in request.headers if key != 'Host'},
+            data=request.get_data(),
+            cookies=request.cookies,
+            allow_redirects=False
+        )
+        return (response.content, response.status_code, response.headers.items())
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/dpp_summary', methods=['GET'])
 def dpp_summary():
