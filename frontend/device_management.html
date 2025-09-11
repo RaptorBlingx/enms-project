@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary-bg-color: #f4f7fc;
+            --text-color: #333;
+            --header-bg-color: #ffffff;
+            --table-border-color: #e0e0e0;
+            --button-bg-color: #4a69bd;
+            --button-hover-bg-color: #5d81d2;
+            --delete-button-bg-color: #e74c3c;
+            --delete-button-hover-bg-color: #c0392b;
+            --edit-button-bg-color: #3498db;
+            --edit-button-hover-bg-color: #2980b9;
+            --modal-bg-color: rgba(0, 0, 0, 0.5);
+            --card-bg-color: #ffffff;
+            --input-border-color: #ccc;
+            --input-focus-border-color: #4a69bd;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--primary-bg-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 95%;
+            margin: auto;
+            background-color: var(--card-bg-color);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--table-border-color);
+        }
+
+        h1 { color: var(--button-bg-color); margin: 0; }
+
+        .btn {
+            padding: 10px 18px; border: none; border-radius: 5px; color: white;
+            cursor: pointer; font-size: 16px; transition: background-color 0.2s ease-in-out;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        }
+
+        .btn-add { background-color: var(--button-bg-color); }
+        .btn-add:hover { background-color: var(--button-hover-bg-color); }
+        .btn-delete { background-color: var(--delete-button-bg-color); }
+        .btn-delete:hover { background-color: var(--delete-button-hover-bg-color); }
+        .btn-edit { background-color: var(--edit-button-bg-color); }
+        .btn-edit:hover { background-color: var(--edit-button-hover-bg-color); }
+
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td {
+            padding: 12px 15px; border: 1px solid var(--table-border-color);
+            text-align: left; white-space: nowrap;
+        }
+        th { background-color: var(--primary-bg-color); font-weight: 600; }
+        tr:nth-of-type(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #f1f1f1; }
+        .actions { display: flex; gap: 10px; }
+
+        .modal {
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0;
+            width: 100%; height: 100%; overflow: auto; background-color: var(--modal-bg-color);
+        }
+        .modal-content {
+            background-color: var(--card-bg-color); margin: 5% auto; padding: 25px;
+            border: 1px solid #888; width: 80%; max-width: 700px;
+            border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--table-border-color); padding-bottom: 10px; margin-bottom: 20px;
+        }
+        .modal-header h2 { margin: 0; }
+        .close-btn { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close-btn:hover, .close-btn:focus { color: black; }
+
+        .form-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { margin-bottom: 5px; font-weight: 500; display: flex; align-items: center; gap: 5px; }
+        .form-group input, .form-group select {
+            padding: 10px; border: 1px solid var(--input-border-color);
+            border-radius: 4px; font-size: 14px;
+        }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--input-focus-border-color); }
+
+        .device-type-selector {
+            grid-column: 1 / -1; display: flex; gap: 20px; margin-bottom: 10px;
+            border-bottom: 1px solid #eee; padding-bottom: 20px;
+        }
+        .device-type-selector label { display: flex; align-items: center; gap: 8px; font-size: 1.1em; cursor: pointer;}
+
+        /* --- NEW: Tooltip Styles --- */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltip-icon {
+            color: #aaa;
+            font-size: 14px;
+            cursor: help;
+        }
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 300px;
+            background-color: #555;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -150px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-weight: normal;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .tooltip .tooltip-text h4 { margin: 0 0 5px 0; }
+        .tooltip .tooltip-text strong { color: #f0f0f0; }
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        /* --- End Tooltip Styles --- */
+
+        #loader { text-align: center; padding: 50px; font-size: 1.2em; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1><i class="fa-solid fa-server"></i> Device Management</h1>
+            <button id="addDeviceBtn" class="btn btn-add"><i class="fa-solid fa-plus"></i> Add New Device</button>
+        </div>
+        <div id="loader">Loading devices...</div>
+        <div class="table-container">
+            <table id="devicesTable" style="display:none;">
+                <thead>
+                    <tr>
+                        <th>Friendly Name</th>
+                        <th>Device Model</th>
+                        <th>Device ID</th>
+                        <th>Location</th>
+                        <th>SimplyPrint ID</th>
+                        <th>API IP</th>
+                        <th>Shelly ID</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="deviceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Device</h2>
+                <span class="close-btn">&times;</span>
+            </div>
+            <form id="deviceForm">
+                <input type="hidden" id="editDeviceId">
+                <div class="form-grid">
+
+                    <div class="device-type-selector">
+                        <label><input type="radio" name="device_type" value="prusa" checked> Prusa Printer</label>
+                        <label><input type="radio" name="device_type" value="simplyprint"> SimplyPrint Printer</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="deviceId">Device ID (Primary Key) *</label>
+                        <input type="text" id="deviceId" name="device_id" placeholder="prusa_mk4_main_floor_1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="deviceModel">Device Model *</label>
+                        <input type="text" id="deviceModel" name="device_model" placeholder="Prusa i3 MK4" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="friendlyName">Friendly Name</label>
+                        <input type="text" id="friendlyName" name="friendly_name" placeholder="Prusa MK4 (Main Floor)">
+                    </div>
+                    <div class="form-group">
+                        <label for="location">Location</label>
+                        <input type="text" id="location" name="location" placeholder="Main Factory Floor">
+                    </div>
+                    <div class="form-group">
+                        <label for="shellyId">Shelly ID</label>
+                        <input type="text" id="shellyId" name="shelly_id" placeholder="SPPS-11">
+                    </div>
+
+                    <!-- Prusa-specific fields -->
+                    <div id="prusaFields">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="apiIp">API IP Address *</label>
+                                <input type="text" id="apiIp" name="api_ip" placeholder="192.168.1.123">
+                            </div>
+                            <div class="form-group">
+                                <label for="apiKey">API Key *</label>
+                                <input type="text" id="apiKey" name="api_key" placeholder="4aCdF83jK9sLpQ7">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SimplyPrint-specific fields -->
+                    <div id="simplyprintFields" style="display:none;">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="simplyprintId">SimplyPrint ID *
+                                    <div class="tooltip">
+                                        <i class="fa-regular fa-circle-question tooltip-icon"></i>
+                                        <span class="tooltip-text">
+                                            <h4>What is this?</h4>This is the unique ID for this specific printer inside your SimplyPrint account. The monitoring flow uses this to fetch the correct printer's status.
+                                            <br><br><strong>Where to find it:</strong> In SimplyPrint, go to your printer's page. The ID is usually visible in the printer's settings or in the URL of the page.
+                                        </span>
+                                    </div>
+                                </label>
+                                <input type="text" id="simplyprintId" name="simplyprint_id" placeholder="45821">
+                            </div>
+                            <div class="form-group">
+                                <label for="spCompanyId">SP Company ID *
+                                    <div class="tooltip">
+                                        <i class="fa-regular fa-circle-question tooltip-icon"></i>
+                                        <span class="tooltip-text">
+                                            <h4>What is this?</h4>This is the unique ID for your entire company or organization within SimplyPrint. It tells the API which account to look for your printers in.
+                                            <br><br><strong>Where to find it:</strong> You can find this in your SimplyPrint account settings, usually under the "API" or "Developer" section. It's the same for all printers in your account.
+                                        </span>
+                                    </div>
+                                </label>
+                                <input type="text" id="spCompanyId" name="sp_company_id" placeholder="18492">
+                            </div>
+                            <div class="form-group">
+                                <label for="spApiKey">SP API Key *
+                                    <div class="tooltip">
+                                        <i class="fa-regular fa-circle-question tooltip-icon"></i>
+                                        <span class="tooltip-text">
+                                            <h4>What is this?</h4>This is your secret password for accessing the SimplyPrint API. It proves that your requests are authorized. <strong>Treat this like a password and keep it secure.</strong>
+                                            <br><br><strong>Where to find it:</strong> You can generate this key in your SimplyPrint account settings, usually under the "API" or "Developer" section.
+                                        </span>
+                                    </div>
+                                </label>
+                                <input type="text" id="spApiKey" name="sp_api_key" placeholder="c013f4a9-3017-4b6e-89fe-b84e867fa2b1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Common Fields continued -->
+                    <div class="form-group">
+                        <label for="printerSizeCategory">Printer Size Category</label>
+                        <input type="text" id="printerSizeCategory" name="printer_size_category" placeholder="Standard">
+                    </div>
+                    <div class="form-group">
+                        <label for="bedWidth">Bed Width (mm)</label>
+                        <input type="number" id="bedWidth" name="bed_width" placeholder="250">
+                    </div>
+                    <div class="form-group">
+                        <label for="bedDepth">Bed Depth (mm)</label>
+                        <input type="number" id="bedDepth" name="bed_depth" placeholder="210">
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label for="notes">Notes</label>
+                        <input type="text" id="notes" name="notes">
+                    </div>
+                </div>
+
+                <div class="modal-footer" style="margin-top:25px; text-align:right;">
+                    <button type="submit" class="btn btn-add">Save Device</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+     // const API_BASE_URL = '/api/devices-crud/'; --- (dev verison) ---
+	const API_BASE_URL = '/api/devices/';
+        
+	// --- DOM Elements ---
+        const deviceModal = document.getElementById('deviceModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const deviceForm = document.getElementById('deviceForm');
+        const editDeviceId = document.getElementById('editDeviceId');
+        const deviceIdInput = document.getElementById('deviceId');
+        const closeBtn = document.querySelector('.close-btn');
+        const tableBody = document.getElementById('devicesTable').querySelector('tbody');
+        const loader = document.getElementById('loader');
+        const prusaFields = document.getElementById('prusaFields');
+        const simplyprintFields = document.getElementById('simplyprintFields');
+        const deviceTypeRadios = document.querySelectorAll('input[name="device_type"]');
+
+        // --- NEW: References to specific input fields for validation ---
+        const prusaInputs = prusaFields.querySelectorAll('input');
+        const simplyprintInputs = simplyprintFields.querySelectorAll('input');
+
+        /**
+         * NEW: Dynamically sets required attributes and placeholders based on device type
+         */
+        function toggleDeviceFields(deviceType) {
+            if (deviceType === 'prusa') {
+                prusaFields.style.display = 'block';
+                simplyprintFields.style.display = 'none';
+                // Set Prusa fields as required, SimplyPrint as not
+                prusaInputs.forEach(input => input.required = true);
+                simplyprintInputs.forEach(input => input.required = false);
+
+                // Update placeholders for Prusa
+                deviceForm.elements['device_id'].placeholder = 'prusa_mk4_main_floor_1';
+                deviceForm.elements['device_model'].placeholder = 'Prusa i3 MK4';
+                deviceForm.elements['friendly_name'].placeholder = 'Prusa MK4 (Main Floor)';
+                deviceForm.elements['location'].placeholder = 'Main Factory Floor';
+                deviceForm.elements['shelly_id'].placeholder = 'SPPS-11';
+                deviceForm.elements['bed_width'].placeholder = '250';
+                deviceForm.elements['bed_depth'].placeholder = '210';
+
+            } else { // 'simplyprint'
+                prusaFields.style.display = 'none';
+                simplyprintFields.style.display = 'block';
+                // Set SimplyPrint fields as required, Prusa as not
+                prusaInputs.forEach(input => input.required = false);
+                simplyprintInputs.forEach(input => input.required = true);
+
+                // Update placeholders for SimplyPrint
+                deviceForm.elements['device_id'].placeholder = 'creality_ender3_pro_testing_b';
+                deviceForm.elements['device_model'].placeholder = 'Creality Ender 3 Pro';
+                deviceForm.elements['friendly_name'].placeholder = 'Ender 3 Pro (Test Bench B)';
+                deviceForm.elements['location'].placeholder = 'R&D Department';
+                deviceForm.elements['shelly_id'].placeholder = 'tele/shelly-plug-s/device-B';
+                deviceForm.elements['bed_width'].placeholder = '220';
+                deviceForm.elements['bed_depth'].placeholder = '220';
+            }
+        }
+
+        async function fetchAndDisplayDevices() {
+            loader.style.display = 'block';
+            document.getElementById('devicesTable').style.display = 'none';
+            try {
+                const response = await fetch(API_BASE_URL);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const devices = await response.json();
+
+                tableBody.innerHTML = '';
+                devices.forEach(device => {
+                    const row = tableBody.insertRow();
+                    // MODIFIED: Updated icons
+                    row.innerHTML = `
+                        <td>${device.friendly_name || ''}</td>
+                        <td>${device.device_model || ''}</td>
+                        <td>${device.device_id || ''}</td>
+                        <td>${device.location || ''}</td>
+                        <td>${device.simplyprint_id || ''}</td>
+                        <td>${device.api_ip || ''}</td>
+                        <td>${device.shelly_id || ''}</td>
+                        <td class="actions">
+                            <button class="btn btn-edit" onclick="handleEdit('${device.device_id}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button class="btn btn-delete" onclick="handleDelete('${device.device_id}')"><i class="fa-solid fa-trash-can"></i></button>
+                        </td>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error fetching devices:', error);
+                alert('Could not load devices. Check the console for more details.');
+            } finally {
+                loader.style.display = 'none';
+                document.getElementById('devicesTable').style.display = 'table';
+            }
+        }
+
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+            const formData = new FormData(deviceForm);
+            const deviceData = {};
+            for (let [key, value] of formData.entries()) {
+                if (key !== 'device_type') {
+                   deviceData[key] = value;
+                }
+            }
+
+            const id = editDeviceId.value;
+            const url = id ? `${API_BASE_URL}${id}` : API_BASE_URL;
+            const method = id ? 'PUT' : 'POST';
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(deviceData)
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'An unknown error occurred.');
+                }
+                closeModal();
+                fetchAndDisplayDevices();
+            } catch (error) {
+                console.error('Error saving device:', error);
+                alert(`Failed to save device: ${error.message}`);
+            }
+        }
+
+        async function handleEdit(id) {
+            try {
+                const response = await fetch(`${API_BASE_URL}${id}`);
+                if (!response.ok) throw new Error('Device not found');
+                const device = await response.json();
+
+                modalTitle.textContent = 'Edit Device';
+                editDeviceId.value = device.device_id;
+                deviceIdInput.readOnly = true;
+
+                if (device.simplyprint_id || device.sp_company_id) {
+                    document.querySelector('input[name="device_type"][value="simplyprint"]').checked = true;
+                    toggleDeviceFields('simplyprint');
+                } else {
+                    document.querySelector('input[name="device_type"][value="prusa"]').checked = true;
+                    toggleDeviceFields('prusa');
+                }
+
+                for (const key in device) {
+                    if (deviceForm.elements[key]) {
+                        deviceForm.elements[key].value = device[key] || '';
+                    }
+                }
+                openModal();
+            } catch (error) {
+                console.error('Error fetching device for edit:', error);
+                alert('Could not fetch device details.');
+            }
+        }
+
+        async function handleDelete(id) {
+            if (!confirm(`Are you sure you want to delete device with ID: ${id}?`)) return;
+            try {
+                const response = await fetch(`${API_BASE_URL}${id}`, { method: 'DELETE' });
+                if (!response.ok) throw new Error('Failed to delete device');
+                fetchAndDisplayDevices();
+            } catch (error) {
+                console.error('Error deleting device:', error);
+                alert('Could not delete the device.');
+            }
+        }
+
+        function openModal() { deviceModal.style.display = 'block'; }
+
+        function closeModal() {
+            deviceModal.style.display = 'none';
+            deviceForm.reset();
+            editDeviceId.value = '';
+            deviceIdInput.readOnly = false;
+            modalTitle.textContent = 'Add New Device';
+            document.querySelector('input[name="device_type"][value="prusa"]').checked = true;
+            toggleDeviceFields('prusa');
+        }
+
+        // --- Event Listeners ---
+        document.getElementById('addDeviceBtn').addEventListener('click', () => {
+            // Set the default state before opening
+            toggleDeviceFields('prusa');
+            openModal();
+        });
+        closeBtn.addEventListener('click', closeModal);
+        window.addEventListener('click', (event) => {
+            if (event.target == deviceModal) closeModal();
+        });
+        deviceForm.addEventListener('submit', handleFormSubmit);
+        deviceTypeRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => toggleDeviceFields(e.target.value));
+        });
+
+        // --- Initial Load ---
+        document.addEventListener('DOMContentLoaded', fetchAndDisplayDevices);
+    </script>
+</body>
+</html>

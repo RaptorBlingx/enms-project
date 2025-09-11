@@ -651,7 +651,9 @@
                     <button id="industrialHybridBtn" class="nav-button special-button" data-target="industrial-hybrid"><i class="fa-solid fa-industry"></i> Industrial Hybrid Edge</button>
                     <!-- ADD THIS NEW BUTTON -->
                     <button id="sensorExplorerBtn" class="nav-button" data-target="sensor-explorer"><i class="fa-solid fa-microchip"></i> Sensor Explorer</button>
-                    <!-- NEW: Interactive Analysis Button -->
+                    <!-- ADD THIS NEW BUTTON -->
+		    <button id="deviceMgmtBtn" class="nav-button" data-target="device-management"><i class="fa-solid fa-server"></i> Device Management</button>
+		    <!-- NEW: Interactive Analysis Button -->
                     <button id="interactiveAnalysisBtn" class="nav-button" data-target="interactive-analysis"><i class="fa-solid fa-wand-magic-sparkles"></i> Interactive Analysis</button> <!-- Used a magic wand icon -->
                     <button id="dppBtn" class="nav-button" data-target="dpp"><i class="fa-solid fa-passport"></i> DPP</button> <!-- NEW DPP BUTTON -->
                     <button id="nodeRed" class="nav-button" data-target="node-red"><i class="fa-solid fa-network-wired"></i> Node-RED</button>
@@ -796,7 +798,7 @@
         const profileConfig = {
             technical: {
                 // Technical Profile now has Node-RED, Industrial Hybrid, and Sensor Explorer
-                visibleTabsDataTargets: ['node-red', 'industrial-hybrid', 'sensor-explorer'],
+                visibleTabsDataTargets: ['node-red', 'industrial-hybrid', 'sensor-explorer', 'device-management'],
                 defaultTabDataTarget: 'node-red' // Default to Node-RED for technical users
             },
             staff: {
@@ -989,7 +991,7 @@ const contentSources = {
     'node-red': `${nodeRedBase}/`,
     'industrial-hybrid': `${grafanaBase}/d/de3xeh2upz400e/industrial-hybrid-edge-system?orgId=1&kiosk`,
     'sensor-explorer': `${grafanaBase}/d/cetamfgpx9mo0f/sensor-data-explorer?orgId=1&kiosk`,
-
+    'device-management': 'device_management.html',
     // Sidebar link targets
     'dashboard': `${grafanaBase}/d/det3mvjccv6rkb/fleet-operations-and-machine?orgId=1&kiosk`,
     'reports': "about:blank",
