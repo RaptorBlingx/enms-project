@@ -71,6 +71,7 @@ This is the core of the system where data is processed, stored, and analyzed. Al
     *   **ML Analysis Scripts (`gcode_analyzer.py`, `train_model.py`):**
         *   `gcode_analyzer.py`: Executed by Node-RED to parse G-code files, extract metadata, and generate thumbnails.
         *   `train_model.py`: An offline script used to train the power prediction model. It uses the **XGBoost** algorithm to create a model file (`best_model.joblib`) that the `Live Predictor` flow in Node-RED then uses for making real-time predictions.
+    *   **Device Management API:** A new set of CRUD (Create, Read, Update, Delete) endpoints within the Flask application. This internal API provides the backend for the Device Management page, allowing administrators to directly manage the `devices` table in the database.
       
 
 #### 1.2.4. Application Layer (The User Interface)
@@ -83,6 +84,7 @@ This layer provides the user-facing interfaces for interacting with the system's
     *   Sensor Data Explorer: A detailed view of all sensor readings.
 *   **Custom Web Frontend:** A single-page application (SPA) served by Nginx that provides custom, highly interactive user experiences.
     *   **DPP Card Module:** A visually rich carousel view of "Digital Product Passport" cards for each printer, showing live status, job progress, and a 3D G-code preview.
+    *   **Device Management Page:** A dedicated CRUD interface accessible to the Technical Profile. It allows users to add new printers, edit existing configurations (including API keys and IDs), and delete devices from the system. The form dynamically adapts based on the printer type (Prusa vs. SimplyPrint).
     *   **Artistic Module:** A "gamification" feature that visualizes energy consumption as a growing plant. The artistic resources (images of plants at different stages) are served by Nginx.
     *   **Interactive Analysis Page:** A dedicated page that allows users to select a device, time range, and specific data points ("drivers") to run a detailed backend analysis, which is then visualized using charts.
 *   **Nginx:** A high-performance web server that acts as a reverse proxy, routing incoming web traffic to the appropriate service (Grafana, Node-RED, or the custom frontend files). It also serves the static assets for the frontend (HTML, CSS, JS, images).
@@ -215,7 +217,7 @@ This section details the primary interfaces used for communication between the d
 
 ### 3.1. API Endpoints
 
-The system exposes two main HTTP API endpoints, which are reverse-proxied through Nginx.
+The system exposes several main HTTP API endpoints, which are reverse-proxied through Nginx.
 
 *   **`GET /api/dpp_summary` (The "DPP-API")**
     *   **Module:** Python Flask API (`python-api/app.py` and `dpp_simulator.py`)
@@ -250,6 +252,16 @@ The system exposes two main HTTP API endpoints, which are reverse-proxied throug
         *   `correlation`, `regression`: Statistical analysis results for the selected drivers.
         *   `ml_feature_importance`: The feature importances from the ML model.
         *   `grafanaUrls`: Dynamically generated URLs to view the raw data in a Grafana panel.
+
+*   **`CRUD /api/devices/`**
+    *   **Module:** Python Flask API (`python-api/app.py`)
+    *   **Purpose:** Provides a full set of internal endpoints for managing devices in the `devices` table. This API is the backend for the Device Management page and is protected by network access rules.
+    *   **Endpoints:**
+        *   **`GET /api/devices/`:** Retrieves a list of all configured devices.
+        *   **`POST /api/devices/`:** Creates a new device record.
+        *   **`GET /api/devices/<device_id>`:** Retrieves the complete data for a single device for populating an edit form.
+        *   **`PUT /api/devices/<device_id>`:** Updates the record for a specific device.
+        *   **`DELETE /api/devices/<device_id>`:** Deletes a specific device from the database.
 
 ### 3.2. MQTT Topics
 
