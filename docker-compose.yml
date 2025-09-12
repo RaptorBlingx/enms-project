@@ -155,6 +155,7 @@ services:
       context: ./python-api
     container_name: enms_python_api
     restart: unless-stopped
+    env_file: ./.env
     volumes:
       - generated_pdfs:/app/generated_pdfs
       - ./python-api:/app
