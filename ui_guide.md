@@ -30,6 +30,16 @@ The Technical Profile is designed for engineers, developers, and system administ
 *   **Screenshot:**
     ![Sensor Explorer](docs/Sensor%20Explorer.png)
 
+### 1.4. Device Management
+*   **Description:** This is a powerful CRUD (Create, Read, Update, Delete) interface that allows technical users to directly manage the fleet's configuration in the database. It is the primary tool for adding new printers to the system or updating the credentials for existing ones.
+*   **Key Features:**
+    *   **Unified View:** Displays all registered devices in a clear table.
+    *   **Dynamic Forms:** The "Add New Device" and "Edit" forms intelligently adapt to the type of printer being configured. Selecting "Prusa" shows fields for `api_ip` and `api_key`, while selecting "SimplyPrint" shows fields for `simplyprint_id`, `sp_company_id`, and `sp_api_key`.
+    *   **Data Integrity:** The form enforces required fields to ensure all necessary information for a device is provided.
+    *   **Embedded Help:** User-friendly tooltips (`<i class="fa-regular fa-circle-question"></i>`) are available for complex fields like the SimplyPrint IDs to explain what they are and where to find them.
+*   **Screenshot:**
+    ![Device Management Page](docs/Device%20Managment.png)
+
 ## 2. Staff Profile
 
 The Staff Profile is tailored for factory managers, operations staff, and team members who need to monitor fleet performance, compare machine efficiency, and analyze energy usage without needing to see the underlying system configuration.
