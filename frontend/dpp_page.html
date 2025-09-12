@@ -143,7 +143,6 @@
             transition: transform 0.7s cubic-bezier(0.4, 0.0, 0.2, 1);
         }
 
-        /* REPLACE this rule */
         .printer-card.is-flipped {
             z-index: 10;
             /* Brings the active card to the front */
@@ -151,7 +150,6 @@
             /* Flips the entire card container */
         }
 
-        /* REPLACE this rule */
         .card-face {
             position: absolute;
             top: 0;
@@ -169,8 +167,7 @@
             overflow: hidden;
         }
 
-        /* REPLACE your .card-face-front rules with this */
-        .card-face-front {
+		.card-face-front {
             background-color: white;
             /* Fallback color */
             padding: 1.25rem 1.5rem;
@@ -235,7 +232,6 @@
             /* margin-top: auto; /* This pushes the footer to the very bottom of the flex container */
         }
 
-        /* REPLACE this rule */
         .card-face-front .card-body {
             flex-grow: 1;
             /* This is KEY - allows .card-body to expand and push footer down */
@@ -392,13 +388,11 @@
             font-size: 1.1rem;
         }
 
-        /* REPLACE this rule */
         .card-visual {
             display: none;
             /* The image container is no longer needed */
         }
 
-        /* Style for the iframe container - THIS WILL BE REPLACED/REMOVED LATER for img */
         .card-visual .iframe-container {
             width: 100%;
             max-width: 280px;
