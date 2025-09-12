@@ -25,22 +25,6 @@ DATA_FRESHNESS_THRESHOLD_MINUTES = 15
 
 PLANT_TYPES = ["generic_plant", "corn", "sunflower", "tomato"]
 
-
-# --- Database Credentials (Only needed for LIVE mode fallback) ---
-# DB_NAME = "reg_ml"
-# DB_USER = "reg_ml"
-# DB_PASS = "raptorblingx" # Be cautious storing passwords in scripts
-# DB_HOST = "postrges"
-# DB_PORT = "5432"
-
-# --- SimplyPrint API Credentials ---
-# SIMPLYPRINT_API_KEY = "9993840f-c7f5-430f-b272-bebc45ed8ac8" # Your real key
-# SIMPLYPRINT_COMPANY_ID = "37411"
-
-# --- SimplyPrint API Credentials ---
-# SIMPLYPRINT_API_KEY = "a012f5a8-4046-4fb5-98fe-a95d977fa3c5"
-# SIMPLYPRINT_COMPANY_ID = "17378"
-
 # --- Helper function for plant stage ---
 PLANT_THRESHOLDS = [0.01, 0.018, 0.021, 0.022, 0.024, 0.027, 0.030, 0.04, 0.045, 0.05, 0.06, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.5, 3.0]
 
@@ -61,11 +45,6 @@ def clean_filename(filename):
         return f"{filename[:15]}...{filename[-15:]}"
     return filename # Return the original name if it's not too long
 
-
-
-
-# --- SIMULATED SMART TIPS ---
-# In dpp_simulator.py
 
 # --- SIMULATED SMART TIPS ---
 TIP_RULES = [
@@ -164,8 +143,6 @@ TIP_RULES = [
     }
 ]
 
-# You do NOT need to change the evaluate_tips function itself.
-# Its logic of picking the highest priority tip is exactly what we need.
 
 def parse_gcode_metadata(gcode_content):
     """
