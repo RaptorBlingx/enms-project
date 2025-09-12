@@ -77,7 +77,6 @@ def get_devices():
     conn = get_db_connection()
     if not conn:
         return jsonify({"error": "Database connection failed"}), 500
-    
     try:
         with conn.cursor() as cur:
             cur.execute("""
@@ -90,6 +89,7 @@ def get_devices():
             devices = [dict(zip(columns, row)) for row in cur.fetchall()]
         return jsonify(devices)
     except Exception as e:
+        traceback.print_exc() # <<< THIS IS THE IMPORTANT ADDITION
         return jsonify({"error": str(e)}), 500
     finally:
         if conn:
@@ -101,7 +101,7 @@ def get_device(device_id):
     conn = get_db_connection()
     if not conn:
         return jsonify({"error": "Database connection failed"}), 500
-        
+
     try:
         with conn.cursor() as cur:
             cur.execute("SELECT * FROM public.devices WHERE device_id = %s", (device_id,))
@@ -112,6 +112,7 @@ def get_device(device_id):
             device = dict(zip(columns, device_data))
         return jsonify(device)
     except Exception as e:
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
     finally:
         if conn:
@@ -123,19 +124,19 @@ def add_device():
     new_device = request.get_json()
     if not new_device or not new_device.get('device_id') or not new_device.get('device_model'):
         return jsonify({"error": "device_id and device_model are required"}), 400
-    
+
     conn = get_db_connection()
     if not conn:
         return jsonify({"error": "Database connection failed"}), 500
 
     columns = [key for key in new_device.keys() if new_device[key] not in [None, '']]
     values = [new_device[key] for key in columns]
-    
+
     if not columns:
         return jsonify({"error": "No data provided to insert"}), 400
-        
+
     sql = f"INSERT INTO public.devices ({', '.join(columns)}) VALUES ({', '.join(['%s'] * len(values))}) RETURNING device_id;"
-    
+
     try:
         with conn.cursor() as cur:
             cur.execute(sql, values)
@@ -144,6 +145,7 @@ def add_device():
         return jsonify({"status": "success", "device_id": device_id}), 201
     except Exception as e:
         conn.rollback()
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
     finally:
         if conn:
@@ -165,7 +167,7 @@ def update_device(device_id):
     values.append(device_id)
 
     sql = f"UPDATE public.devices SET {set_clause} WHERE device_id = %s;"
-    
+
     try:
         with conn.cursor() as cur:
             cur.execute(sql, values)
@@ -173,6 +175,7 @@ def update_device(device_id):
         return jsonify({"status": "success", "updated_id": device_id})
     except Exception as e:
         conn.rollback()
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
     finally:
         if conn:
@@ -193,6 +196,7 @@ def delete_device(device_id):
         return jsonify({"status": "success", "deleted_id": device_id})
     except Exception as e:
         conn.rollback()
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
     finally:
         if conn:
