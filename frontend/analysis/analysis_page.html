@@ -608,7 +608,6 @@
             <option value="">Loading Devices...</option>
         </select>
 
-        <!-- Start Replacement: Time Range Section -->
         <fieldset class="time-range-container">
             <legend class="time-range-title">
                 <svg class="time-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18"
@@ -633,10 +632,8 @@
                 <span id="rangeLabel">Initializing...</span>
             </div>
 
-            <!-- Keep the hidden input, ensure value is a valid default (e.g., 24h) -->
             <input type="hidden" id="selectedTimeRange" value="24h">
         </fieldset>
-        <!-- End Replacement: Time Range Section -->
 
         <fieldset class="driver-group">
             <legend>Temperatures</legend>
@@ -1668,7 +1665,7 @@
                     'z_height_mm_missing': 'Z Height Missing',
                     'temperature_c': 'Ambient Temp (°C)',
                     'humidity_percent': 'Ambient Humidity (%)',
-                    'material': 'Filament Material' // <<< ADDED
+                    'material': 'Filament Material' // 
                 };
 
                 // --- Populate Sections ---
@@ -1729,7 +1726,6 @@
                 showLoadingOverlay(summaryLoadingOverlay);
                 showLoadingOverlay(grafanaLoadingOverlay);
 
-                // **** START REPLACE HERE ****
                 try {
                     const response = await fetch(`${NODE_RED_API_BASE}/api/analyze`, {
                         method: 'POST',
@@ -1764,7 +1760,6 @@
                     // Hide loading overlays (ensure hideAllLoadingOverlays function exists)
                     hideAllLoadingOverlays();
                 }
-                // **** END REPLACE HERE ****
 
             } // --- End Main Analysis Handler ---
 
@@ -1938,8 +1933,6 @@
                 }
             }
             // **** END OF NEW FUNCTION ****
-
-            // --- Ensure other functions like setupEventListeners, fetchDeviceList, handleRunAnalysis etc. exist ---
 
         </script>
         <!-- End Script block -->
