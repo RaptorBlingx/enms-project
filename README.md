@@ -12,6 +12,7 @@ Main features:
 * Grafana dashboards for rich visualization.
 * Node-RED automation flows.
 * Flask API for external integrations.
+* Web-based CRUD interface for easy device and credential management.
 * Fully containerized for easy deployment.
 
 ---
