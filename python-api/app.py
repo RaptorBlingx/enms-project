@@ -6,10 +6,17 @@ import psycopg2
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
-# Import our existing function for the summary
-from dpp_simulator import get_live_dpp_data
-# Import our new, dedicated function for PDF generation
-from pdf_service import generate_pdf_for_job
+# These imports might not exist, but let's keep them from your original file
+# If they are the cause of the error, the app won't even start.
+try:
+    from dpp_simulator import get_live_dpp_data
+    from pdf_service import generate_pdf_for_job
+    print("--- DEBUG: Successfully imported dpp_simulator and pdf_service. ---")
+except ImportError:
+    print("--- DEBUG: Could not import dpp_simulator or pdf_service. Ignoring for now. ---")
+    get_live_dpp_data = lambda: {"error": "DPP simulator not available"}
+    generate_pdf_for_job = lambda job_id: {"error": "PDF service not available"}
+
 
 app = Flask(__name__)
 # Initialize CORS to allow cross-origin requests from the frontend
@@ -53,9 +60,11 @@ def generate_dpp_pdf_endpoint():
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
-# --- NEW: Database Connection Function (Docker-aware) ---
+# --- NEW: Database Connection Function (Docker-aware) with DEBUG LOGGING ---
 def get_db_connection():
     """Establishes a connection to the PostgreSQL database using environment variables."""
+    print("--- DEBUG: Attempting to connect to database... ---")
+    print(f"--- DEBUG: Host: {os.environ.get('POSTGRES_HOST')}, Port: {os.environ.get('POSTGRES_PORT')}, DB: {os.environ.get('POSTGRES_DB')}, User: {os.environ.get('POSTGRES_USER')}")
     try:
         conn = psycopg2.connect(
             dbname=os.environ.get('POSTGRES_DB'),
@@ -64,35 +73,48 @@ def get_db_connection():
             host=os.environ.get('POSTGRES_HOST'), # This will be 'postgres' from docker-compose
             port=os.environ.get('POSTGRES_PORT')
         )
+        print("--- DEBUG: Database connection SUCCESSFUL. ---")
         return conn
-    except psycopg2.OperationalError as e:
-        print(f"Error connecting to database: {e}")
+    except Exception as e:
+        # This will now catch ANY exception during connection, not just OperationalError
+        print("--- DEBUG: DATABASE CONNECTION FAILED! ---")
+        traceback.print_exc() # Print the full exception traceback to the logs
         return None
 
 # --- NEW: DEVICE MANAGEMENT API ENDPOINTS ---
 
-# GET /api/devices/ (Fetch all devices for the main table)
+# GET /api/devices/ (Fetch all devices for the main table) - WITH DEBUG LOGGING
 @app.route('/api/devices/', methods=['GET'])
 def get_devices():
+    print("\n--- DEBUG: ENTERED get_devices() endpoint. ---")
     conn = get_db_connection()
+
     if not conn:
-        return jsonify({"error": "Database connection failed"}), 500
+        print("--- DEBUG: get_db_connection() returned None. Exiting with 500. ---")
+        return jsonify({"error": "Database connection failed as reported by get_db_connection"}), 500
+
     try:
+        print("--- DEBUG: Connection object exists, proceeding to create cursor. ---")
         with conn.cursor() as cur:
+            print("--- DEBUG: Cursor created. Executing SQL query... ---")
             cur.execute("""
-                SELECT device_id, device_model, friendly_name, location, notes, 
+                SELECT device_id, device_model, friendly_name, location, notes,
                        shelly_id, api_ip, simplyprint_id, sp_company_id,
-                       printer_size_category, bed_width, bed_depth 
+                       printer_size_category, bed_width, bed_depth
                 FROM public.devices ORDER BY friendly_name ASC
             """)
+            print("--- DEBUG: SQL query executed successfully. Fetching results... ---")
             columns = [desc[0] for desc in cur.description]
             devices = [dict(zip(columns, row)) for row in cur.fetchall()]
+            print("--- DEBUG: Results fetched and processed. Returning data. ---")
         return jsonify(devices)
     except Exception as e:
-        traceback.print_exc() # <<< THIS IS THE IMPORTANT ADDITION
+        print("--- DEBUG: An exception occurred INSIDE THE 'try' block of get_devices(). ---")
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
     finally:
         if conn:
+            print("--- DEBUG: Closing database connection in get_devices(). ---")
             conn.close()
 
 # GET /api/devices/<device_id> (Fetch a single device for the edit form)
@@ -205,4 +227,5 @@ def delete_device(device_id):
 # --- Main execution block ---
 if __name__ == '__main__':
     # For production, debug should be False. Gunicorn or another WSGI server will be used.
+    print("--- DEBUG: Starting Flask development server. ---")
     app.run(host='0.0.0.0', port=5000, debug=False)
