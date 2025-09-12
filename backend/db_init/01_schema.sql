@@ -44,7 +44,7 @@ CREATE TABLE public.devices (
 CREATE TABLE public.print_jobs (
     job_id integer NOT NULL,
     device_id text NOT NULL,
-    simplyprint_job_id text NOT NULL,
+    simplyprint_job_id text,
     start_time timestamp with time zone,
     end_time timestamp with time zone,
     duration_seconds integer,
