@@ -11,6 +11,7 @@ volumes:
   generated_pdfs:
   mosquitto_data:
   mosquitto_config:
+  gcode_previews_data:
 
 services:
   # 1. PostgreSQL Database
@@ -158,6 +159,7 @@ services:
     env_file: ./.env
     volumes:
       - generated_pdfs:/app/generated_pdfs
+      - gcode_previews_data:/app/gcode_previews
       - ./python-api:/app
       - ./backend:/app/backend:rw
     depends_on:
@@ -175,6 +177,7 @@ services:
       - ./frontend:/usr/share/nginx/html
       - ./artistic-resources:/usr/share/nginx/html/artistic-resources
       - generated_pdfs:/usr/share/nginx/html/dpp_reports:ro
+      - gcode_previews_data:/usr/share/nginx/html/gcode_previews:ro
     depends_on:
       - nodered
       - python_api
