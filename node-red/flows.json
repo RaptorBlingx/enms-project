@@ -249,7 +249,6 @@
             "af3255605d249b0d",
             "c59b3ae72ac4073a",
             "075caf0daf376cc6",
-            "de12c14d1a3c57d5",
             "f56cc50a4481ddce",
             "31b1ea47700de376",
             "4958a8c7f64eaabd",
@@ -263,7 +262,8 @@
             "3893c4f9f6dfef59",
             "1a68329a7809840d",
             "853372a55c401c65",
-            "41d230d0ab5a436b"
+            "41d230d0ab5a436b",
+            "427ce1fb3064c7cf"
         ],
         "x": 1714,
         "y": 419,
@@ -3837,7 +3837,7 @@
         "z": "c4582a5c3c4d6d09",
         "g": "b1bed7a2a4a4d39a",
         "name": "Call SimplyPrint API",
-        "method": "POST",
+        "method": "use",
         "ret": "obj",
         "paytoqs": "ignore",
         "url": "",
@@ -3847,6 +3847,7 @@
         "insecureHTTPParser": false,
         "authType": "",
         "senderr": true,
+        "headers": [],
         "x": 680,
         "y": 660,
         "wires": [
@@ -3862,7 +3863,7 @@
         "z": "c4582a5c3c4d6d09",
         "g": "b1bed7a2a4a4d39a",
         "name": "Call Prusa /printer API",
-        "method": "GET",
+        "method": "use",
         "ret": "obj",
         "paytoqs": "ignore",
         "url": "",
@@ -4244,6 +4245,7 @@
         "id": "5a0b6ccc23334296",
         "type": "postgresql",
         "z": "c4582a5c3c4d6d09",
+        "d": true,
         "g": "39cad17b39cec1d1",
         "name": "Check if Job Analyzed",
         "query": "SELECT gcode_analysis_data FROM print_jobs WHERE device_id = $1 AND filename = $2;",
@@ -4263,6 +4265,7 @@
         "id": "6d7486e2afc97f13",
         "type": "switch",
         "z": "c4582a5c3c4d6d09",
+        "d": true,
         "g": "39cad17b39cec1d1",
         "name": "Is Analysis Missing?",
         "property": "payload[0].gcode_analysis_data",
@@ -4287,6 +4290,7 @@
         "id": "9fb13978446f7b8a",
         "type": "function",
         "z": "c4582a5c3c4d6d09",
+        "d": true,
         "g": "39cad17b39cec1d1",
         "name": "Prepare G-code Download",
         "func": "const device = msg.original_device_config;\nconst filename = msg.params[13];\n\n// Store these for the final database update\nmsg.device_id_for_update = msg.params[1];\nmsg.filename_for_update = filename;\n\nmsg.headers = { 'X-Api-Key': device.api_key };\nmsg.url = `http://${device.api_ip}/api/files/local/${filename}`;\nmsg.payload = {};\nreturn msg;",
@@ -4308,6 +4312,7 @@
         "id": "8b6805e59ca0e048",
         "type": "http request",
         "z": "c4582a5c3c4d6d09",
+        "d": true,
         "g": "39cad17b39cec1d1",
         "name": "Download G-code File",
         "method": "GET",
@@ -4333,6 +4338,7 @@
         "id": "e5f04ef6f5bc94fc",
         "type": "function",
         "z": "c4582a5c3c4d6d09",
+        "d": true,
         "g": "39cad17b39cec1d1",
         "name": "Parse G-code & Prep DB",
         "func": "const gcodeText = msg.payload;\nif (typeof gcodeText !== 'string' || gcodeText.length === 0) {\n    node.warn(\"G-code content was empty, skipping analysis.\");\n    return null;\n}\n\n// --- JavaScript version of your Python parser ---\nconst metadata = {};\nconst pattern_equals = /^;\\s*([^=]+?)\\s*=\\s*(.*)/;\nconst lines = gcodeText.split('\\\\n');\n\nfor (const line of lines) {\n    const match = line.match(pattern_equals);\n    if (match) {\n        const key = match[1].trim();\n        const value = match[2].trim();\n        metadata[key] = value;\n    }\n}\n\nconst analysis_data = {};\nif (metadata.layer_height) {\n    analysis_data.layerHeight = parseFloat(metadata.layer_height);\n}\nif (metadata.model_size) {\n    const dims = metadata.model_size.split(',');\n    if (dims.length === 3) {\n        analysis_data.modelSize = {\n            x: parseFloat(dims[0]),\n            y: parseFloat(dims[1]),\n            z: parseFloat(dims[2])\n        };\n    }\n}\n// --- End of parser ---\n\n// Prepare parameters for the final database update\nmsg.params = [\n    JSON.stringify(analysis_data), // The new analysis object\n    msg.device_id_for_update,\n    msg.filename_for_update\n];\n\nreturn msg;",
@@ -4354,6 +4360,7 @@
         "id": "060a8b27d87f8bf9",
         "type": "postgresql",
         "z": "c4582a5c3c4d6d09",
+        "d": true,
         "g": "39cad17b39cec1d1",
         "name": "UPDATE print_jobs with Analysis",
         "query": "UPDATE print_jobs SET gcode_analysis_data = $1 WHERE device_id = $2 AND filename = $3;\n",
@@ -4584,6 +4591,7 @@
         "id": "af3255605d249b0d",
         "type": "comment",
         "z": "c4582a5c3c4d6d09",
+        "d": true,
         "g": "39cad17b39cec1d1",
         "name": "Process: Parse G-code Metadata",
         "info": "**Purpose:** Parses the downloaded G-code file text to extract key metadata left by the slicer (e.g., PrusaSlicer).\n\n**Inputs:**\n- `msg.payload`: The raw text content of the `.gcode` file.\n\n**Logic:**\n- Uses regular expressions to find and extract key-value pairs from the G-code comments (lines starting with `;`).\n- It specifically looks for metadata like `layer_height`, `model_size`, etc.\n- The extracted metadata is formatted into a JSON object.\n\n**Output:**\n- `msg.params`: An array containing the JSON analysis data, `device_id`, and `filename`, ready for the final database `UPDATE` query.",
@@ -4630,7 +4638,7 @@
         "y": 780,
         "wires": [
             [
-                "de12c14d1a3c57d5"
+                "427ce1fb3064c7cf"
             ]
         ]
     },
@@ -4652,30 +4660,6 @@
         "wires": [
             [
                 "c59b3ae72ac4073a"
-            ]
-        ]
-    },
-    {
-        "id": "de12c14d1a3c57d5",
-        "type": "switch",
-        "z": "c4582a5c3c4d6d09",
-        "g": "39cad17b39cec1d1",
-        "name": "Is Analysis Missing?",
-        "property": "payload[0].gcode_analysis_data",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "null"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 1,
-        "x": 2640,
-        "y": 820,
-        "wires": [
-            [
-                "f56cc50a4481ddce"
             ]
         ]
     },
@@ -4707,7 +4691,7 @@
         "g": "39cad17b39cec1d1",
         "name": "API: Download G-code",
         "method": "GET",
-        "ret": "txt",
+        "ret": "bin",
         "paytoqs": "ignore",
         "url": "",
         "tls": "",
@@ -4736,7 +4720,7 @@
         "appendNewline": false,
         "createDir": true,
         "overwriteFile": "true",
-        "encoding": "none",
+        "encoding": "binary",
         "x": 2820,
         "y": 940,
         "wires": [
@@ -4812,7 +4796,7 @@
         "z": "c4582a5c3c4d6d09",
         "g": "39cad17b39cec1d1",
         "name": "Prepare Prusa Analysis for DB",
-        "func": "const analysisResult = msg.payload;\n\n// Stop if the script failed to produce a thumbnail.\nif (!analysisResult || !analysisResult.thumbnail_url) {\n    node.warn(\"Prusa G-code analysis did not return a thumbnail. Stopping.\");\n    return null;\n}\n\n// Prepare parameters for the final SQL UPDATE query.\n// [$1: analysis_data, $2: thumbnail_url, $3: device_id, $4: filename]\nmsg.params = [\n    JSON.stringify(analysisResult),\n    analysisResult.thumbnail_url,\n    msg.device_id_for_update,\n    msg.filename_for_update\n];\n\nreturn msg;",
+        "func": "const result = msg.payload || {};\nconst parsed = result.parsed_data || {};\n\nmsg.params = [\n    // $1: thumbnail_url\n    result.thumbnail_url || null,\n    // $2: duration_seconds\n    parsed.duration_seconds || null,\n    // $3: filament_used_g\n    parsed.filament_used_g || null,\n    // $4: nozzle_diameter\n    parsed.nozzle_diameter || null,\n    // $5: filament_diameter\n    parsed.filament_diameter || null,\n    // $6: gcode_analysis_data (Full reference JSON)\n    result ? JSON.stringify(result) : null,\n    // $7: per_part_analysis (For SimplyPrint compatibility)\n    result.per_part_analysis ? JSON.stringify(result.per_part_analysis) : null,\n    // $8: device_id (for WHERE clause)\n    msg.device_id_for_update,\n    // $9: filename (for WHERE clause)\n    msg.filename_for_update\n];\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -4833,7 +4817,7 @@
         "z": "c4582a5c3c4d6d09",
         "g": "39cad17b39cec1d1",
         "name": "DB: UPDATE Job with Analysis",
-        "query": "UPDATE print_jobs\nSET\n  gcode_analysis_data = $1,\n  thumbnail_url = $2\nWHERE\n  device_id = $3 AND filename = $4;",
+        "query": "UPDATE print_jobs\nSET\n  thumbnail_url = $1,\n  duration_seconds = $2,\n  filament_used_g = $3,\n  nozzle_diameter = $4,\n  filament_diameter = $5,\n  gcode_analysis_data = $6,\n  per_part_analysis = $7\nWHERE\n  device_id = $8 AND filename = $9;",
         "postgreSQLConfig": "4259e91acb63e17b",
         "split": false,
         "rowsPerMsg": 1,
@@ -4884,6 +4868,7 @@
         "id": "95202ab5fa233a47",
         "type": "function",
         "z": "c4582a5c3c4d6d09",
+        "d": true,
         "g": "39cad17b39cec1d1",
         "name": "Format Params for Analysis Check",
         "func": "// This function receives the full message with 16 parameters from the main status update.\n// It correctly extracts only the two parameters needed for the next database node.\n\n// Preserve the original device config for the download step later in the chain.\nmsg.preserved_device_config = msg.original_device_config;\n\n// Overwrite msg.params with a new array containing only device_id and filename.\nmsg.params = [\n    msg.params[1], // device_id\n    msg.params[13] // filename\n];\n\nreturn msg;",
@@ -4983,6 +4968,27 @@
         "y": 600,
         "wires": [],
         "l": false
+    },
+    {
+        "id": "427ce1fb3064c7cf",
+        "type": "function",
+        "z": "c4582a5c3c4d6d09",
+        "g": "39cad17b39cec1d1",
+        "name": "Needs Analysis?",
+        "func": "const row = (msg.payload && msg.payload[0]) || {};\nconst needs = (row.gcode_analysis_data == null) || (row.thumbnail_url == null);\n\n// Only forward when we actually need analysis\nif (needs) return msg;\nreturn null;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2670,
+        "y": 820,
+        "wires": [
+            [
+                "f56cc50a4481ddce"
+            ]
+        ]
     },
     {
         "id": "31749266865874cf",
