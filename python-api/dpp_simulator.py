@@ -281,15 +281,22 @@ def get_live_dpp_data():
             FROM energy_data
             WHERE device_id = d.device_id AND timestamp >= NOW() - INTERVAL '24 hours'
         ), 0) AS kwh_last_24h,
+        
+        -- GET DATA FOR THE CURRENT JOB (if printing)
+        pj.thumbnail_url AS current_job_thumbnail_url,
+        pj.per_part_analysis AS current_job_per_part_analysis,
         pj.gcode_analysis_data,
         pj.session_energy_wh,
         pj.start_energy_wh,
         ed.current_total_wh,
+
+        -- GET DATA FOR THE LAST COMPLETED JOB (if idle)
         lj.session_energy_wh AS last_completed_job_kwh,
         lj.duration_seconds AS last_job_duration_seconds,
         lj.filament_used_g AS last_job_filament_g,
         lj.thumbnail_url AS last_job_thumbnail_url,
         lj.per_part_analysis AS last_job_per_part_analysis,
+        
         hist.history_data
     FROM devices d
     LEFT JOIN LATERAL (
@@ -383,6 +390,8 @@ def get_live_dpp_data():
                     "model": row.get('device_model', 'Unknown Model'),
                     "sizeCategory": row.get('printer_size_category', 'Standard'),
                     "plant_type": PLANT_TYPES[i % len(PLANT_TYPES)],
+                    "thumbnailUrl": row.get('current_job_thumbnail_url') or row.get('last_job_thumbnail_url'),
+                    "lastJobPerPartAnalysis": row.get('current_job_per_part_analysis') or row.get('last_job_per_part_analysis'),
                     "kwhLast24h": float(row['kwh_last_24h'] or 0),
                     "lastJobKwh": float(row.get('last_completed_job_kwh') or 0) / 1000.0,
                     "printTimeSeconds": float(row.get('last_job_duration_seconds') or 0),
