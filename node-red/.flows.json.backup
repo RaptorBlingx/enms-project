@@ -249,7 +249,6 @@
             "af3255605d249b0d",
             "c59b3ae72ac4073a",
             "075caf0daf376cc6",
-            "de12c14d1a3c57d5",
             "f56cc50a4481ddce",
             "31b1ea47700de376",
             "4958a8c7f64eaabd",
@@ -263,13 +262,14 @@
             "3893c4f9f6dfef59",
             "1a68329a7809840d",
             "853372a55c401c65",
-            "41d230d0ab5a436b"
+            "41d230d0ab5a436b",
+            "427ce1fb3064c7cf"
         ],
         "x": 1714,
         "y": 419,
         "w": 2112,
         "h": 762,
-        "info": "This group takes the raw API data, parses it, standardizes it, detects job state changes, and triggers further enrichment processes."
+        "info": "This group takes the raw API data from the input poll, parses it, and standardizes it into a consistent format. It detects job start/end transitions for all printer types and triggers the appropriate database actions. For Prusa printers, it also initiates the G-code download and analysis sub-flow if a print is active."
     },
     {
         "id": "5f3f1baac114fb7c",
@@ -4559,7 +4559,7 @@
         "z": "c4582a5c3c4d6d09",
         "g": "39cad17b39cec1d1",
         "name": "Process: Parse PrusaLink Response & Detect Job State",
-        "info": "**Purpose:** This is the main processing hub for PrusaLink devices. It combines the `/printer` and `/job` API responses, standardizes the data, and detects if a print job has just started or finished.\n\n**Inputs:**\n- `msg.printer_api_response`: The JSON response from the `/printer` endpoint.\n- `msg.payload`: The JSON response from the `/job` endpoint.\n- `msg.original_device_config`: The full database config for the device.\n- `msg.last_status`: The previous state of the printer (is_printing, filename) retrieved from flow memory.\n\n**Logic:**\n1.  Compares `is_printing_now` with `was_printing` from the previous cycle.\n2.  **Job Start Detection:** If `!was_printing && is_printing_now`, it triggers the \"Record Start Energy\" subflow.\n3.  **Job End Detection:** If `was_printing && !is_printing_now`, it triggers the \"Calculate Final Energy\" subflow.\n4.  Formats the combined data into a standardized structure for the `printer_status` database table.\n\n**Outputs:**\n- **Output 1:** A message with standardized `params` for inserting into the `printer_status` table. Sent on every poll.\n- **Output 2:** A trigger message (`CALCULATE_FINAL_ENERGY`) sent *only* when a job has just finished.",
+        "info": "     **Purpose:** This is the main processing hub for PrusaLink devices. It combines the `/printer` and `/job` API responses, standardizes the data, detects job state transitions, and formats the data for insertion into the `printer_status` table.\n    \n     **State Change Logic:**\n     *   **On Job Start:** Detects a transition from not printing to printing and sends a message to create a new record in the `print_jobs` table.\n     *   **On Job End:** Detects a transition from printing to not printing and sends messages to finalize the job record and calculate the final energy usage.\n    \n     **Outputs:**\n     *   **Output 1:** Forwards the standardized status message (`msg.params`) to the main processing pipeline on every poll.\n     *   **Output 2:** Sends a trigger message for final energy calculation **only** when a job finishes.\n     *   **Output 3:** Sends a message to create or update the job status in the `print_jobs` table **only** on a state change.",
         "x": 2000,
         "y": 520,
         "wires": []
@@ -4638,7 +4638,7 @@
         "y": 780,
         "wires": [
             [
-                "de12c14d1a3c57d5"
+                "427ce1fb3064c7cf"
             ]
         ]
     },
@@ -4660,30 +4660,6 @@
         "wires": [
             [
                 "c59b3ae72ac4073a"
-            ]
-        ]
-    },
-    {
-        "id": "de12c14d1a3c57d5",
-        "type": "switch",
-        "z": "c4582a5c3c4d6d09",
-        "g": "39cad17b39cec1d1",
-        "name": "Is Analysis Missing?",
-        "property": "payload[0].gcode_analysis_data",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "null"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 1,
-        "x": 2640,
-        "y": 820,
-        "wires": [
-            [
-                "f56cc50a4481ddce"
             ]
         ]
     },
@@ -4820,7 +4796,7 @@
         "z": "c4582a5c3c4d6d09",
         "g": "39cad17b39cec1d1",
         "name": "Prepare Prusa Analysis for DB",
-        "func": "const result = msg.payload || {};\nconst parsed = result.parsed_data || {};\n\n// This creates an array of parameters for our new, targeted UPDATE query.\nmsg.params = [\n    // $1: thumbnail_url (String)\n    result.thumbnail_url || null,\n\n    // $2: duration_seconds (Integer)\n    parsed.duration_seconds || null,\n\n    // $3: filament_used_g (Numeric)\n    parsed.filament_used_g || null,\n\n    // $4: nozzle_diameter (Real)\n    parsed.nozzle_diameter || null,\n\n    // $5: filament_diameter (Real)\n    parsed.filament_diameter || null,\n\n    // $6: gcode_analysis_data (The full JSON for reference)\n    result ? JSON.stringify(result) : null,\n\n    // $7: per_part_analysis (The result from the original function)\n    result.per_part_analysis ? JSON.stringify(result.per_part_analysis) : null,\n\n    // $8 & $9 are for the WHERE clause\n    msg.device_id_for_update,\n    msg.filename_for_update\n];\n\nreturn msg;",
+        "func": "const result = msg.payload || {};\nconst parsed = result.parsed_data || {};\n\nmsg.params = [\n    // $1: thumbnail_url\n    result.thumbnail_url || null,\n    // $2: duration_seconds\n    parsed.duration_seconds || null,\n    // $3: filament_used_g\n    parsed.filament_used_g || null,\n    // $4: nozzle_diameter\n    parsed.nozzle_diameter || null,\n    // $5: filament_diameter\n    parsed.filament_diameter || null,\n    // $6: gcode_analysis_data (Full reference JSON)\n    result ? JSON.stringify(result) : null,\n    // $7: per_part_analysis (For SimplyPrint compatibility)\n    result.per_part_analysis ? JSON.stringify(result.per_part_analysis) : null,\n    // $8: device_id (for WHERE clause)\n    msg.device_id_for_update,\n    // $9: filename (for WHERE clause)\n    msg.filename_for_update\n];\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -4992,6 +4968,27 @@
         "y": 600,
         "wires": [],
         "l": false
+    },
+    {
+        "id": "427ce1fb3064c7cf",
+        "type": "function",
+        "z": "c4582a5c3c4d6d09",
+        "g": "39cad17b39cec1d1",
+        "name": "Needs Analysis?",
+        "func": "const row = (msg.payload && msg.payload[0]) || {};\nconst needs = (row.gcode_analysis_data == null) || (row.thumbnail_url == null);\n\n// Only forward when we actually need analysis\nif (needs) return msg;\nreturn null;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2670,
+        "y": 820,
+        "wires": [
+            [
+                "f56cc50a4481ddce"
+            ]
+        ]
     },
     {
         "id": "31749266865874cf",

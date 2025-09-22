@@ -245,8 +245,6 @@
             "abc0bca12f6f89e4",
             "721f5a33a2061419",
             "f81e90cc3d42a0f9",
-            "52a6268367a8d644",
-            "af3255605d249b0d",
             "c59b3ae72ac4073a",
             "075caf0daf376cc6",
             "f56cc50a4481ddce",
@@ -263,13 +261,14 @@
             "1a68329a7809840d",
             "853372a55c401c65",
             "41d230d0ab5a436b",
-            "427ce1fb3064c7cf"
+            "427ce1fb3064c7cf",
+            "cbb30734c4289be9"
         ],
         "x": 1714,
         "y": 419,
-        "w": 2112,
+        "w": 1832,
         "h": 762,
-        "info": "This group takes the raw API data, parses it, standardizes it, detects job state changes, and triggers further enrichment processes."
+        "info": "This group takes the raw API data from the input poll, parses it, and standardizes it into a consistent format. It detects job start/end transitions for all printer types and triggers the appropriate database actions. For Prusa printers, it also initiates the G-code download and analysis sub-flow if a print is active."
     },
     {
         "id": "5f3f1baac114fb7c",
@@ -4559,7 +4558,7 @@
         "z": "c4582a5c3c4d6d09",
         "g": "39cad17b39cec1d1",
         "name": "Process: Parse PrusaLink Response & Detect Job State",
-        "info": "**Purpose:** This is the main processing hub for PrusaLink devices. It combines the `/printer` and `/job` API responses, standardizes the data, and detects if a print job has just started or finished.\n\n**Inputs:**\n- `msg.printer_api_response`: The JSON response from the `/printer` endpoint.\n- `msg.payload`: The JSON response from the `/job` endpoint.\n- `msg.original_device_config`: The full database config for the device.\n- `msg.last_status`: The previous state of the printer (is_printing, filename) retrieved from flow memory.\n\n**Logic:**\n1.  Compares `is_printing_now` with `was_printing` from the previous cycle.\n2.  **Job Start Detection:** If `!was_printing && is_printing_now`, it triggers the \"Record Start Energy\" subflow.\n3.  **Job End Detection:** If `was_printing && !is_printing_now`, it triggers the \"Calculate Final Energy\" subflow.\n4.  Formats the combined data into a standardized structure for the `printer_status` database table.\n\n**Outputs:**\n- **Output 1:** A message with standardized `params` for inserting into the `printer_status` table. Sent on every poll.\n- **Output 2:** A trigger message (`CALCULATE_FINAL_ENERGY`) sent *only* when a job has just finished.",
+        "info": "     **Purpose:** This is the main processing hub for PrusaLink devices. It combines the `/printer` and `/job` API responses, standardizes the data, detects job state transitions, and formats the data for insertion into the `printer_status` table.\n    \n     **State Change Logic:**\n     *   **On Job Start:** Detects a transition from not printing to printing and sends a message to create a new record in the `print_jobs` table.\n     *   **On Job End:** Detects a transition from printing to not printing and sends messages to finalize the job record and calculate the final energy usage.\n    \n     **Outputs:**\n     *   **Output 1:** Forwards the standardized status message (`msg.params`) to the main processing pipeline on every poll.\n     *   **Output 2:** Sends a trigger message for final energy calculation **only** when a job finishes.\n     *   **Output 3:** Sends a message to create or update the job status in the `print_jobs` table **only** on a state change.",
         "x": 2000,
         "y": 520,
         "wires": []
@@ -4573,30 +4572,6 @@
         "info": "**Purpose:** For SimplyPrint devices, this node triggers the \"Historical Enrichment Flow\".\n\n**Logic:**\n- It passes the live API response and the device's database configuration to the subflow.\n- The subflow is responsible for making additional API calls to SimplyPrint to get rich details about the current job (e.g., filament usage, start/end times, G-code analysis data).\n- This separation keeps the main flow clean, delegating the complex enrichment logic to a dedicated subflow.\n\n**Next Step:** The \"Historical Enrichment Flow\" will execute and eventually send messages to the \"Data Output\" link-in nodes (`Upsert to print_jobs`, `Insert to printer_status`, etc.).",
         "x": 3030,
         "y": 520,
-        "wires": []
-    },
-    {
-        "id": "52a6268367a8d644",
-        "type": "comment",
-        "z": "c4582a5c3c4d6d09",
-        "g": "39cad17b39cec1d1",
-        "name": "DB: Is G-code Analyzed?",
-        "info": "**Purpose:** Prevents re-analyzing the G-code for a print job that is already in progress and has been analyzed.\n\n**Inputs:**\n- `msg.params`: Contains the `device_id` and `filename`.\n\n**Logic:**\n- Queries the `print_jobs` table to check if the `gcode_analysis_data` column is `NULL` for the current job.\n- If the column is `NULL` (meaning it needs analysis), the message is passed to the \"Is Analysis Missing?\" switch.\n\n**Next Step:** If analysis is needed, the flow proceeds to download and parse the G-code file.",
-        "x": 2890,
-        "y": 620,
-        "wires": [],
-        "icon": "font-awesome/fa-database"
-    },
-    {
-        "id": "af3255605d249b0d",
-        "type": "comment",
-        "z": "c4582a5c3c4d6d09",
-        "d": true,
-        "g": "39cad17b39cec1d1",
-        "name": "Process: Parse G-code Metadata",
-        "info": "**Purpose:** Parses the downloaded G-code file text to extract key metadata left by the slicer (e.g., PrusaSlicer).\n\n**Inputs:**\n- `msg.payload`: The raw text content of the `.gcode` file.\n\n**Logic:**\n- Uses regular expressions to find and extract key-value pairs from the G-code comments (lines starting with `;`).\n- It specifically looks for metadata like `layer_height`, `model_size`, etc.\n- The extracted metadata is formatted into a JSON object.\n\n**Output:**\n- `msg.params`: An array containing the JSON analysis data, `device_id`, and `filename`, ready for the final database `UPDATE` query.",
-        "x": 3670,
-        "y": 820,
         "wires": []
     },
     {
@@ -4989,6 +4964,18 @@
                 "f56cc50a4481ddce"
             ]
         ]
+    },
+    {
+        "id": "cbb30734c4289be9",
+        "type": "comment",
+        "z": "c4582a5c3c4d6d09",
+        "g": "39cad17b39cec1d1",
+        "name": "Is G-code Analyzed?",
+        "info": "     **Purpose:** Prevents re-analyzing the G-code for a print job that has already been successfully analyzed.\n    \n     **Logic:**\n     *   Queries the `print_jobs` table for the current job.\n     *   The subsequent **\"Needs Analysis?\"** function node checks if either the `gcode_analysis_data` or the `thumbnail_url` is `NULL`.\n     *   If either is missing, the message is passed on to trigger a new analysis. Otherwise, the flow is stopped for this branch.\n",
+        "x": 2930,
+        "y": 800,
+        "wires": [],
+        "icon": "font-awesome/fa-database"
     },
     {
         "id": "31749266865874cf",
