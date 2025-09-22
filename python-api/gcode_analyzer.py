@@ -146,6 +146,12 @@ def parse_duration_to_seconds(duration_str):
         return None
 
 def parse_slicer_metadata(gcode_content):
+    """
+    FINAL, REGRESSION-PROOF VERSION.
+    This function parses all valuable key-value pairs from the G-code footer.
+    It then creates a clean 'parsed_data' object with both the specifically typed
+    values for the database columns AND the extra metadata for the frontend's 'job_details'.
+    """
     raw_metadata = {}
     pattern = re.compile(r'^\s*;\s*([^=]+?)\s*=\s*(.*)')
     for line in gcode_content.split('\n'):
@@ -153,27 +159,50 @@ def parse_slicer_metadata(gcode_content):
         if match:
             key = match.group(1).strip()
             raw_metadata[key] = match.group(2).strip()
-
+            
+    # This dictionary will hold all the clean data we extract.
     processed_data = {}
+
+    # --- 1. Process data for dedicated database columns ---
     duration_str = raw_metadata.get("estimated printing time (normal mode)")
     processed_data["duration_seconds"] = parse_duration_to_seconds(duration_str)
+    
     try:
         filament_g_str = raw_metadata.get("filament used [g]")
         processed_data["filament_used_g"] = float(filament_g_str) if filament_g_str else None
     except (ValueError, TypeError):
         processed_data["filament_used_g"] = None
+        
     try:
         nozzle_str = raw_metadata.get("nozzle_diameter")
         processed_data["nozzle_diameter"] = float(nozzle_str) if nozzle_str else None
     except (ValueError, TypeError):
         processed_data["nozzle_diameter"] = None
+        
     try:
         filament_dia_str = raw_metadata.get("filament_diameter")
         processed_data["filament_diameter"] = float(filament_dia_str) if filament_dia_str else None
     except (ValueError, TypeError):
         processed_data["filament_diameter"] = None
-    return processed_data
 
+    # --- 2. ADDED: Process extra data needed by the frontend 'job_details' object ---
+    # The frontend expects 'infill_density_percent', but PrusaSlicer provides 'fill_density' (e.g., "15%").
+    # We will parse this and convert it to a number.
+    try:
+        infill_str = raw_metadata.get("fill_density", "0%")
+        # Remove the '%' and convert to a number
+        processed_data["infill_density_percent"] = float(infill_str.replace('%', ''))
+    except (ValueError, TypeError):
+        processed_data["infill_density_percent"] = None
+        
+    # The frontend expects 'layer_height_mm', PrusaSlicer provides 'layer_height'.
+    try:
+        layer_h_str = raw_metadata.get("layer_height")
+        processed_data["layer_height_mm"] = float(layer_h_str) if layer_h_str else None
+    except (ValueError, TypeError):
+        processed_data["layer_height_mm"] = None
+
+    return processed_data
 # --- PER-PART ANALYSIS (from original script, preserved) ---
 OBJECT_START_RE = re.compile(r'; printing object (.*?)')
 OBJECT_END_RE = re.compile(r'; stop printing object (.*?)')
