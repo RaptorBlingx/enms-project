@@ -1140,12 +1140,12 @@
                 <table id="global-history-table">
                     <thead>
                         <tr>
-                            <th class="preview-cell">Preview</th> <!-- NEW COLUMN -->
+                            <th class="preview-cell">Preview</th>
                             <th data-sort="printerName">Printer Name ↕</th>
                             <th data-sort="filename">Filename ↕</th>
                             <th data-sort="kwh">Energy (kWh) ↕</th>
                             <th data-sort="completedAt">Completed At ↕</th>
-			    <th>Report</th>
+                            <th>Report</th> 
                         </tr>
                     </thead>
                     <tbody id="history-table-body">
@@ -1528,14 +1528,7 @@
                                 <span class="detail-value last-job-time" style="font-size: 0.85em;"></span>
                                 <span class="detail-value last-job-filament" style="font-size: 0.85em;"></span>
                                 <span class="detail-value last-job-energy" style="font-size: 0.85em;"></span>
-
-                                    <!-- START: NEW Per-Part Analysis Placeholder -->
-                                    <div class="per-part-analysis-front">
-                                        <!-- Content will be injected here by JavaScript -->
-                                    </div>
-                                    <!-- END: NEW Placeholder -->
-
-
+                                <div class="per-part-analysis-front"></div>
                             </div>
                             <div class="detail-item">
                                 <span class="detail-label">Energy (Current Session)</span>
@@ -1599,7 +1592,6 @@
                     </div>
                 </div>
 
-                <!-- ===== THIS IS THE CORRECTED PART ===== -->
                 <div class="card-face card-face-back">
                     <h4 style="margin-top:0; display: flex; justify-content: space-between; align-items: center;">
                         <span>Detailed Analysis</span>
@@ -1754,46 +1746,41 @@
                 }
 
                 // --- NEW: Render Per-Part Analysis on Card Front ---
-const analysisContainerFront = cardElement.querySelector('.per-part-analysis-front');
-// We get this data from the main printer object now
-const lastJobAnalysis = printer.lastJobPerPartAnalysis;
+                // --- ADDED: Per-Part Analysis Rendering Logic ---
+                const analysisContainerFront = cardElement.querySelector('.per-part-analysis-front');
+                const perPartAnalysisData = printer.lastJobPerPartAnalysis;
+                const lastJobKwhTotal = printer.lastJobKwh;
 
-if (analysisContainerFront && lastJobAnalysis && lastJobAnalysis.parts && lastJobAnalysis.parts.length > 1) {
-    let analysisHTML = '<h5>Part Breakdown (Est.)</h5><ul>';
-    const totalJobKwh = printer.lastJobKwh || 0;
-
-    lastJobAnalysis.parts.forEach(part => {
-        const partKwh = totalJobKwh * part.energy_percentage;
-        analysisHTML += `
-            <li>
-                <span class="part-name">${part.name}</span>
-                <span class="part-energy">${partKwh.toFixed(3)} kWh</span>
-            </li>
-        `;
-    });
-
-    analysisHTML += '</ul>';
-    analysisContainerFront.innerHTML = analysisHTML;
-    analysisContainerFront.style.display = 'block';
-} else if (analysisContainerFront) {
-    analysisContainerFront.innerHTML = ''; // Clear it out
-    analysisContainerFront.style.display = 'none'; // Hide if no data or only one part
-}
-
-                const tipSectionElement = cardElement.querySelector('.card-tip-section');
-                const tipContentElement = tipSectionElement.querySelector('.tip-content');
-                const newTipText = printer.tipText || "";
-                if (newTipText) {
-                    if (tipContentElement.textContent !== newTipText) tipContentElement.textContent = newTipText;
-                    tipSectionElement.style.display = 'block';
-                } else {
-                    tipSectionElement.style.display = 'none';
+                if (analysisContainerFront && perPartAnalysisData && perPartAnalysisData.parts && perPartAnalysisData.parts.length > 1 && lastJobKwhTotal > 0) {
+                    let analysisHTML = '<h5>Part Breakdown (Est.)</h5><ul>';
+                    perPartAnalysisData.parts.forEach(part => {
+                        const partKwh = lastJobKwhTotal * (part.energy_percentage || 0);
+                        analysisHTML += `
+                            <li>
+                                <span class="part-name">${part.name}</span>
+                                <span class="part-energy">${partKwh.toFixed(3)} kWh</span>
+                            </li>
+                        `;
+                    });
+                    analysisHTML += '</ul>';
+                    analysisContainerFront.innerHTML = analysisHTML;
+                    analysisContainerFront.style.display = 'block';
+                } else if (analysisContainerFront) {
+                    analysisContainerFront.style.display = 'none';
                 }
+                
+                // --- ADDED: Card Background Image Logic ---
+                const thumbnailUrl = printer.thumbnailUrl;
                 const frontFace = cardElement.querySelector('.card-face-front');
-                const newPlantImageSrc = getPlantImageSrc(printer.plant_type, printer.plantStage);
-                const newUrlStyle = `url("${newPlantImageSrc}")`;
+                let newImageUrl;
+                if (thumbnailUrl) {
+                    newImageUrl = thumbnailUrl;
+                } else {
+                    newImageUrl = getPlantImageSrc(printer.plant_type, printer.plantStage);
+                }
+                const newUrlStyle = `url("${newImageUrl}")`;
                 if (frontFace.style.backgroundImage !== newUrlStyle) {
-                    frontFace.style.backgroundImage = `url('${newPlantImageSrc}')`;
+                    frontFace.style.backgroundImage = newUrlStyle;
                 }
 
                 cardElement.dataset.stale = "false";
@@ -1802,7 +1789,7 @@ if (analysisContainerFront && lastJobAnalysis && lastJobAnalysis.parts && lastJo
             existingCardElements.forEach(card => {
                 if (card.dataset.stale === 'true') card.remove();
             });
-        } // End renderCards function
+        }
 
         // --- Fetch Data Function ---
 
@@ -2088,7 +2075,7 @@ if (analysisContainerFront && lastJobAnalysis && lastJobAnalysis.parts && lastJo
             });
 
             if (filteredData.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="5">No matching jobs found.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="6">No matching jobs found.</td></tr>`;
                 return;
             }
 
