@@ -948,6 +948,44 @@
     color: var(--gray-800);
 }
 
+/* --- NEW: Pagination Button Styling --- */
+#history-pagination {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.25rem;
+}
+#history-pagination button {
+    padding: 0.5rem 0.8rem;
+    border: 1px solid var(--gray-300);
+    background-color: white;
+    color: var(--gray-700);
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+#history-pagination button:not(:disabled):hover {
+    background-color: var(--gray-100);
+    border-color: var(--gray-400);
+}
+#history-pagination button.active-page {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    font-weight: 600;
+}
+#history-pagination button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+#history-pagination span {
+    padding: 0 0.5rem;
+    color: var(--gray-400);
+}
     </style>
 </head>
 
@@ -1153,6 +1191,7 @@
                     </tbody>
                 </table>
             </div>
+          <div id="history-pagination" style="text-align: center; margin-top: 1rem;"></div>
         </div>
         <!-- END: Global History Section -->
 
@@ -1171,9 +1210,7 @@
 
     </div> <!-- End Main Container -->
 
-    <!-- No JavaScript needed for this static version -->
 
-    <!-- Add this script block before the closing </body> tag -->
     <!-- Add this script block before the closing </body> tag -->
     <script type="module">
         import * as THREE from 'three';
@@ -1182,7 +1219,9 @@
         import { FileLoader } from 'three'; // <-- ADD THIS LINE
 
         let globalPrinterDataCache = []; // To store the latest fetched printer data
-        let globalHistoryCache = []; // To store the fetched history data
+        let globalHistoryCache = { items: [], totalPages: 1 }; // Store the whole history object
+        let currentPage = 1; // Add state for current page
+        let currentSearchTerm = ''; // Add state for search term
         let currentSort = { key: 'completedAt', direction: 'desc' }; // Default sort order
         let swiper = null;
         let firstLoadDone = false;
@@ -1804,10 +1843,19 @@
             showLoading(); // Show loading indicator at the start of fetch
 
             try {
-                let apiUrl = API_ENDPOINT; // Original endpoint
-                if (currentScenario && currentScenario !== 'live') {
-                    apiUrl += `?scenario=${encodeURIComponent(currentScenario)}`;
+                // --- MODIFIED: Build a dynamic URL with pagination and search ---
+                const params = new URLSearchParams({
+                    page: currentPage,
+                    limit: 12 // Or your desired page size
+                });
+                if (currentSearchTerm) {
+                    params.append('searchTerm', currentSearchTerm);
                 }
+                if (currentScenario && currentScenario !== 'live') {
+                    params.append('scenario', currentScenario);
+                }
+                const apiUrl = `${API_ENDPOINT}?${params.toString()}`;
+                console.log("FETCHING DATA:", apiUrl); // Helpful for debugging
 
                 const response = await fetch(apiUrl);
                 if (!response.ok) {
@@ -1914,17 +1962,15 @@
                     printerCard.classList.remove('is-flipped');
                 }
                 const searchInput = document.getElementById('history-search');
-                const tableHeaders = document.querySelectorAll('#global-history-table th');
-
-                searchInput.addEventListener('input', renderHistoryTable);
+                if (searchInput) {
+                    searchInput.addEventListener('input', handleSearch);
+                }
+                const tableHeaders = document.querySelectorAll('#global-history-table th[data-sort]');
                 tableHeaders.forEach(header => {
                     header.addEventListener('click', () => handleSort(header.dataset.sort));
                 });
 
-
             });
-
-
 
             // --- Simulation Button Logic ---
             const simButtons = document.querySelectorAll('.simulation-buttons button.sim-btn');
@@ -2051,64 +2097,82 @@
         }
 
         // --- NEW: Global History Functions ---
-        function renderHistoryTable() {
+                function renderHistoryTable() {
             const tableBody = document.getElementById('history-table-body');
-            const searchInput = document.getElementById('history-search');
-            if (!tableBody || !searchInput) return;
+            if (!tableBody) return;
 
-            const searchTerm = searchInput.value.toLowerCase();
+            const items = globalHistoryCache.items || [];
 
-            const filteredData = globalHistoryCache.filter(job =>
-                job.printerName.toLowerCase().includes(searchTerm) ||
-                job.filename.toLowerCase().includes(searchTerm)
-            );
+            if (items.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No matching jobs found.</td></tr>`;
+            } else {
+                 tableBody.innerHTML = items.map(job => {
+                    const completedDate = job.completedAt ? new Date(job.completedAt).toLocaleString() : 'N/A';
+                    const kwh = typeof job.kwh === 'number' ? job.kwh.toFixed(3) : 'N/A';
+                    const pdfButton = job.pdfUrl
+                        ? `<a href="${job.pdfUrl}" target="_blank" title="Download DPP Report" style="color: var(--danger); font-size: 1.1em;"><i class="fas fa-file-pdf"></i></a>`
+                        : '';
+                    return `
+                    <tr>
+                        <td class="preview-cell">${job.thumbnailUrl ? `<img src="${job.thumbnailUrl}" class="history-thumbnail">` : ''}</td>
+                        <td>${job.printerName}</td>
+                        <td title="${job.filename}">${job.filename}</td>
+                        <td class="energy-cell">${kwh}</td>
+                        <td>${completedDate}</td>
+                        <td>${pdfButton}</td>
+                    </tr>`;
+                }).join('');
+            }
+            // After rendering the table, create the pagination controls
+            renderPaginationControls();
+        }
 
-            filteredData.sort((a, b) => {
-                const valA = a[currentSort.key];
-                const valB = b[currentSort.key];
-                if (valA === null) return 1;
-                if (valB === null) return -1;
-                let comparison = 0;
-                if (valA > valB) comparison = 1;
-                else if (valA < valB) comparison = -1;
-                return currentSort.direction === 'desc' ? comparison * -1 : comparison;
-            });
-
-            if (filteredData.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="6">No matching jobs found.</td></tr>`;
+        function renderPaginationControls() {
+            const container = document.getElementById('history-pagination');
+            const totalPages = globalHistoryCache.totalPages || 1;
+            const currentPage = globalHistoryCache.currentPage || 1;
+            if (!container || totalPages <= 1) {
+                if(container) container.innerHTML = '';
                 return;
             }
 
-            tableBody.innerHTML = filteredData.map(job => {
-                const completedDate = job.completedAt ? new Date(job.completedAt).toLocaleString() : 'N/A';
-                const kwh = typeof job.kwh === 'number' ? job.kwh.toFixed(3) : 'N/A';
-                const pdfButton = job.pdfUrl
-		    ? `<a href="${job.pdfUrl}" target="_blank" title="Download DPP Report" style="color: var(--danger); font-size: 1.1em;"><i class="fas fa-file-pdf"></i></a>`
-		    : ''; // Otherwise, it's an empty string
-		return `
-                <tr>
-                    <td class="preview-cell">
-                        ${job.thumbnailUrl ? `<img src="${job.thumbnailUrl}" class="history-thumbnail">` : ''}
-                    </td>
-                    <td>${job.printerName}</td>
-                    <td title="${job.filename}">${job.filename}</td>
-                    <td class="energy-cell">${kwh}</td>
-                    <td>${completedDate}</td>
-		    <td>${pdfButton}</td>
-                </tr>
-            `;
-            }).join('');
+            let buttonsHTML = `<button onclick="handlePageClick(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>&laquo; Prev</button>`;
+            // Add smart ellipsis logic for page numbers
+            const pages = [...new Set([1, ...Array.from({length: 5}, (_, i) => Math.max(2, currentPage - 2 + i)).filter(p => p < totalPages), totalPages])];
+            let lastPage = 0;
+            pages.forEach(p => {
+                if (lastPage > 0 && p > lastPage + 1) buttonsHTML += `<span>...</span>`;
+                buttonsHTML += `<button onclick="handlePageClick(${p})" class="${p === currentPage ? 'active-page' : ''}">${p}</button>`;
+                lastPage = p;
+            });
+            buttonsHTML += `<button onclick="handlePageClick(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next &raquo;</button>`;
+            container.innerHTML = buttonsHTML;
+        }
+
+        function handlePageClick(page) {
+            if (page < 1 || page > globalHistoryCache.totalPages) return;
+            currentPage = page;
+            fetchDppData();
+        }
+
+        let searchTimeout;
+        function handleSearch(event) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                currentSearchTerm = event.target.value;
+                currentPage = 1; // Reset to page 1 on new search
+                fetchDppData();
+            }, 300);
         }
 
         function handleSort(sortKey) {
-            if (currentSort.key === sortKey) {
-                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-            } else {
-                currentSort.key = sortKey;
-                currentSort.direction = 'desc';
-            }
-            renderHistoryTable();
+            // NOTE: Server-side sorting would require passing sortKey to the backend.
+            // For now, this is a placeholder.
+            console.log(`Sorting by ${sortKey} would require a backend change.`);
         }
+
+        // Make page click handler globally accessible for onclick attributes
+        window.handlePageClick = handlePageClick;
 
 
 

@@ -248,7 +248,7 @@ def evaluate_tips(printer_data):
 
 
 # --- Main Execution ---
-def get_live_dpp_data():
+def get_live_dpp_data(page=1, limit=12, searchTerm=None):
     """
     Connects to the database, fetches all printer data, processes it,
     and returns a dictionary containing the final printer list and global history.
@@ -259,6 +259,7 @@ def get_live_dpp_data():
     cur = None
 
     # This is the complete query for fetching all printer and job data.
+    # THIS QUERY REMAINS UNCHANGED.
     query_all_printers = """
     SELECT
         d.device_id, d.friendly_name, d.device_model, d.printer_size_category,
@@ -332,26 +333,8 @@ def get_live_dpp_data():
     ORDER BY d.friendly_name;
     """
 
-    query_global_history = """
-    SELECT
-        d.friendly_name,
-        pj.filename,
-        pj.session_energy_wh,
-        pj.end_time,
-        pj.thumbnail_url,
-	pj.dpp_pdf_url
-    FROM
-        print_jobs pj
-    JOIN
-        devices d ON pj.device_id = d.device_id
-    WHERE
-        pj.status = 'done'
-        AND pj.session_energy_wh IS NOT NULL
-        AND pj.session_energy_wh > 0
-    ORDER BY
-        pj.end_time DESC NULLS LAST
-    LIMIT 50;
-    """
+    # --- MODIFIED BLOCK STARTS HERE ---
+    # The old, static query_global_history string has been removed.
 
     try:
         conn = psycopg2.connect(
@@ -360,11 +343,43 @@ def get_live_dpp_data():
         )
         cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
+        # 1. Fetch main printer data (no change in this part's logic)
         cur.execute(query_all_printers)
         all_printers = cur.fetchall()
 
-        cur.execute(query_global_history)
+        # 2. Fetch global history with pagination and search
+        search_pattern = f"%{searchTerm}%" if searchTerm else None
+        offset = (page - 1) * limit
+
+        # New query to get the TOTAL count of items matching the search
+        query_global_history_count = """
+        SELECT COUNT(*) FROM print_jobs pj
+        JOIN devices d ON pj.device_id = d.device_id
+        WHERE pj.status = 'done'
+        AND (%s IS NULL OR d.friendly_name ILIKE %s OR pj.filename ILIKE %s);
+        """
+        cur.execute(query_global_history_count, (searchTerm, search_pattern, search_pattern))
+        total_history_items = cur.fetchone()[0]
+        total_pages = (total_history_items + limit - 1) // limit if limit > 0 else 1
+
+        # New query to get the paginated ITEMS matching the search
+        query_global_history_items = """
+        SELECT
+            d.friendly_name, pj.filename, pj.session_energy_wh,
+            pj.end_time, pj.thumbnail_url, pj.dpp_pdf_url
+        FROM print_jobs pj
+        JOIN devices d ON pj.device_id = d.device_id
+        WHERE
+            pj.status = 'done'
+            AND (%s IS NULL OR d.friendly_name ILIKE %s OR pj.filename ILIKE %s)
+        ORDER BY pj.end_time DESC NULLS LAST
+        LIMIT %s OFFSET %s;
+        """
+        cur.execute(query_global_history_items, (searchTerm, search_pattern, search_pattern, limit, offset))
         history_results = cur.fetchall()
+
+        # The rest of the logic continues as before...
+        # --- MODIFIED BLOCK ENDS HERE ---
 
         for row in history_results:
             global_history_list.append({
@@ -373,9 +388,10 @@ def get_live_dpp_data():
                 "kwh": float(row['session_energy_wh']) / 1000.0 if row['session_energy_wh'] is not None else 0.0,
                 "completedAt": row['end_time'].isoformat() if row['end_time'] else None,
                 "thumbnailUrl": row['thumbnail_url'],
-		"pdfUrl": row['dpp_pdf_url']
+		        "pdfUrl": row['dpp_pdf_url']
             })
 
+        # THIS ENTIRE LOOP FOR PROCESSING PRINTERS REMAINS UNCHANGED.
         for i, row in enumerate(all_printers):
             try:
                 status_text = (row.get('state_text') or 'Offline').capitalize()
@@ -431,9 +447,15 @@ def get_live_dpp_data():
 
         final_dpp_data_sorted = sorted(final_dpp_data, key=lambda x: x.get('friendlyName', x.get('deviceId', '')))
 
+        # THIS RETURN STATEMENT IS MODIFIED TO INCLUDE PAGINATION DATA.
         return {
             "printers": final_dpp_data_sorted,
-            "globalHistory": global_history_list
+            "globalHistory": {
+                "items": global_history_list,
+                "currentPage": page,
+                "totalPages": total_pages,
+                "totalItems": total_history_items
+            }
         }
 
     except Exception as e_main:
@@ -445,6 +467,7 @@ def get_live_dpp_data():
         if cur: cur.close()
         if conn: conn.close()
 
+        
 # Keep a simple main function for direct testing of the script if ever needed
 def main():
     """
