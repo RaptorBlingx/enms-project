@@ -50,12 +50,17 @@ This is the primary endpoint of the DPP API. It returns a comprehensive, real-ti
 
 #### Query Parameters
 
-This endpoint does not accept any query parameters.
+| Parameter    | Type    | Default | Description                                                                                             |
+| :----------- | :------ | :------ | :------------------------------------------------------------------------------------------------------ |
+| `page`       | integer | `1`     | The page number of the global history results to retrieve.                                              |
+| `limit`      | integer | `12`    | The number of history items to return per page.                                                         |
+| `searchTerm` | string  | `null`  | A search string to filter the history results. The search is performed against the printer's friendly name and the job's filename. |
 
 #### Example Request
 
+A request to get the second page of history results, with a page size of 10, filtered by the term "benchy":
 ```bash
-curl http://<your_enms_instance_ip>/api/dpp_summary
+curl "http://<your_enms_instance_ip>/api/dpp_summary?page=2&limit=10&searchTerm=benchy"
 ```
 
 #### Example JSON Response
@@ -113,29 +118,23 @@ The response is a JSON object containing two top-level keys: `printers` and `glo
       ],
       "plantStage": 13,
       "tipText": "Heads up: 'big_benchy.gcode' is currently printing. Monitor its progress to ensure a successful outcome."
-    },
-    {
-      "deviceId": "PrusaMK4-2",
-      "friendlyName": "Prusa MK4 2",
-      "model": "PrusaMK4",
-      "sizeCategory": "Standard",
-      "plant_type": "generic_plant",
-      "kwhLast24h": 0.075,
-      "lastJobKwh": 0.55,
-      "currentStatus": "Idle",
-      "isPrintingNow": false,
-      "..."
     }
   ],
-  "globalHistory": [
-    {
-      "printerName": "Prusa MK4 2",
-      "filename": "some_other_print.gcode",
-      "kwh": 0.85,
-      "completedAt": "2023-10-27T10:30:00Z",
-      "thumbnailUrl": "/gcode_previews/job_124.png"
-    }
-  ]
+  "globalHistory": {
+    "items": [
+        {
+            "printerName": "Prusa MK4 2",
+            "filename": "some_other_print.gcode",
+            "kwh": 0.85,
+            "completedAt": "2023-10-27T10:30:00Z",
+            "thumbnailUrl": "/gcode_previews/job_124.png",
+            "pdfUrl": "/dpp_reports/report_124.pdf"
+        }
+    ],
+    "currentPage": 1,
+    "totalPages": 5,
+    "totalItems": 58
+  }
 }
 ```
 
@@ -155,10 +154,10 @@ This section provides an authoritative reference for all fields in the JSON resp
 
 ### 4.1. Top-Level Object
 
-| Field           | Type  | Description                                           |
-| :-------------- | :---- | :---------------------------------------------------- |
-| `printers`      | array | An array of Printer Objects, each representing a device. |
-| `globalHistory` | array | An array of Global History Objects.                   |
+| Field           | Type   | Description                                                     |
+| :-------------- | :----- | :-------------------------------------------------------------- |
+| `printers`      | array  | An array of Printer Objects, each representing a device.        |
+| `globalHistory` | object | A pagination object containing the global history of print jobs. See section 4.4. |
 
 ### 4.2. The Printer Object
 
@@ -210,7 +209,18 @@ This object contains metadata extracted from the G-code file by the ENMS backend
 
 ### 4.4. The Global History Object
 
-Each object in the `globalHistory` array represents a single completed print job from anywhere in the fleet.
+The `globalHistory` object contains the paginated list of completed print jobs from across the entire fleet.
+
+| Field         | Type                      | Description                                                                 |
+| :------------ | :------------------------ | :-------------------------------------------------------------------------- |
+| `items`       | array                     | An array of Job History Item objects for the current page. See section 4.5. |
+| `currentPage` | integer                   | The current page number being displayed.                                    |
+| `totalPages`  | integer                   | The total number of pages available.                                        |
+| `totalItems`  | integer                   | The total number of jobs that match the current search criteria.            |
+
+### 4.5. The Job History Item Object
+
+Each object in the `globalHistory.items` array represents a single completed print job.
 
 | Field         | Type                      | Source Table (`Column`)         | Description                                                  |
 | :------------ | :------------------------ | :------------------------------ | :----------------------------------------------------------- |
@@ -221,7 +231,7 @@ Each object in the `globalHistory` array represents a single completed print job
 | `thumbnailUrl`| string                    | `print_jobs` (`thumbnail_url`)  | A URL to a thumbnail image of the printed object. `null` if not available. |
 | `pdfUrl`      | string                    | `print_jobs` (`dpp_pdf_url`)    | A URL to the automatically generated PDF report for this job. `null` if the report is not yet available.|
 
-### 4.5. Field Nullability
+### 4.6. Field Nullability
 
 Several fields in the `Printer Object` can be `null` depending on the printer's state. Your application should be designed to handle these cases gracefully.
 

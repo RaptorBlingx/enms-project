@@ -69,9 +69,15 @@ This is the core of the system where data is processed, stored, and analyzed. Al
     *   **Flask API (`/api/dpp_summary`):** A lightweight web server that provides a real-time summary of all printers for the DPP frontend. It queries the database directly to generate this data.
     *   **PDF Generation Service (`/api/generate_dpp_pdf`):** A new endpoint within the Flask API. Triggered by Node-RED upon job completion, it fetches final job data from PostgreSQL, renders it into an HTML template, and uses the WeasyPrint library to generate a final PDF report.
     *   **ML Analysis Scripts (`gcode_analyzer.py`, `train_model.py`):**
-        *   `gcode_analyzer.py`: Executed by Node-RED to parse G-code files, extract metadata, and generate thumbnails.
+        *   `gcode_analyzer.py`: A universal G-code analysis engine. It is no longer a simple parser but an advanced script that:
+            *   Handles both Prusa's QOI (Quite OK Image) format and standard PNG thumbnails embedded in G-code.
+            *   Intelligently selects the highest-resolution thumbnail available from multiple embedded options.
+            *   Includes a self-contained QOI decoder to convert the proprietary format into a web-safe PNG.
+            *   Parses specific metadata fields (e.g., `estimated printing time`, `filament used [g]`, `nozzle_diameter`) and formats them for dedicated columns in the `print_jobs` database table.
+            *   Preserves the original per-part analysis logic for backward compatibility.
         *   `train_model.py`: An offline script used to train the power prediction model. It uses the **XGBoost** algorithm to create a model file (`best_model.joblib`) that the `Live Predictor` flow in Node-RED then uses for making real-time predictions.
     *   **Device Management API:** A new set of CRUD (Create, Read, Update, Delete) endpoints within the Flask application. This internal API provides the backend for the Device Management page, allowing administrators to directly manage the `devices` table in the database.
+    *   **Thumbnail Generation Architecture:** The system uses a shared Docker volume (`gcode_previews_data`) to manage G-code thumbnails. The `python-api` service (running `gcode_analyzer.py`) writes the generated PNG thumbnails to this volume. The `web_server` (Nginx) service mounts the same volume in read-only mode and serves the images via a dedicated `/gcode_previews/` location block, ensuring secure and efficient delivery to the frontend.
       
 
 #### 1.2.4. Application Layer (The User Interface)
@@ -83,11 +89,11 @@ This layer provides the user-facing interfaces for interacting with the system's
     *   Machine Performance Comparison: Comparing key metrics across different machines.
     *   Sensor Data Explorer: A detailed view of all sensor readings.
 *   **Custom Web Frontend:** A single-page application (SPA) served by Nginx that provides custom, highly interactive user experiences.
-    *   **DPP Card Module:** A visually rich carousel view of "Digital Product Passport" cards for each printer, showing live status, job progress, and a 3D G-code preview.
+    *   **DPP Card Module:** A visually rich carousel view of "Digital Product Passport" cards for each printer, showing live status and job progress. It now includes a fully interactive "Recent Print Jobs" table that communicates with the paginated backend API. This component dynamically renders pagination controls and performs server-side searches, allowing users to efficiently browse the entire print history.
     *   **Device Management Page:** A dedicated CRUD interface accessible to the Technical Profile. It allows users to add new printers, edit existing configurations (including API keys and IDs), and delete devices from the system. The form dynamically adapts based on the printer type (Prusa vs. SimplyPrint).
     *   **Artistic Module:** A "gamification" feature that visualizes energy consumption as a growing plant. The artistic resources (images of plants at different stages) are served by Nginx.
     *   **Interactive Analysis Page:** A dedicated page that allows users to select a device, time range, and specific data points ("drivers") to run a detailed backend analysis, which is then visualized using charts.
-*   **Nginx:** A high-performance web server that acts as a reverse proxy, routing incoming web traffic to the appropriate service (Grafana, Node-RED, or the custom frontend files). It also serves the static assets for the frontend (HTML, CSS, JS, images).
+*   **Nginx:** A high-performance web server that acts as a reverse proxy, routing incoming web traffic to the appropriate service (Grafana, Node-RED, or the custom frontend files). It also serves the static assets for the frontend (HTML, CSS, JS, images), as well as dynamically generated content like PDF reports and G-code thumbnails from shared volumes.
 
 ## 2. Data Flow & Dataset Descriptions
 
@@ -347,14 +353,14 @@ This section provides a more detailed breakdown of the responsibilities and key 
 Node-RED is the central nervous system of the platform, responsible for data flow orchestration, API hosting, and scheduling. Its functions are organized into a series of flows (tabs).
 
 *   **Master Ingestion Flow:**
-    *   **Function:** Acts as the main entry point for polling data from printer APIs.
+    *   **Function:** Acts as the main entry point for polling data from all printer APIs (PrusaLink, SimplyPrint, etc.).
     *   **Process:**
         1.  Triggers every 30 seconds.
         2.  Fetches the list of all configured devices from the `devices` table.
-        3.  For each device, it routes the flow based on the data source (PrusaLink vs. SimplyPrint).
-        4.  Triggers the appropriate API calls.
-        5.  Detects job start/end transitions by comparing the current state with the previous state (stored in flow memory).
-        6.  Triggers other sub-flows (like energy calculation and G-code analysis) based on these state changes.
+        3.  For each device, it routes the flow based on the data source.
+        4.  **PrusaLink Route:** The Prusa data ingestion path has been completely overhauled for robustness. It now correctly handles the two-step API poll (`/api/printer` and `/api/job`), manages job state transitions reliably, and triggers the `gcode_analyzer.py` script upon job start. The database logic has been updated to populate all new, specific columns in the `print_jobs` table (e.g., `duration_seconds`, `filament_used_g`, `thumbnail_url`) with the parsed results.
+        5.  **SimplyPrint Route:** Triggers the `Historical Enrichment` sub-flow to gather detailed job data.
+        6.  Detects job start/end transitions to trigger energy calculation sub-flows.
 
 *   **Ingest Shelly MQTT / ESP Sensors Flows:**
     *   **Function:** Ingest real-time data from IoT devices.
