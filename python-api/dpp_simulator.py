@@ -28,13 +28,35 @@ PLANT_TYPES = ["generic_plant", "corn", "sunflower", "tomato"]
 # --- Helper function for plant stage ---
 #PLANT_THRESHOLDS = [0.01, 0.018, 0.021, 0.022, 0.024, 0.027, 0.030, 0.04, 0.045, 0.05, 0.06, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.5, 3.0]
 PLANT_THRESHOLDS = [0.003, 0.006, 0.007, 0.0073, 0.008, 0.009, 0.01, 0.0133, 0.015, 0.0167, 0.02, 0.333, 0.4, 0.467, 0.533, 0.6, 0.667, 0.833, 1.0]
-def get_plant_stage(kwh):
-    kwh_val = kwh if isinstance(kwh, (int, float)) else float('-inf')
-    if kwh_val < PLANT_THRESHOLDS[0]: return 1
-    for i in range(len(PLANT_THRESHOLDS) - 1, -1, -1):
-        if kwh_val >= PLANT_THRESHOLDS[i]: return min(i + 2, 19)
-    return 1
+#def get_plant_stage(kwh):
+#    kwh_val = kwh if isinstance(kwh, (int, float)) else float('-inf')
+#    if kwh_val < PLANT_THRESHOLDS[0]: return 1
+#    for i in range(len(PLANT_THRESHOLDS) - 1, -1, -1):
+#        if kwh_val >= PLANT_THRESHOLDS[i]: return min(i + 2, 19)
+#    return 1
 
+def get_plant_stage(kwh):
+    # --- START OF MODIFICATION ---
+
+    # 1. Define the energy needed for one full growth cycle.
+    #    We get this from the last value in our thresholds list.
+    CYCLE_THRESHOLD = PLANT_THRESHOLDS[-1] # This will be 3.0
+
+    kwh_val = kwh if isinstance(kwh, (int, float)) else 0.0
+
+    # 2. Calculate the "effective" kWh for the current cycle using the modulo operator.
+    #    For example, if kwh is 3.1, effective_kwh becomes 0.1 (3.1 % 3.0).
+    #    If kwh is 7.5, effective_kwh becomes 1.5 (7.5 % 3.0).
+    effective_kwh = kwh_val % CYCLE_THRESHOLD
+
+    # --- END OF MODIFICATION ---
+
+    # 3. The rest of the logic remains the same, but now uses 'effective_kwh'.
+    #    This ensures any energy value is mapped back to a stage between 1 and 19.
+    if effective_kwh < PLANT_THRESHOLDS[0]: return 1
+    for i in range(len(PLANT_THRESHOLDS) - 1, -1, -1):
+        if effective_kwh >= PLANT_THRESHOLDS[i]: return min(i + 2, 19)
+    return 1
 
 def clean_filename(filename):
     """
