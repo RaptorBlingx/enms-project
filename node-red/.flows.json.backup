@@ -2482,6 +2482,16 @@
         "info": "**Purpose:** Executes the main Python script responsible for gathering, processing, and formatting all the data for the DPP.\n\n**Command:** `/home/ubuntu/monitor_ml/dpp_simulator.py --scenario live`\n\n**Logic:**\n1.  Calls the Python interpreter from the project's virtual environment.\n2.  Runs the `dpp_simulator.py` script.\n3.  The `--scenario live` argument tells the script to fetch real-time data from the PostgreSQL database.\n4.  The script's output (a single line of JSON) is passed to `stdout` (the first output of this node).\n\n**Output:**\n- `msg.payload`: A string containing the JSON summary of all printers."
     },
     {
+        "id": "626e0f0f5a327c31",
+        "type": "comment",
+        "z": "249c21de5a8d56e0",
+        "name": "",
+        "info": "### DPP Summary API\n\n**Endpoint:** `GET /api/dpp_summary`\n\n**Purpose:** This is the main data source for the DPP dashboard. It executes a Python script to fetch printer status and job history from the database.\n\n---\n\n#### **How It Works**\n\nThe flow inspects the incoming request for a `?page=` query parameter.\n\n1.  **If `?page=` is present:** The request is for paginated history. The **top path** is taken.\n    *   A **`function`** node builds the full command with all query parameters (`--page`, `--limit`, `--searchTerm`).\n    *   The **`exec`** node runs the Python script dynamically with these arguments.\n\n2.  **If `?page=` is NOT present:** This is a legacy or simple request. The **bottom path** is taken.\n    *   The **`exec`** node runs the Python script with a static, default command. This ensures backward compatibility.\n\n---\n\n#### **API Parameters (Query String)**\n\n*   `page` (optional, number): The page number for the print history. Enables pagination logic.\n*   `limit` (optional, number): The number of history items per page. Default is 12.\n*   `searchTerm` (optional, string): A string to search against printer names and filenames in the history.\n*   `scenario` (optional, string): Used for development to load mock data instead of live data (e.g., `mk4_printing_pla`).\n\n---\n\n#### **Output**\n\n*   Returns a single JSON object containing two main keys:\n    1.  `printers`: An array of objects, one for each printer.\n    2.  `globalHistory`: An object containing the paginated results (`items`, `currentPage`, `totalPages`, `totalItems`).",
+        "x": 840,
+        "y": 260,
+        "wires": []
+    },
+    {
         "id": "f77d140fdd22352b",
         "type": "mqtt in",
         "z": "44c225e855f817f8",
@@ -5101,8 +5111,8 @@
         "z": "088fab733419c707",
         "g": "2406f1dc5d32b76a",
         "name": "Parse and Merge All Data",
-        "func": "// --- Get data from previous nodes --- \nconst job_details = msg.payload.job;\nconst live_data = msg.live_data;\nconst device = msg.original_device_config;\nconst last_status = flow.get('printer_status_' + device.device_id) || {};\n\n// --- Find the correct printer ---\nconst target_printer_id = parseInt(device.simplyprint_id, 10);\nconst api_response_data = live_data.data?.find(p => p.id === target_printer_id);\n\nif (!api_response_data) {\n    node.error(`Parse/Merge Error: Did not find printer with ID ${target_printer_id}.`, msg);\n    return null;\n}\n\n// --- Unify the Filename and State ---\nconst current_filename = job_details?.file || api_response_data.job?.file || null;\nconst stateText = api_response_data.printer?.state?.charAt(0).toUpperCase() + api_response_data.printer.state.slice(1) || 'Unknown';\nconst is_printing_now = ['printing', 'heating'].includes(stateText.toLowerCase());\nconst was_printing = last_status.is_printing ?? false;\n\n// --- Initialize all outgoing messages ---\nlet msg_job_upsert = null;\nlet msg_status_update = null;\nlet msg_end_of_job = null;\nlet msg_start_energy_trigger = null;\nlet msg_gcode_analysis_trigger = null;\n\n// --- Job Completion Detection ---\nif (was_printing && !is_printing_now && last_status.filename) {\n    msg_end_of_job = {\n        topic: \"CALCULATE_FINAL_ENERGY\",\n        params: [last_status.device_id, last_status.filename]\n    };\n}\n\n// --- Update flow memory for the NEXT cycle ---\nflow.set('printer_status_' + device.device_id, {\n    is_printing: is_printing_now,\n    filename: current_filename,\n    device_id: device.device_id\n});\n\n// --- Prepare Status Update ---\n// --- Prepare Status Update ---\nmsg_status_update = {\n    topic: \"INSERT_PRINTER_STATUS\",\n    params: [\n        new Date().toISOString(), // 1\n        device.device_id, // 2\n        stateText, // 3\n        stateText.toLowerCase() !== 'offline', // 4\n        is_printing_now, // 5\n        stateText.toLowerCase() === 'paused', // 6\n        stateText.toLowerCase() === 'error', // 7\n        ['printing', 'paused', 'heating'].includes(stateText.toLowerCase()), // 8\n        api_response_data.printer.temps?.current?.tool?.[0] ?? null, // 9\n        api_response_data.printer.temps?.target?.tool?.[0] ?? null, // 10\n        api_response_data.printer.temps?.current?.bed ?? null, // 11\n        api_response_data.printer.temps?.target?.bed ?? null, // 12\n        api_response_data.filament?.[0]?.type?.name ?? null, // 13\n        current_filename, // 14\n        api_response_data.job?.percentage ?? null, // 15\n        api_response_data.job?.time ?? null, // 16\n        // THE NEW PARAMETER\n        api_response_data.printer.temps?.ambient ?? null // 17\n    ]\n};\n\n// --- Prepare Job Upsert, Triggers, and NEW Part Metadata Logic ---\nif (job_details && job_details.id) {\n    const gcodeAnalysis = job_details.analysis ? JSON.stringify(job_details.analysis) : null;\n    let filamentGrams = null;\n    if (job_details.filament?.e0?.fil?.[0]?.gram) {\n        filamentGrams = job_details.filament.e0.fil[0].gram;\n    }\n\n// ================== NEW LOGIC START ==================\nlet partMetadata = null;\nif (Array.isArray(job_details.customFields) && job_details.customFields.length > 0) {\n    const modelDataField = job_details.customFields.find(field => field.id === 'modeldata');\n    \n    if (modelDataField && modelDataField.value && typeof modelDataField.value.string === 'string') {\n        let rawString = modelDataField.value.string;\n        \n        try {\n            // Find the first occurrence of '['\n            const startIndex = rawString.indexOf('[');\n            // Find the last occurrence of ']'\n            const endIndex = rawString.lastIndexOf(']');\n            \n            if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {\n                // Extract the substring between the first '[' and last ']'\n                let jsonArrayString = rawString.substring(startIndex, endIndex + 1);\n                \n                // Replace all single quotes with double quotes\n                jsonArrayString = jsonArrayString.replace(/'/g, '\"');\n                \n                // Parse the clean string\n                partMetadata = JSON.parse(jsonArrayString);\n            } else {\n                node.warn(`Could not find a JSON array '[...]' in modelData string: ${rawString}`);\n            }\n\n        } catch (e) {\n            node.warn(`Could not parse cleaned modelData for job ${job_details.id}. Error: ${e.message}`);\n        }\n    }\n}\n// =================== NEW LOGIC END ===================\n    msg_job_upsert = {\n        topic: \"UPSERT_PRINT_JOB\",\n        params: [\n            job_details.id.toString(), // 1\n            device.device_id, // 2\n            job_details.started, // 3\n            job_details.ended, // 4\n            job_details.totalPrintTime, // 5\n\n            // CORRECTED: Use the detailed state from the job_details\n            job_details.state, // 6\n\n            current_filename, // 7\n            filamentGrams, // 8\n            gcodeAnalysis, // 9\n            partMetadata ? JSON.stringify(partMetadata) : null, // 10\n\n            // NEW PARAMETERS\n            job_details.analysis?.nozzleSize ?? null, // 11 - Get nozzle size from analysis\n            msg.payload.filament?.[0]?.dia ?? null // 12 - Get filament diameter from main payload\n        ]\n    };\n\n    if (is_printing_now && !was_printing && current_filename) {\n        msg_start_energy_trigger = {\n            topic: \"RECORD_START_ENERGY\",\n            params: [device.device_id, current_filename]\n        };\n    }\n\n    if (current_filename && device.gcode_preview_host && device.gcode_preview_api_key) {\n        msg_gcode_analysis_trigger = {\n            topic: \"ANALYZE_GCODE\",\n            job_id: job_details.id.toString(),\n            filename: current_filename,\n            gcode_host: device.gcode_preview_host,\n            gcode_api_key: device.gcode_preview_api_key,\n            job_details: job_details,\n            original_device_config: device\n        };\n    }\n}\n\nreturn [msg_job_upsert, msg_status_update, msg_end_of_job, msg_start_energy_trigger, msg_gcode_analysis_trigger];",
-        "outputs": 5,
+        "func": "// --- Get data from previous nodes --- \nconst job_details = msg.payload.job;\nconst live_data = msg.live_data;\nconst device = msg.original_device_config;\nconst last_status = flow.get('printer_status_' + device.device_id) || {};\n\n// --- Find the correct printer ---\nconst target_printer_id = parseInt(device.simplyprint_id, 10);\nconst api_response_data = live_data.data?.find(p => p.id === target_printer_id);\n\nif (!api_response_data) {\n    node.error(`Parse/Merge Error: Did not find printer with ID ${target_printer_id}.`, msg);\n    return null;\n}\n\n// --- Unify the Filename and State ---\nconst current_filename = job_details?.file || api_response_data.job?.file || null;\nconst stateText = api_response_data.printer?.state?.charAt(0).toUpperCase() + api_response_data.printer.state.slice(1) || 'Unknown';\nconst is_printing_now = ['printing', 'heating'].includes(stateText.toLowerCase());\nconst was_printing = last_status.is_printing ?? false;\n\n// --- Initialize all outgoing messages ---\nlet msg_job_upsert = null;\nlet msg_status_update = null;\nlet msg_end_of_job = null;\nlet msg_start_energy_trigger = null;\nlet msg_gcode_analysis_trigger = null;\nlet msg_pdf_generation_trigger = null; // New message for PDF generation\n\n// --- Job Completion Detection ---\nif (was_printing && !is_printing_now && last_status.filename) {\n    msg_end_of_job = {\n        topic: \"CALCULATE_FINAL_ENERGY\",\n        params: [last_status.device_id, last_status.filename]\n    };\n\n    // --- NEW: Trigger PDF Generation on Job Completion ---\n    if (job_details && job_details.id) {\n        msg_pdf_generation_trigger = {\n            method: \"POST\",\n            url: \"http://python-api:5000/api/generate_dpp_pdf\",\n            headers: {\n                'Content-Type': 'application/json'\n            },\n            payload: {\n                job_id: job_details.id.toString()\n            }\n        };\n    }\n}\n\n// --- Update flow memory for the NEXT cycle ---\nflow.set('printer_status_' + device.device_id, {\n    is_printing: is_printing_now,\n    filename: current_filename,\n    device_id: device.device_id\n});\n\n// --- Prepare Status Update ---\nmsg_status_update = {\n    topic: \"INSERT_PRINTER_STATUS\",\n    params: [\n        new Date().toISOString(), // 1\n        device.device_id, // 2\n        stateText, // 3\n        stateText.toLowerCase() !== 'offline', // 4\n        is_printing_now, // 5\n        stateText.toLowerCase() === 'paused', // 6\n        stateText.toLowerCase() === 'error', // 7\n        ['printing', 'paused', 'heating'].includes(stateText.toLowerCase()), // 8\n        api_response_data.printer.temps?.current?.tool?.[0] ?? null, // 9\n        api_response_data.printer.temps?.target?.tool?.[0] ?? null, // 10\n        api_response_data.printer.temps?.current?.bed ?? null, // 11\n        api_response_data.printer.temps?.target?.bed ?? null, // 12\n        api_response_data.filament?.[0]?.type?.name ?? null, // 13\n        current_filename, // 14\n        api_response_data.job?.percentage ?? null, // 15\n        api_response_data.job?.time ?? null, // 16\n        api_response_data.printer.temps?.ambient ?? null // 17\n    ]\n};\n\n// --- Prepare Job Upsert, Triggers, and NEW Part Metadata Logic ---\nif (job_details && job_details.id) {\n    const gcodeAnalysis = job_details.analysis ? JSON.stringify(job_details.analysis) : null;\n    let filamentGrams = null;\n    if (job_details.filament?.e0?.fil?.[0]?.gram) {\n        filamentGrams = job_details.filament.e0.fil[0].gram;\n    }\n\n    let partMetadata = null;\n    if (Array.isArray(job_details.customFields) && job_details.customFields.length > 0) {\n        const modelDataField = job_details.customFields.find(field => field.id === 'modeldata');\n        if (modelDataField && modelDataField.value && typeof modelDataField.value.string === 'string') {\n            let rawString = modelDataField.value.string;\n            try {\n                const startIndex = rawString.indexOf('[');\n                const endIndex = rawString.lastIndexOf(']');\n                if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {\n                    let jsonArrayString = rawString.substring(startIndex, endIndex + 1);\n                    jsonArrayString = jsonArrayString.replace(/'/g, '\"');\n                    partMetadata = JSON.parse(jsonArrayString);\n                } else {\n                    node.warn(`Could not find a JSON array '[...]' in modelData string: ${rawString}`);\n                }\n            } catch (e) {\n                node.warn(`Could not parse cleaned modelData for job ${job_details.id}. Error: ${e.message}`);\n            }\n        }\n    }\n\n    msg_job_upsert = {\n        topic: \"UPSERT_PRINT_JOB\",\n        params: [\n            job_details.id.toString(),\n            device.device_id,\n            job_details.started,\n            job_details.ended,\n            job_details.totalPrintTime,\n            job_details.state,\n            current_filename,\n            filamentGrams,\n            gcodeAnalysis,\n            partMetadata ? JSON.stringify(partMetadata) : null,\n            job_details.analysis?.nozzleSize ?? null,\n            msg.payload.filament?.[0]?.dia ?? null\n        ]\n    };\n\n    if (is_printing_now && !was_printing && current_filename) {\n        msg_start_energy_trigger = {\n            topic: \"RECORD_START_ENERGY\",\n            params: [device.device_id, current_filename]\n        };\n    }\n\n    if (current_filename && device.gcode_preview_host && device.gcode_preview_api_key) {\n        msg_gcode_analysis_trigger = {\n            topic: \"ANALYZE_GCODE\",\n            job_id: job_details.id.toString(),\n            filename: current_filename,\n            gcode_host: device.gcode_preview_host,\n            gcode_api_key: device.gcode_preview_api_key,\n            job_details: job_details,\n            original_device_config: device\n        };\n    }\n}\n\nreturn [msg_job_upsert, msg_status_update, msg_end_of_job, msg_start_energy_trigger, msg_gcode_analysis_trigger, msg_pdf_generation_trigger];",
+        "outputs": 6,
         "timeout": "",
         "noerr": 0,
         "initialize": "",
@@ -5125,6 +5135,9 @@
             ],
             [
                 "548b0a238325e0b8"
+            ],
+            [
+                "c74a8a1a.a3a5e8"
             ]
         ],
         "info": "**Purpose:** The central processing hub of this entire flow. It merges all available data sources (live poll, detailed job API) and determines what actions need to be taken.\r\n\r\n**Logic:**\r\n1.  Detects job start/end transitions and prepares trigger messages for energy calculations.\r\n2.  Standardizes the printer status data for insertion into the `printer_status` table.\r\n3.  Parses the `modelData` from the `customFields` array.\r\n4.  Prepares a complete message with all job details (`filament_used_g`, `part_metadata`, etc.) for insertion into the `print_jobs` table.\r\n5.  Prepares a trigger message for the G-code analysis pipeline if a job is active.\r\n\r\n**Outputs:** This node has 5 outputs, each sending a different, specialized message to a `link out` node to trigger a specific action in the main flow or other subflows."
@@ -5395,8 +5408,50 @@
         "wires": [
             [
                 "a849c171e8e54fe4"
+            ],
+            [
+                "c74a8a1a.a3a5e8",
+                "a9d3a4e9.1c2d28"
             ]
         ]
+    },
+    {
+        "id": "c74a8a1a.a3a5e8",
+        "type": "http request",
+        "z": "088fab733419c707",
+        "name": "Generate DPP Report PDF",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://python-api:5000/api/generate_dpp_pdf",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 1600,
+        "y": 560,
+        "wires": [
+            [
+                "a9d3a4e9.1c2d28"
+            ]
+        ]
+    },
+    {
+        "id": "a9d3a4e9.1c2d28",
+        "type": "debug",
+        "z": "088fab733419c707",
+        "name": "PDF Generation Status",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 1820,
+        "y": 560,
+        "wires": []
     },
     {
         "id": "856d2b19e2a0d021",

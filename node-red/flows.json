@@ -211,8 +211,7 @@
             "18c9e99643ee6bcd",
             "7e24e1bcd17d804e",
             "fa5fe3526a66b815",
-            "ad0abf33e2e61735",
-            "08941a4001c4ec9a"
+            "ad0abf33e2e61735"
         ],
         "x": 14,
         "y": 59,
@@ -4886,42 +4885,6 @@
         ]
     },
     {
-        "id": "08941a4001c4ec9a",
-        "type": "inject",
-        "z": "c4582a5c3c4d6d09",
-        "g": "b1bed7a2a4a4d39a",
-        "name": "3389466",
-        "props": [
-            {
-                "p": "original_device_config",
-                "v": "{\"device_id\":\"prusa_i3_mk2_virtuell_schreibtisch\",\"device_model\":\"i3 MK2\",\"shelly_id\":null,\"api_ip\":null,\"api_key\":null,\"friendly_name\":\"Prusa i3 MK2 virtuell Schreibtisch\",\"location\":\"Fab Lab Fabulous St. Pauli\",\"notes\":null,\"printer_size_category\":\"Unknown\",\"simplyprint_id\":\"35675\",\"last_seen\":\"2025-07-18T06:26:34.482Z\",\"sp_company_id\":\"17378\",\"sp_api_key\":\"a012f5a8-4046-4fb5-98fe-a95d977fa3c5\",\"gcode_preview_host\":null,\"gcode_preview_api_key\":null,\"bed_width\":250,\"bed_depth\":210}",
-                "vt": "json"
-            },
-            {
-                "p": "payload"
-            },
-            {
-                "p": "live_data",
-                "v": "{\"data\":[{\"id\":35675,\"job\":{\"uid\":\"4f200e18-2230-4425-96cc-c1c5eec3e820\"},\"printer\":{\"state\":\"operational\"}}]}",
-                "vt": "json"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "{\"data\":[{\"id\":35675,\"job\":{\"uid\":\"4f200e18-2230-4425-96cc-c1c5eec3e820\"},\"printer\":{\"state\":\"operational\"}}]}",
-        "payloadType": "json",
-        "x": 360,
-        "y": 720,
-        "wires": [
-            [
-                "5dda7fb58e2cb2a2"
-            ]
-        ]
-    },
-    {
         "id": "95202ab5fa233a47",
         "type": "function",
         "z": "c4582a5c3c4d6d09",
@@ -5408,10 +5371,6 @@
         "wires": [
             [
                 "a849c171e8e54fe4"
-            ],
-            [
-                "c74a8a1a.a3a5e8",
-                "a9d3a4e9.1c2d28"
             ]
         ]
     },
