@@ -26,8 +26,8 @@ DATA_FRESHNESS_THRESHOLD_MINUTES = 15
 PLANT_TYPES = ["generic_plant", "corn", "sunflower", "tomato"]
 
 # --- Helper function for plant stage ---
-PLANT_THRESHOLDS = [0.01, 0.018, 0.021, 0.022, 0.024, 0.027, 0.030, 0.04, 0.045, 0.05, 0.06, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.5, 3.0]
-
+#PLANT_THRESHOLDS = [0.01, 0.018, 0.021, 0.022, 0.024, 0.027, 0.030, 0.04, 0.045, 0.05, 0.06, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.5, 3.0]
+PLANT_THRESHOLDS = [0.003, 0.006, 0.007, 0.0073, 0.008, 0.009, 0.01, 0.0133, 0.015, 0.0167, 0.02, 0.333, 0.4, 0.467, 0.533, 0.6, 0.667, 0.833, 1.0]
 def get_plant_stage(kwh):
     kwh_val = kwh if isinstance(kwh, (int, float)) else float('-inf')
     if kwh_val < PLANT_THRESHOLDS[0]: return 1
