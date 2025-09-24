@@ -20,3 +20,12 @@ node-red/.config.json
 
 #.env file
 .env
+
+
+# Ignore local SQL init data
+backend/db_init/02_data.sql
+
+# Ignore Node-RED backup flows
+node-red/flows.json.backup
+node-red/flows_docker.json.bak
+node-red/.flows_docker.json.backup
