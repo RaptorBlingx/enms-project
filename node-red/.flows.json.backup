@@ -211,8 +211,7 @@
             "18c9e99643ee6bcd",
             "7e24e1bcd17d804e",
             "fa5fe3526a66b815",
-            "ad0abf33e2e61735",
-            "08941a4001c4ec9a"
+            "ad0abf33e2e61735"
         ],
         "x": 14,
         "y": 59,
@@ -256,18 +255,21 @@
             "cb5a40c591c23af4",
             "c4637953a58714ae",
             "95202ab5fa233a47",
-            "cda295997d384d1b",
             "3893c4f9f6dfef59",
-            "1a68329a7809840d",
-            "853372a55c401c65",
             "41d230d0ab5a436b",
             "427ce1fb3064c7cf",
-            "cbb30734c4289be9"
+            "cbb30734c4289be9",
+            "d4a6c62d776ab650",
+            "3de247fdd8a7f5cb",
+            "081dd58a17d1672a",
+            "b14301d5247c060e",
+            "c237333bb9968607",
+            "077c5cbec43628e7"
         ],
-        "x": 1714,
-        "y": 419,
-        "w": 1832,
-        "h": 762,
+        "x": 1654,
+        "y": 379,
+        "w": 1892,
+        "h": 802,
         "info": "This group takes the raw API data from the input poll, parses it, and standardizes it into a consistent format. It detects job start/end transitions for all printer types and triggers the appropriate database actions. For Prusa printers, it also initiates the G-code download and analysis sub-flow if a print is active."
     },
     {
@@ -326,12 +328,16 @@
             "566c89287199eab1",
             "d980d78960bfd999",
             "235f4c81c8825e75",
-            "11be79141838bc02"
+            "11be79141838bc02",
+            "c74a8a1a.a3a5e8",
+            "36443dab4440c606",
+            "b09a67e1a0a51288",
+            "cdf9aaf2b9bc1726"
         ],
-        "x": 1074,
-        "y": 319,
-        "w": 652,
-        "h": 242
+        "x": 1194,
+        "y": 239,
+        "w": 1112,
+        "h": 342
     },
     {
         "id": "ec87e2210a0fba2e",
@@ -3944,7 +3950,7 @@
         "z": "c4582a5c3c4d6d09",
         "g": "b1bed7a2a4a4d39a",
         "name": "Call Prusa /printer API",
-        "method": "use",
+        "method": "GET",
         "ret": "obj",
         "paytoqs": "ignore",
         "url": "",
@@ -4018,8 +4024,8 @@
         "z": "c4582a5c3c4d6d09",
         "g": "39cad17b39cec1d1",
         "name": "Parse PrusaLink Data",
-        "func": "// --- Get data from previous nodes ---\nconst printer_response = msg.printer_api_response;\nconst job_response = msg.payload;\nconst device = msg.original_device_config;\nconst last_status = flow.get('printer_status_' + device.device_id) || {};\n\n// --- Safety Check ---\nif (!printer_response || !printer_response.state) {\n    node.warn(`No valid /printer response for ${device.friendly_name}. Skipping.`);\n    return null;\n}\n\n// --- Parse Current and Previous States ---\nconst stateFlags = printer_response.state?.flags ?? {};\nconst is_printing_now = stateFlags.printing ?? false;\nconst was_printing = last_status.is_printing ?? false;\nconst current_filename = job_response?.job?.file?.name ?? null;\n\n\n// --- FIX: Robust State Change Logic ---\n\n// --- Event 1: A new print has started ---\nif (is_printing_now && !was_printing && current_filename) {\n    const new_job_msg = {\n        topic: \"CREATE_NEW_PRUSA_JOB\",\n        query: `\n            INSERT INTO print_jobs (device_id, filename, status, start_time)\n            VALUES ($1, $2, 'printing', NOW());\n        `,\n        params: [device.device_id, current_filename]\n    };\n\n    // Send the message to create the job record (Output 3)\n    // We create a clone of the original msg to send, which is good practice.\n    node.send([null, null, new_job_msg]);\n\n    // **CRITICAL FIX**: Only update the state *after* handling the \"job start\" event.\n    flow.set('printer_status_' + device.device_id, {\n        is_printing: true,\n        filename: current_filename,\n        device_id: device.device_id\n    });\n\n    // --- Event 2: A print has just finished ---\n} else if (was_printing && !is_printing_now) {\n    const end_of_job_msg = {\n        topic: \"CALCULATE_FINAL_ENERGY\",\n        params: [last_status.device_id, last_status.filename]\n    };\n\n    const update_job_status_msg = {\n        topic: \"UPDATE_PRUSA_JOB_STATUS\",\n        query: `\n            UPDATE print_jobs \n            SET status = 'done', end_time = NOW(), duration_seconds = EXTRACT(EPOCH FROM (NOW() - start_time))\n            WHERE device_id = $1 AND filename = $2 AND status = 'printing';\n        `,\n        params: [last_status.device_id, last_status.filename]\n    };\n\n    // Send messages for job completion events (Outputs 2 and 3)\n    node.send([null, end_of_job_msg, update_job_status_msg]);\n\n    // **CRITICAL FIX**: Update the state to reflect the printer is no longer printing.\n    flow.set('printer_status_' + device.device_id, {\n        is_printing: false,\n        filename: null, // Clear the filename\n        device_id: device.device_id\n    });\n}\n\n// --- Prepare the main status insert message for Output 1 ---\n// This part runs on every poll, regardless of state changes.\nconst params = [\n    new Date().toISOString(), // 1\n    device.device_id, // 2\n    printer_response.state?.text ?? 'Unknown', // 3\n    stateFlags.operational ?? false, // 4\n    is_printing_now, // 5\n    stateFlags.paused ?? false, // 6\n    stateFlags.error ?? false, // 7\n    stateFlags.busy ?? false, // 8\n    printer_response.temperature?.tool0?.actual ?? null, // 9\n    printer_response.temperature?.tool0?.target ?? null, // 10\n    printer_response.temperature?.bed?.actual ?? null, // 11\n    printer_response.temperature?.bed?.target ?? null, // 12\n    printer_response.telemetry?.material ?? null, // 13\n    current_filename, // 14\n    (job_response?.progress?.completion ?? 0) * 100, // 15\n    job_response?.progress?.printTimeLeft ?? null, // 16\n    null // 17 (Placeholder for ambient_temp_c)\n];\n\n// Pass the main status message to Output 1\nmsg.params = params;\nreturn msg;",
-        "outputs": 3,
+        "func": "// --- Get data from previous nodes ---\nconst printer_response = msg.printer_api_response;\nconst job_response = msg.payload;\nconst device = msg.original_device_config;\nconst last_status = flow.get('printer_status_' + device.device_id) || {};\n\n// --- Safety Check ---\nif (!printer_response || !printer_response.state) {\n    node.warn(`No valid /printer response for ${device.friendly_name}. Skipping.`);\n    return null;\n}\n\n// --- Parse Current and Previous States ---\nconst stateFlags = printer_response.state?.flags ?? {};\nconst is_printing_now = stateFlags.printing ?? false;\nconst was_printing = last_status.is_printing ?? false;\nconst current_filename = job_response?.job?.file?.name ?? null;\n\nlet msg_end_of_job = null;\nlet msg_create_job = null;\nlet msg_finalize_job = null;\n\nif (is_printing_now && !was_printing && current_filename) {\n    msg_create_job = {\n        params: [device.device_id, current_filename]\n    };\n    flow.set('printer_status_' + device.device_id, { is_printing: true, filename: current_filename, device_id: device.device_id });\n}\n// --- Event 2: A print has just finished ---\nelse if (was_printing && !is_printing_now && last_status.filename) {\n    msg_end_of_job = { topic: \"CALCULATE_FINAL_ENERGY\", params: [last_status.device_id, last_status.filename] };\n    msg_finalize_job = { params: [last_status.device_id, last_status.filename] };\n    flow.set('printer_status_' + device.device_id, { is_printing: false, filename: null, device_id: device.device_id });\n}\n\n\n// --- Prepare the main status insert message for Output 1 ---\n// This part runs on every poll, regardless of state changes.\nconst params = [\n    new Date().toISOString(), // 1\n    device.device_id, // 2\n    printer_response.state?.text ?? 'Unknown', // 3\n    stateFlags.operational ?? false, // 4\n    is_printing_now, // 5\n    stateFlags.paused ?? false, // 6\n    stateFlags.error ?? false, // 7\n    stateFlags.busy ?? false, // 8\n    printer_response.temperature?.tool0?.actual ?? null, // 9\n    printer_response.temperature?.tool0?.target ?? null, // 10\n    printer_response.temperature?.bed?.actual ?? null, // 11\n    printer_response.temperature?.bed?.target ?? null, // 12\n    printer_response.telemetry?.material ?? null, // 13\n    current_filename, // 14\n    (job_response?.progress?.completion ?? 0) * 100, // 15\n    job_response?.progress?.printTimeLeft ?? null, // 16\n    null // 17 (Placeholder for ambient_temp_c)\n];\n\nreturn [{ params: status_params }, msg_end_of_job_energy, msg_create_job, msg_finalize_job];\n",
+        "outputs": 4,
         "timeout": "",
         "noerr": 0,
         "initialize": "",
@@ -4030,16 +4036,16 @@
         "wires": [
             [
                 "76faa27c3f22fa95",
-                "cda295997d384d1b",
                 "3bc77aad3c1f970d"
             ],
             [
-                "81d3cb6157d204a7",
-                "853372a55c401c65"
+                "81d3cb6157d204a7"
             ],
             [
-                "3893c4f9f6dfef59",
-                "1a68329a7809840d"
+                "3893c4f9f6dfef59"
+            ],
+            [
+                "d4a6c62d776ab650"
             ]
         ]
     },
@@ -4079,8 +4085,8 @@
         "links": [
             "af2f0b8c71e0ef6c"
         ],
-        "x": 2590,
-        "y": 480,
+        "x": 2350,
+        "y": 420,
         "wires": [],
         "l": true
     },
@@ -4276,8 +4282,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 2410,
-        "y": 640,
+        "x": 2390,
+        "y": 500,
         "wires": [
             [
                 "38850782ee90eabb",
@@ -4489,8 +4495,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1900,
-        "y": 700,
+        "x": 2200,
+        "y": 620,
         "wires": [
             [
                 "76e36f5c70691ad5"
@@ -4507,8 +4513,8 @@
         "links": [
             "b882adb136a0e909"
         ],
-        "x": 1930,
-        "y": 760,
+        "x": 2210,
+        "y": 660,
         "wires": [],
         "l": true,
         "info": "This node triggers the separate Historical Enrichment Flow, which is a major processing step"
@@ -4519,7 +4525,7 @@
         "z": "c4582a5c3c4d6d09",
         "g": "b1bed7a2a4a4d39a",
         "name": "Call SimplyPrint API output",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -4585,7 +4591,7 @@
         "g": "39cad17b39cec1d1",
         "name": "Group 2: Data Processing & Enrichment",
         "info": "    This group takes the raw API data, parses it, standardizes it, detects job state changes, and triggers further enrichment processes.",
-        "x": 2310,
+        "x": 2410,
         "y": 460,
         "wires": []
     },
@@ -4641,8 +4647,8 @@
         "g": "39cad17b39cec1d1",
         "name": "Process: Parse PrusaLink Response & Detect Job State",
         "info": "     **Purpose:** This is the main processing hub for PrusaLink devices. It combines the `/printer` and `/job` API responses, standardizes the data, detects job state transitions, and formats the data for insertion into the `printer_status` table.\n    \n     **State Change Logic:**\n     *   **On Job Start:** Detects a transition from not printing to printing and sends a message to create a new record in the `print_jobs` table.\n     *   **On Job End:** Detects a transition from printing to not printing and sends messages to finalize the job record and calculate the final energy usage.\n    \n     **Outputs:**\n     *   **Output 1:** Forwards the standardized status message (`msg.params`) to the main processing pipeline on every poll.\n     *   **Output 2:** Sends a trigger message for final energy calculation **only** when a job finishes.\n     *   **Output 3:** Sends a message to create or update the job status in the `print_jobs` table **only** on a state change.",
-        "x": 2000,
-        "y": 520,
+        "x": 1920,
+        "y": 480,
         "wires": []
     },
     {
@@ -4886,42 +4892,6 @@
         ]
     },
     {
-        "id": "08941a4001c4ec9a",
-        "type": "inject",
-        "z": "c4582a5c3c4d6d09",
-        "g": "b1bed7a2a4a4d39a",
-        "name": "3389466",
-        "props": [
-            {
-                "p": "original_device_config",
-                "v": "{\"device_id\":\"prusa_i3_mk2_virtuell_schreibtisch\",\"device_model\":\"i3 MK2\",\"shelly_id\":null,\"api_ip\":null,\"api_key\":null,\"friendly_name\":\"Prusa i3 MK2 virtuell Schreibtisch\",\"location\":\"Fab Lab Fabulous St. Pauli\",\"notes\":null,\"printer_size_category\":\"Unknown\",\"simplyprint_id\":\"35675\",\"last_seen\":\"2025-07-18T06:26:34.482Z\",\"sp_company_id\":\"17378\",\"sp_api_key\":\"a012f5a8-4046-4fb5-98fe-a95d977fa3c5\",\"gcode_preview_host\":null,\"gcode_preview_api_key\":null,\"bed_width\":250,\"bed_depth\":210}",
-                "vt": "json"
-            },
-            {
-                "p": "payload"
-            },
-            {
-                "p": "live_data",
-                "v": "{\"data\":[{\"id\":35675,\"job\":{\"uid\":\"4f200e18-2230-4425-96cc-c1c5eec3e820\"},\"printer\":{\"state\":\"operational\"}}]}",
-                "vt": "json"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "{\"data\":[{\"id\":35675,\"job\":{\"uid\":\"4f200e18-2230-4425-96cc-c1c5eec3e820\"},\"printer\":{\"state\":\"operational\"}}]}",
-        "payloadType": "json",
-        "x": 360,
-        "y": 720,
-        "wires": [
-            [
-                "5dda7fb58e2cb2a2"
-            ]
-        ]
-    },
-    {
         "id": "95202ab5fa233a47",
         "type": "function",
         "z": "c4582a5c3c4d6d09",
@@ -4944,75 +4914,21 @@
         ]
     },
     {
-        "id": "cda295997d384d1b",
-        "type": "debug",
-        "z": "c4582a5c3c4d6d09",
-        "g": "39cad17b39cec1d1",
-        "name": "debug 13",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1970,
-        "y": 580,
-        "wires": []
-    },
-    {
         "id": "3893c4f9f6dfef59",
         "type": "postgresql",
         "z": "c4582a5c3c4d6d09",
         "g": "39cad17b39cec1d1",
-        "name": "Prusa Job State Handler",
-        "query": "",
+        "name": "Create New Prusa Job",
+        "query": "INSERT INTO print_jobs (device_id, filename, status, start_time) VALUES ($1, $2, 'printing', NOW());",
         "postgreSQLConfig": "4259e91acb63e17b",
         "split": false,
         "rowsPerMsg": 1,
         "outputs": 1,
-        "x": 2200,
-        "y": 660,
+        "x": 2180,
+        "y": 760,
         "wires": [
             []
         ]
-    },
-    {
-        "id": "1a68329a7809840d",
-        "type": "debug",
-        "z": "c4582a5c3c4d6d09",
-        "g": "39cad17b39cec1d1",
-        "name": "debug 15",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 2170,
-        "y": 780,
-        "wires": []
-    },
-    {
-        "id": "853372a55c401c65",
-        "type": "debug",
-        "z": "c4582a5c3c4d6d09",
-        "g": "39cad17b39cec1d1",
-        "name": "debug 16",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 2250,
-        "y": 600,
-        "wires": []
     },
     {
         "id": "41d230d0ab5a436b",
@@ -5058,6 +4974,134 @@
         "y": 800,
         "wires": [],
         "icon": "font-awesome/fa-database"
+    },
+    {
+        "id": "d4a6c62d776ab650",
+        "type": "postgresql",
+        "z": "c4582a5c3c4d6d09",
+        "g": "39cad17b39cec1d1",
+        "name": "Finalize Prusa Job & Get ID",
+        "query": "UPDATE print_jobs SET status = 'done', end_time = NOW(), duration_seconds = EXTRACT(EPOCH FROM (NOW() - start_time)) WHERE device_id = $1 AND filename = $2 AND status = 'printing' RETURNING job_id;",
+        "postgreSQLConfig": "4259e91acb63e17b",
+        "split": false,
+        "rowsPerMsg": 1,
+        "outputs": 1,
+        "x": 2020,
+        "y": 820,
+        "wires": [
+            [
+                "3de247fdd8a7f5cb"
+            ]
+        ]
+    },
+    {
+        "id": "3de247fdd8a7f5cb",
+        "type": "function",
+        "z": "c4582a5c3c4d6d09",
+        "g": "39cad17b39cec1d1",
+        "name": "Prepare PDF Request",
+        "func": "const job_id = msg.payload[0]?.job_id;\nif (!job_id) {\n    return null;\n}\nmsg.method = \"POST\";\nmsg.url = \"http://python_api:5000/api/generate_dpp_pdf\";\nmsg.headers = { \"Content-Type\": \"application/json\" };\nmsg.payload = { \"job_id\": job_id };\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2020,
+        "y": 900,
+        "wires": [
+            [
+                "081dd58a17d1672a",
+                "c237333bb9968607"
+            ]
+        ]
+    },
+    {
+        "id": "081dd58a17d1672a",
+        "type": "http request",
+        "z": "c4582a5c3c4d6d09",
+        "g": "39cad17b39cec1d1",
+        "name": "Call PDF Service",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 2090,
+        "y": 960,
+        "wires": [
+            [
+                "077c5cbec43628e7"
+            ]
+        ]
+    },
+    {
+        "id": "b14301d5247c060e",
+        "type": "inject",
+        "z": "c4582a5c3c4d6d09",
+        "g": "39cad17b39cec1d1",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"job_id\": 2285}]",
+        "payloadType": "json",
+        "x": 1780,
+        "y": 900,
+        "wires": [
+            [
+                "3de247fdd8a7f5cb"
+            ]
+        ]
+    },
+    {
+        "id": "c237333bb9968607",
+        "type": "debug",
+        "z": "c4582a5c3c4d6d09",
+        "g": "39cad17b39cec1d1",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 2210,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "077c5cbec43628e7",
+        "type": "debug",
+        "z": "c4582a5c3c4d6d09",
+        "g": "39cad17b39cec1d1",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 2150,
+        "y": 1020,
+        "wires": []
     },
     {
         "id": "31749266865874cf",
@@ -5111,15 +5155,15 @@
         "z": "088fab733419c707",
         "g": "2406f1dc5d32b76a",
         "name": "Parse and Merge All Data",
-        "func": "// --- Get data from previous nodes --- \nconst job_details = msg.payload.job;\nconst live_data = msg.live_data;\nconst device = msg.original_device_config;\nconst last_status = flow.get('printer_status_' + device.device_id) || {};\n\n// --- Find the correct printer ---\nconst target_printer_id = parseInt(device.simplyprint_id, 10);\nconst api_response_data = live_data.data?.find(p => p.id === target_printer_id);\n\nif (!api_response_data) {\n    node.error(`Parse/Merge Error: Did not find printer with ID ${target_printer_id}.`, msg);\n    return null;\n}\n\n// --- Unify the Filename and State ---\nconst current_filename = job_details?.file || api_response_data.job?.file || null;\nconst stateText = api_response_data.printer?.state?.charAt(0).toUpperCase() + api_response_data.printer.state.slice(1) || 'Unknown';\nconst is_printing_now = ['printing', 'heating'].includes(stateText.toLowerCase());\nconst was_printing = last_status.is_printing ?? false;\n\n// --- Initialize all outgoing messages ---\nlet msg_job_upsert = null;\nlet msg_status_update = null;\nlet msg_end_of_job = null;\nlet msg_start_energy_trigger = null;\nlet msg_gcode_analysis_trigger = null;\nlet msg_pdf_generation_trigger = null; // New message for PDF generation\n\n// --- Job Completion Detection ---\nif (was_printing && !is_printing_now && last_status.filename) {\n    msg_end_of_job = {\n        topic: \"CALCULATE_FINAL_ENERGY\",\n        params: [last_status.device_id, last_status.filename]\n    };\n\n    // --- NEW: Trigger PDF Generation on Job Completion ---\n    if (job_details && job_details.id) {\n        msg_pdf_generation_trigger = {\n            method: \"POST\",\n            url: \"http://python-api:5000/api/generate_dpp_pdf\",\n            headers: {\n                'Content-Type': 'application/json'\n            },\n            payload: {\n                job_id: job_details.id.toString()\n            }\n        };\n    }\n}\n\n// --- Update flow memory for the NEXT cycle ---\nflow.set('printer_status_' + device.device_id, {\n    is_printing: is_printing_now,\n    filename: current_filename,\n    device_id: device.device_id\n});\n\n// --- Prepare Status Update ---\nmsg_status_update = {\n    topic: \"INSERT_PRINTER_STATUS\",\n    params: [\n        new Date().toISOString(), // 1\n        device.device_id, // 2\n        stateText, // 3\n        stateText.toLowerCase() !== 'offline', // 4\n        is_printing_now, // 5\n        stateText.toLowerCase() === 'paused', // 6\n        stateText.toLowerCase() === 'error', // 7\n        ['printing', 'paused', 'heating'].includes(stateText.toLowerCase()), // 8\n        api_response_data.printer.temps?.current?.tool?.[0] ?? null, // 9\n        api_response_data.printer.temps?.target?.tool?.[0] ?? null, // 10\n        api_response_data.printer.temps?.current?.bed ?? null, // 11\n        api_response_data.printer.temps?.target?.bed ?? null, // 12\n        api_response_data.filament?.[0]?.type?.name ?? null, // 13\n        current_filename, // 14\n        api_response_data.job?.percentage ?? null, // 15\n        api_response_data.job?.time ?? null, // 16\n        api_response_data.printer.temps?.ambient ?? null // 17\n    ]\n};\n\n// --- Prepare Job Upsert, Triggers, and NEW Part Metadata Logic ---\nif (job_details && job_details.id) {\n    const gcodeAnalysis = job_details.analysis ? JSON.stringify(job_details.analysis) : null;\n    let filamentGrams = null;\n    if (job_details.filament?.e0?.fil?.[0]?.gram) {\n        filamentGrams = job_details.filament.e0.fil[0].gram;\n    }\n\n    let partMetadata = null;\n    if (Array.isArray(job_details.customFields) && job_details.customFields.length > 0) {\n        const modelDataField = job_details.customFields.find(field => field.id === 'modeldata');\n        if (modelDataField && modelDataField.value && typeof modelDataField.value.string === 'string') {\n            let rawString = modelDataField.value.string;\n            try {\n                const startIndex = rawString.indexOf('[');\n                const endIndex = rawString.lastIndexOf(']');\n                if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {\n                    let jsonArrayString = rawString.substring(startIndex, endIndex + 1);\n                    jsonArrayString = jsonArrayString.replace(/'/g, '\"');\n                    partMetadata = JSON.parse(jsonArrayString);\n                } else {\n                    node.warn(`Could not find a JSON array '[...]' in modelData string: ${rawString}`);\n                }\n            } catch (e) {\n                node.warn(`Could not parse cleaned modelData for job ${job_details.id}. Error: ${e.message}`);\n            }\n        }\n    }\n\n    msg_job_upsert = {\n        topic: \"UPSERT_PRINT_JOB\",\n        params: [\n            job_details.id.toString(),\n            device.device_id,\n            job_details.started,\n            job_details.ended,\n            job_details.totalPrintTime,\n            job_details.state,\n            current_filename,\n            filamentGrams,\n            gcodeAnalysis,\n            partMetadata ? JSON.stringify(partMetadata) : null,\n            job_details.analysis?.nozzleSize ?? null,\n            msg.payload.filament?.[0]?.dia ?? null\n        ]\n    };\n\n    if (is_printing_now && !was_printing && current_filename) {\n        msg_start_energy_trigger = {\n            topic: \"RECORD_START_ENERGY\",\n            params: [device.device_id, current_filename]\n        };\n    }\n\n    if (current_filename && device.gcode_preview_host && device.gcode_preview_api_key) {\n        msg_gcode_analysis_trigger = {\n            topic: \"ANALYZE_GCODE\",\n            job_id: job_details.id.toString(),\n            filename: current_filename,\n            gcode_host: device.gcode_preview_host,\n            gcode_api_key: device.gcode_preview_api_key,\n            job_details: job_details,\n            original_device_config: device\n        };\n    }\n}\n\nreturn [msg_job_upsert, msg_status_update, msg_end_of_job, msg_start_energy_trigger, msg_gcode_analysis_trigger, msg_pdf_generation_trigger];",
+        "func": "// --- Get data from previous nodes --- \nconst job_details = msg.payload.job;\nconst live_data = msg.live_data;\nconst device = msg.original_device_config;\nconst last_status = flow.get('printer_status_' + device.device_id) || {};\n\nconst api_response_data = live_data.data?.find(p => p.id === parseInt(device.simplyprint_id, 10));\nif (!api_response_data) {\n    return [null, null, null, null, null, null];\n}\n\nconst current_filename = job_details?.file || api_response_data.job?.file || null;\nconst stateText = api_response_data.printer?.state?.charAt(0).toUpperCase() + api_response_data.printer.state.slice(1) || 'Unknown';\nconst is_printing_now = ['printing', 'heating'].includes(stateText.toLowerCase());\nconst was_printing = last_status.is_printing ?? false;\n\nlet msg_job_upsert = null;\nlet msg_status_update = null;\nlet msg_end_of_job_energy = null;\nlet msg_start_energy_trigger = null;\nlet msg_gcode_analysis_trigger = null;\nlet msg_db_lookup_trigger = null; // Changed name for clarity\n\n// --- Job Completion Detection ---\nif (was_printing && !is_printing_now && last_status.filename) {\n    msg_end_of_job_energy = {\n        topic: \"CALCULATE_FINAL_ENERGY\",\n        params: [last_status.device_id, last_status.filename]\n    };\n\n    // At the moment of completion, job_details might be gone, but last_status holds the cloud ID.\n    if (last_status.simplyprint_job_id) {\n        msg_db_lookup_trigger = {\n            // We send a message to a postgresql node to do the lookup\n            params: [last_status.simplyprint_job_id]\n        };\n    }\n}\n\n// --- Update flow memory for the NEXT cycle ---\n// We store the cloud ID, which is the only reliable piece of data during the print.\nflow.set('printer_status_' + device.device_id, {\n    is_printing: is_printing_now,\n    filename: current_filename,\n    device_id: device.device_id,\n    simplyprint_job_id: job_details ? job_details.id.toString() : null\n});\n\n// --- Prepare Status Update ---\nmsg_status_update = {\n    topic: \"INSERT_PRINTER_STATUS\",\n    params: [\n        new Date().toISOString(), // 1\n        device.device_id, // 2\n        stateText, // 3\n        stateText.toLowerCase() !== 'offline', // 4\n        is_printing_now, // 5\n        stateText.toLowerCase() === 'paused', // 6\n        stateText.toLowerCase() === 'error', // 7\n        ['printing', 'paused', 'heating'].includes(stateText.toLowerCase()), // 8\n        api_response_data.printer.temps?.current?.tool?.[0] ?? null, // 9\n        api_response_data.printer.temps?.target?.tool?.[0] ?? null, // 10\n        api_response_data.printer.temps?.current?.bed ?? null, // 11\n        api_response_data.printer.temps?.target?.bed ?? null, // 12\n        api_response_data.filament?.[0]?.type?.name ?? null, // 13\n        current_filename, // 14\n        api_response_data.job?.percentage ?? null, // 15\n        api_response_data.job?.time ?? null, // 16\n        api_response_data.printer.temps?.ambient ?? null // 17\n    ]\n};\n\n// --- Prepare Job Upsert, Triggers, and NEW Part Metadata Logic ---\nif (job_details && job_details.id) {\n    const gcodeAnalysis = job_details.analysis ? JSON.stringify(job_details.analysis) : null;\n    let filamentGrams = null;\n    if (job_details.filament?.e0?.fil?.[0]?.gram) {\n        filamentGrams = job_details.filament.e0.fil[0].gram;\n    }\n\n    let partMetadata = null;\n    if (Array.isArray(job_details.customFields) && job_details.customFields.length > 0) {\n        const modelDataField = job_details.customFields.find(field => field.id === 'modeldata');\n        if (modelDataField && modelDataField.value && typeof modelDataField.value.string === 'string') {\n            let rawString = modelDataField.value.string;\n            try {\n                const startIndex = rawString.indexOf('[');\n                const endIndex = rawString.lastIndexOf(']');\n                if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {\n                    let jsonArrayString = rawString.substring(startIndex, endIndex + 1);\n                    jsonArrayString = jsonArrayString.replace(/'/g, '\"');\n                    partMetadata = JSON.parse(jsonArrayString);\n                } else {\n                    node.warn(`Could not find a JSON array '[...]' in modelData string: ${rawString}`);\n                }\n            } catch (e) {\n                node.warn(`Could not parse cleaned modelData for job ${job_details.id}. Error: ${e.message}`);\n            }\n        }\n    }\n\n    msg_job_upsert = {\n        topic: \"UPSERT_PRINT_JOB\",\n        params: [\n            job_details.id.toString(),\n            device.device_id,\n            job_details.started,\n            job_details.ended,\n            job_details.totalPrintTime,\n            job_details.state,\n            current_filename,\n            filamentGrams,\n            gcodeAnalysis,\n            partMetadata ? JSON.stringify(partMetadata) : null,\n            job_details.analysis?.nozzleSize ?? null,\n            msg.payload.filament?.[0]?.dia ?? null\n        ]\n    };\n\n    if (is_printing_now && !was_printing && current_filename) {\n        msg_start_energy_trigger = {\n            topic: \"RECORD_START_ENERGY\",\n            params: [device.device_id, current_filename]\n        };\n    }\n\n    if (current_filename && device.gcode_preview_host && device.gcode_preview_api_key) {\n        msg_gcode_analysis_trigger = {\n            topic: \"ANALYZE_GCODE\",\n            job_id: job_details.id.toString(),\n            filename: current_filename,\n            gcode_host: device.gcode_preview_host,\n            gcode_api_key: device.gcode_preview_api_key,\n            job_details: job_details,\n            original_device_config: device\n        };\n    }\n}\n\nreturn [msg_job_upsert, msg_status_update, msg_end_of_job_energy, msg_start_energy_trigger, msg_gcode_analysis_trigger, msg_db_lookup_trigger];",
         "outputs": 6,
         "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1210,
-        "y": 460,
+        "x": 1350,
+        "y": 380,
         "wires": [
             [
                 "566c89287199eab1"
@@ -5137,7 +5181,7 @@
                 "548b0a238325e0b8"
             ],
             [
-                "c74a8a1a.a3a5e8"
+                "36443dab4440c606"
             ]
         ],
         "info": "**Purpose:** The central processing hub of this entire flow. It merges all available data sources (live poll, detailed job API) and determines what actions need to be taken.\r\n\r\n**Logic:**\r\n1.  Detects job start/end transitions and prepares trigger messages for energy calculations.\r\n2.  Standardizes the printer status data for insertion into the `printer_status` table.\r\n3.  Parses the `modelData` from the `customFields` array.\r\n4.  Prepares a complete message with all job details (`filament_used_g`, `part_metadata`, etc.) for insertion into the `print_jobs` table.\r\n5.  Prepares a trigger message for the G-code analysis pipeline if a job is active.\r\n\r\n**Outputs:** This node has 5 outputs, each sending a different, specialized message to a `link out` node to trigger a specific action in the main flow or other subflows."
@@ -5152,8 +5196,8 @@
         "links": [
             "bf152e33e1198b2b"
         ],
-        "x": 1570,
-        "y": 360,
+        "x": 1710,
+        "y": 280,
         "wires": [],
         "l": true,
         "info": "**Purpose:** Acts as a named portal to send a fully prepared message back to the `Data Output` section of the `Master Ingestion Flow`. This keeps the flow diagram clean by avoiding long wires. This specific link sends the message to update the `print_jobs` table."
@@ -5168,8 +5212,8 @@
         "links": [
             "af2f0b8c71e0ef6c"
         ],
-        "x": 1580,
-        "y": 420,
+        "x": 1720,
+        "y": 340,
         "wires": [],
         "l": true
     },
@@ -5209,8 +5253,8 @@
         "links": [
             "b882adb136a0e909"
         ],
-        "x": 1590,
-        "y": 480,
+        "x": 1730,
+        "y": 400,
         "wires": [],
         "l": true
     },
@@ -5224,8 +5268,8 @@
         "links": [
             "878bdfc6b43e57cb"
         ],
-        "x": 1540,
-        "y": 520,
+        "x": 1680,
+        "y": 440,
         "wires": [],
         "l": true
     },
@@ -5408,10 +5452,6 @@
         "wires": [
             [
                 "a849c171e8e54fe4"
-            ],
-            [
-                "c74a8a1a.a3a5e8",
-                "a9d3a4e9.1c2d28"
             ]
         ]
     },
@@ -5419,17 +5459,21 @@
         "id": "c74a8a1a.a3a5e8",
         "type": "http request",
         "z": "088fab733419c707",
+        "g": "2406f1dc5d32b76a",
         "name": "Generate DPP Report PDF",
         "method": "POST",
         "ret": "txt",
         "paytoqs": "ignore",
-        "url": "http://python-api:5000/api/generate_dpp_pdf",
+        "url": "",
         "tls": "",
         "persist": false,
         "proxy": "",
+        "insecureHTTPParser": false,
         "authType": "",
-        "x": 1600,
-        "y": 560,
+        "senderr": false,
+        "headers": [],
+        "x": 2160,
+        "y": 540,
         "wires": [
             [
                 "a9d3a4e9.1c2d28"
@@ -5445,12 +5489,12 @@
         "tosidebar": true,
         "console": false,
         "tostatus": true,
-        "complete": "payload",
-        "targetType": "msg",
+        "complete": "true",
+        "targetType": "full",
         "statusVal": "payload",
         "statusType": "auto",
-        "x": 1820,
-        "y": 560,
+        "x": 2370,
+        "y": 580,
         "wires": []
     },
     {
@@ -5459,7 +5503,7 @@
         "z": "088fab733419c707",
         "g": "d46e71e1a4ec093a",
         "name": "debug 17",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -5477,7 +5521,7 @@
         "z": "088fab733419c707",
         "g": "d46e71e1a4ec093a",
         "name": "debug 18",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -5488,6 +5532,72 @@
         "x": 810,
         "y": 560,
         "wires": []
+    },
+    {
+        "id": "cdf9aaf2b9bc1726",
+        "type": "inject",
+        "z": "088fab733419c707",
+        "g": "2406f1dc5d32b76a",
+        "name": "",
+        "props": [
+            {
+                "p": "params",
+                "v": "[\"3929327\"]",
+                "vt": "json"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 1290,
+        "y": 520,
+        "wires": [
+            [
+                "36443dab4440c606"
+            ]
+        ]
+    },
+    {
+        "id": "36443dab4440c606",
+        "type": "postgresql",
+        "z": "088fab733419c707",
+        "g": "2406f1dc5d32b76a",
+        "name": "Get Job PK by Cloud ID",
+        "query": "SELECT job_id FROM print_jobs WHERE simplyprint_job_id = $1;",
+        "postgreSQLConfig": "4259e91acb63e17b",
+        "split": false,
+        "rowsPerMsg": 1,
+        "outputs": 1,
+        "x": 1630,
+        "y": 500,
+        "wires": [
+            [
+                "b09a67e1a0a51288"
+            ]
+        ]
+    },
+    {
+        "id": "b09a67e1a0a51288",
+        "type": "function",
+        "z": "088fab733419c707",
+        "g": "2406f1dc5d32b76a",
+        "name": "Prepare PDF Request",
+        "func": "const job_id = msg.payload[0]?.job_id;\nif (!job_id) {\n    return null;\n}\nmsg.method = \"POST\";\nmsg.url = \"http://python_api:5000/api/generate_dpp_pdf\";\nmsg.headers = { \"Content-Type\": \"application/json\" };\nmsg.payload = { \"job_id\": job_id };\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1920,
+        "y": 500,
+        "wires": [
+            [
+                "c74a8a1a.a3a5e8"
+            ]
+        ]
     },
     {
         "id": "878bdfc6b43e57cb",

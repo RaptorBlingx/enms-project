@@ -69,8 +69,12 @@ def get_plant_image_src(plant_type, kwh_for_plant):
     image_path = os.path.join(ART_ROOT, "plants", plant_folder, f"{plant_folder}_stage_{stage_padded}.png")
     return f"file://{image_path}"
 
-# --- Main Service Function (to be called by app.py) ---
+# --- Main Service Function ---
 def generate_pdf_for_job(job_id):
+    """
+    Fetches job data, renders a template, creates a PDF, and updates the database.
+    Returns a dictionary with success status and the PDF URL.
+    """
     conn = None
     try:
         conn = get_db_connection()
@@ -97,36 +101,42 @@ def generate_pdf_for_job(job_id):
 
         job_data_dict = dict(job_data)
 
-        # Clean filenames before rendering
+        # ===== THIS IS THE FIX: The order of operations is corrected =====
+        
+        # 1. FIRST, safely handle the gcode_analysis_data field.
+        # This ensures it is ALWAYS a dictionary before anything else tries to access it.
+        gca_data = job_data_dict.get("gcode_analysis_data")
+        if gca_data is None:
+            job_data_dict["gcode_analysis_data"] = {} # If NULL, make it an empty dict
+        elif isinstance(gca_data, str):
+            try:
+                job_data_dict["gcode_analysis_data"] = json.loads(gca_data)
+            except (json.JSONDecodeError, TypeError):
+                job_data_dict["gcode_analysis_data"] = {}
+
+        # 2. SECOND, now that we know gcode_analysis_data is a dict, we can safely clean filenames.
         if 'filename' in job_data_dict:
-            job_data_dict['filename'] = clean_filename(job_data_dict['filename'])
+            job_data_dict['filename'] = clean_filename(job_data_dict.get('filename'))
+        
+        # This line is now safe because job_data_dict["gcode_analysis_data"] is guaranteed to be a dict.
         if job_data_dict.get("gcode_analysis_data", {}).get("object_name"):
             job_data_dict["gcode_analysis_data"]["object_name"] = clean_filename(job_data_dict["gcode_analysis_data"]["object_name"])
+
+        # ===== END OF FIX =====
 
         numeric_fields = ['session_energy_wh', 'filament_used_g', 'duration_seconds', 'nozzle_temp_actual', 'bed_temp_actual']
         for field in numeric_fields:
             if field in job_data_dict and job_data_dict[field] is not None:
                 job_data_dict[field] = float(job_data_dict[field])
         
-        gca_data = job_data_dict.get("gcode_analysis_data")
-        if isinstance(gca_data, str):
-            try: job_data_dict["gcode_analysis_data"] = json.loads(gca_data)
-            except (json.JSONDecodeError, TypeError): job_data_dict["gcode_analysis_data"] = {}
-        elif gca_data is None: job_data_dict["gcode_analysis_data"] = {}
-
-        session_energy = job_data_dict.get('session_energy_wh', 0)
+        session_energy = job_data_dict.get('session_energy_wh', 0) or 0
         kwh_consumed = session_energy / 1000.0 if session_energy else 0
         
         plant_type_for_job = job_data_dict.get('plant_type', 'generic_plant')
         file_path_plant_image_url = get_plant_image_src(plant_type_for_job, kwh_consumed)
         
-        # --- Correct Thumbnail Path for Docker ---
-        # The python_api service CANNOT see the Nginx web root. This is a key difference.
-        # We must construct the path based on the shared gcode_previews volume.
         file_path_thumbnail_url = None
         if job_data_dict.get('thumbnail_url'):
-            # The thumbnail_url is like '/gcode_previews/job_123.png'
-            # The volume is mounted at '/app/gcode_previews'
             thumbnail_path = os.path.join("/app", job_data_dict['thumbnail_url'].lstrip('/'))
             if os.path.exists(thumbnail_path):
                 file_path_thumbnail_url = f"file://{thumbnail_path}"
@@ -139,7 +149,6 @@ def generate_pdf_for_job(job_id):
         )
 
         pdf_filename = f'dpp_job_{job_id}.pdf'
-        # This is the shared volume path INSIDE this container
         pdf_dir = '/app/generated_pdfs' 
         pdf_path = os.path.join(pdf_dir, pdf_filename)
         HTML(string=rendered_html).write_pdf(pdf_path)
@@ -152,4 +161,5 @@ def generate_pdf_for_job(job_id):
         return {"success": True, "pdf_url": pdf_url}
 
     finally:
-        if conn: conn.close()
+        if conn:
+            conn.close()
