@@ -47,16 +47,15 @@ def generate_dpp_pdf_endpoint():
     """
     data = request.get_json()
     job_id = data.get('job_id')
-
     if not job_id:
         return jsonify({"error": "job_id is required"}), 400
-
     try:
-        # Call the function from our other file to do the work
+        # Call the real function from our other file
         result = generate_pdf_for_job(job_id)
+        if "error" in result:
+             return jsonify(result), 500
         return jsonify(result), 200
     except Exception as e:
-        # If anything goes wrong in our service, handle the error gracefully
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 

@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libharfbuzz0b \
     libffi-dev \
     libcairo2 \
+    libgdk-pixbuf2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
 # 4. Copy the requirements file into the container.
@@ -32,10 +33,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # 7. Create a directory inside the container for generated PDFs.
-RUN mkdir -p /app/generated_pdfs
+RUN mkdir -p /app/generated_pdfs /app/gcode_previews
 
 # 8. Expose the port that the Flask application will run on.
 EXPOSE 5000
 
 # 9. Define the command to run when the container starts.
-CMD ["python", "app.py"]
+#CMD ["python", "app.py"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]

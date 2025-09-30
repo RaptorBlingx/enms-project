@@ -160,6 +160,7 @@ services:
     volumes:
       - generated_pdfs:/app/generated_pdfs
       - gcode_previews_data:/app/gcode_previews
+      - ./artistic-resources:/app/artistic-resources:ro
       - ./python-api:/app
       - ./backend:/app/backend:rw
     depends_on:
