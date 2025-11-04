@@ -1,0 +1,349 @@
+/* ====================================================================
+   ENMS Demo - Reusable Tooltip Component
+   Provides contextual help throughout the application
+   ==================================================================== */
+
+/* Tooltip Wrapper */
+.tooltip-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    margin-left: 6px;
+}
+
+/* Tooltip Icon */
+.tooltip-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    font-size: 12px;
+    color: var(--tooltip-icon-color, #3b82f6);
+    cursor: help;
+    transition: all 0.2s ease;
+    opacity: 0.7;
+}
+
+.tooltip-icon:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Tooltip Content Box */
+.tooltip-content {
+    position: fixed !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    top: auto !important;
+    min-width: 200px;
+    max-width: 320px;
+    padding: 12px 14px;
+    background-color: var(--tooltip-bg, #ffffff);
+    color: var(--tooltip-text, #1f2937);
+    font-size: 13px;
+    line-height: 1.6;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+    pointer-events: none;
+    z-index: 999999;
+    text-align: left;
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+/* Arrow */
+.tooltip-content::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: var(--arrow-offset, 50%);
+    transform: translateX(-50%);
+    border-width: 7px;
+    border-style: solid;
+    border-color: var(--tooltip-bg, #ffffff) transparent transparent transparent;
+}
+
+/* Arrow border for depth */
+.tooltip-content::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: var(--arrow-offset, 50%);
+    transform: translateX(-50%);
+    border-width: 8px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.1) transparent transparent transparent;
+    z-index: -1;
+}
+
+/* Show on Hover */
+.tooltip-wrapper:hover .tooltip-content,
+.tooltip-icon:focus + .tooltip-content {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Positioning Variants */
+
+/* Bottom Position (arrows point up when tooltip is below) */
+.tooltip-wrapper.tooltip-bottom .tooltip-content::after {
+    top: auto;
+    bottom: 100%;
+    border-color: transparent transparent var(--tooltip-bg, #ffffff) transparent;
+}
+
+.tooltip-wrapper.tooltip-bottom .tooltip-content::before {
+    top: auto;
+    bottom: 100%;
+    border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
+}
+
+/* Left Position */
+.tooltip-wrapper.tooltip-left .tooltip-content {
+    left: auto;
+    right: calc(100% + 8px);
+    bottom: 50%;
+    transform: translateY(50%);
+}
+
+.tooltip-wrapper.tooltip-left .tooltip-content::after {
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%);
+    border-color: transparent transparent transparent var(--tooltip-bg, #1f2937);
+}
+
+.tooltip-wrapper.tooltip-left:hover .tooltip-content {
+    transform: translateY(50%) translateX(-4px);
+}
+
+/* Right Position */
+.tooltip-wrapper.tooltip-right .tooltip-content {
+    left: calc(100% + 8px);
+    right: auto;
+    bottom: 50%;
+    transform: translateY(50%);
+}
+
+.tooltip-wrapper.tooltip-right .tooltip-content::after {
+    top: 50%;
+    left: auto;
+    right: 100%;
+    transform: translateY(-50%);
+    border-color: transparent var(--tooltip-bg, #1f2937) transparent transparent;
+}
+
+.tooltip-wrapper.tooltip-right:hover .tooltip-content {
+    transform: translateY(50%) translateX(4px);
+}
+
+/* Size Variants */
+.tooltip-content.tooltip-small {
+    min-width: 150px;
+    max-width: 200px;
+    font-size: 12px;
+    padding: 8px 10px;
+}
+
+.tooltip-content.tooltip-large {
+    min-width: 250px;
+    max-width: 400px;
+    font-size: 14px;
+    padding: 12px 14px;
+}
+
+/* Theme Variants */
+
+/* Dark Theme (if needed) */
+.tooltip-wrapper.tooltip-dark .tooltip-content {
+    background-color: #1f2937;
+    color: #f3f4f6;
+    border: 1px solid #374151;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+}
+
+.tooltip-wrapper.tooltip-dark .tooltip-content::after {
+    border-top-color: #1f2937;
+}
+
+.tooltip-wrapper.tooltip-dark .tooltip-content::before {
+    border-top-color: #374151;
+}
+
+.tooltip-wrapper.tooltip-dark .tooltip-icon {
+    color: #60a5fa;
+}
+
+/* Success Theme */
+.tooltip-wrapper.tooltip-success .tooltip-content {
+    background-color: #059669;
+    color: #ffffff;
+}
+
+.tooltip-wrapper.tooltip-success .tooltip-content::after {
+    border-top-color: #059669;
+}
+
+.tooltip-wrapper.tooltip-success .tooltip-icon {
+    color: #059669;
+}
+
+/* Warning Theme */
+.tooltip-wrapper.tooltip-warning .tooltip-content {
+    background-color: #d97706;
+    color: #ffffff;
+}
+
+.tooltip-wrapper.tooltip-warning .tooltip-content::after {
+    border-top-color: #d97706;
+}
+
+.tooltip-wrapper.tooltip-warning .tooltip-icon {
+    color: #d97706;
+}
+
+/* Error Theme */
+.tooltip-wrapper.tooltip-error .tooltip-content {
+    background-color: #dc2626;
+    color: #ffffff;
+}
+
+.tooltip-wrapper.tooltip-error .tooltip-content::after {
+    border-top-color: #dc2626;
+}
+
+.tooltip-wrapper.tooltip-error .tooltip-icon {
+    color: #dc2626;
+}
+
+/* Info Theme (default) */
+.tooltip-wrapper.tooltip-info .tooltip-icon {
+    color: #3b82f6;
+}
+
+/* Inline Tooltip (for use within text) */
+.tooltip-inline {
+    display: inline;
+    margin-left: 2px;
+}
+
+.tooltip-inline .tooltip-icon {
+    width: 14px;
+    height: 14px;
+    font-size: 11px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .tooltip-content {
+        max-width: 250px;
+        font-size: 12px;
+        padding: 8px 10px;
+    }
+    
+    /* On mobile, always show bottom tooltip to avoid overflow */
+    .tooltip-wrapper .tooltip-content {
+        bottom: auto;
+        top: calc(100% + 8px);
+    }
+    
+    .tooltip-wrapper .tooltip-content::after {
+        top: auto;
+        bottom: 100%;
+        border-color: transparent transparent var(--tooltip-bg, #1f2937) transparent;
+    }
+    
+    .tooltip-wrapper:hover .tooltip-content {
+        transform: translateX(-50%) translateY(4px);
+    }
+}
+
+/* Touch Device Support */
+@media (hover: none) {
+    /* On touch devices, show on tap/click */
+    .tooltip-wrapper.active .tooltip-content {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(-4px);
+    }
+    
+    .tooltip-icon {
+        /* Make icon slightly larger for easier tapping */
+        width: 18px;
+        height: 18px;
+        font-size: 14px;
+    }
+}
+
+/* Keyboard Accessibility */
+.tooltip-icon:focus {
+    outline: 2px solid var(--tooltip-icon-color, #3b82f6);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    .tooltip-content {
+        border: 2px solid currentColor;
+    }
+    
+    .tooltip-icon {
+        opacity: 1;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    .tooltip-content,
+    .tooltip-icon {
+        transition: none;
+    }
+    
+    .tooltip-wrapper:hover .tooltip-content {
+        transform: translateX(-50%);
+    }
+}
+
+/* Light Mode Default (matching application theme) */
+:root {
+    --tooltip-bg: #ffffff;
+    --tooltip-text: #1f2937;
+    --tooltip-icon-color: #3b82f6;
+}
+
+/* Animation for delayed appearance */
+@keyframes tooltipFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(0);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-4px);
+    }
+}
+
+.tooltip-wrapper:hover .tooltip-content {
+    animation: tooltipFadeIn 0.3s ease forwards;
+    animation-delay: 0.3s; /* Delay before showing */
+}
+
+/* Prevent tooltip from being cut off at viewport edges */
+.tooltip-content.tooltip-edge-left {
+    left: 0;
+    transform: translateX(0);
+}
+
+.tooltip-content.tooltip-edge-right {
+    left: auto;
+    right: 0;
+    transform: translateX(0);
+}
