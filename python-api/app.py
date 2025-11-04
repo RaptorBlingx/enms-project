@@ -173,6 +173,39 @@ def api_verify_token():
         traceback.print_exc()
         return jsonify({"valid": False, "error": str(e)}), 500
 
+@app.route('/api/auth/check-session', methods=['GET'])
+def api_check_session():
+    """Check if session is valid (alias for verify)"""
+    if not verify_token:
+        return jsonify({"valid": False, "error": "Auth service not available"}), 503
+    
+    try:
+        auth_header = request.headers.get('Authorization', '')
+        if not auth_header.startswith('Bearer '):
+            return jsonify({"valid": False}), 200
+        
+        token = auth_header.split(' ')[1]
+        result = verify_token(token)
+        
+        # If valid, extract user info from payload
+        if result.get('valid') and result.get('payload'):
+            payload = result['payload']
+            return jsonify({
+                "valid": True,
+                "user": {
+                    "id": payload.get('user_id'),
+                    "email": payload.get('email'),
+                    "role": payload.get('role'),
+                    "full_name": payload.get('full_name', payload.get('email', '').split('@')[0])
+                }
+            }), 200
+        else:
+            return jsonify({"valid": False, "error": result.get('error', 'Invalid token')}), 200
+        
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({"valid": False, "error": str(e)}), 200
+
 @app.route('/api/auth/me', methods=['GET'])
 def api_get_current_user():
     """Get current user information"""
