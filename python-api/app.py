@@ -17,6 +17,17 @@ except ImportError:
     get_live_dpp_data = lambda: {"error": "DPP simulator not available"}
     generate_pdf_for_job = lambda job_id: {"error": "PDF service not available"}
 
+# Import auth service
+try:
+    from auth_service import register_user, login_user, logout_user, verify_token
+    print("--- DEBUG: Successfully imported auth_service. ---")
+except ImportError as e:
+    print(f"--- DEBUG: Could not import auth_service: {e} ---")
+    register_user = None
+    login_user = None
+    logout_user = None
+    verify_token = None
+
 
 app = Flask(__name__)
 # Initialize CORS to allow cross-origin requests from the frontend
@@ -58,6 +69,136 @@ def generate_dpp_pdf_endpoint():
     except Exception as e:
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
+
+# --- AUTH ENDPOINTS ---
+
+@app.route('/api/auth/register', methods=['POST'])
+def api_register():
+    """User registration endpoint"""
+    if not register_user:
+        return jsonify({"success": False, "error": "Auth service not available"}), 503
+    
+    try:
+        data = request.get_json()
+        required_fields = ['email', 'password', 'organization', 'full_name', 'position', 'country']
+        
+        for field in required_fields:
+            if not data.get(field):
+                return jsonify({"success": False, "error": f"Missing required field: {field}"}), 400
+        
+        result = register_user(
+            email=data['email'],
+            password=data['password'],
+            organization=data['organization'],
+            full_name=data['full_name'],
+            position=data['position'],
+            mobile=data.get('mobile', ''),
+            country=data['country']
+        )
+        
+        status_code = 201 if result.get('success') else 400
+        return jsonify(result), status_code
+        
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/auth/login', methods=['POST'])
+def api_login():
+    """User login endpoint"""
+    if not login_user:
+        return jsonify({"success": False, "error": "Auth service not available"}), 503
+    
+    try:
+        data = request.get_json()
+        
+        if not data.get('email') or not data.get('password'):
+            return jsonify({"success": False, "error": "Email and password are required"}), 400
+        
+        ip_address = request.remote_addr
+        user_agent = request.headers.get('User-Agent', '')
+        
+        result = login_user(
+            email=data['email'],
+            password=data['password'],
+            ip_address=ip_address,
+            user_agent=user_agent
+        )
+        
+        status_code = 200 if result.get('success') else 401
+        return jsonify(result), status_code
+        
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/auth/logout', methods=['POST'])
+def api_logout():
+    """User logout endpoint"""
+    if not logout_user:
+        return jsonify({"success": False, "error": "Auth service not available"}), 503
+    
+    try:
+        auth_header = request.headers.get('Authorization', '')
+        if not auth_header.startswith('Bearer '):
+            return jsonify({"success": False, "error": "Invalid authorization header"}), 401
+        
+        token = auth_header.split(' ')[1]
+        result = logout_user(token)
+        
+        return jsonify(result), 200
+        
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/auth/verify', methods=['GET'])
+def api_verify_token():
+    """Verify authentication token"""
+    if not verify_token:
+        return jsonify({"valid": False, "error": "Auth service not available"}), 503
+    
+    try:
+        auth_header = request.headers.get('Authorization', '')
+        if not auth_header.startswith('Bearer '):
+            return jsonify({"valid": False, "error": "Invalid authorization header"}), 401
+        
+        token = auth_header.split(' ')[1]
+        result = verify_token(token)
+        
+        status_code = 200 if result.get('valid') else 401
+        return jsonify(result), status_code
+        
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({"valid": False, "error": str(e)}), 500
+
+@app.route('/api/auth/me', methods=['GET'])
+def api_get_current_user():
+    """Get current user information"""
+    if not verify_token:
+        return jsonify({"success": False, "error": "Auth service not available"}), 503
+    
+    try:
+        auth_header = request.headers.get('Authorization', '')
+        if not auth_header.startswith('Bearer '):
+            return jsonify({"success": False, "error": "Invalid authorization header"}), 401
+        
+        token = auth_header.split(' ')[1]
+        result = verify_token(token)
+        
+        if result.get('valid'):
+            # Return user info from the token verification
+            return jsonify({
+                "success": True,
+                "user": result.get('user', {})
+            }), 200
+        else:
+            return jsonify({"success": False, "error": "Invalid token"}), 401
+        
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({"success": False, "error": str(e)}), 500
 
 # --- NEW: Database Connection Function (Docker-aware) with DEBUG LOGGING ---
 def get_db_connection():
