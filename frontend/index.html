@@ -1,9 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light-mode">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modern Embedded Dashboard v4 (Dark/Light Mode)</title>
+    
+    <!-- Immediate Auth Check - Prevent Page Flash -->
+    <script>
+        (function() {
+            const token = localStorage.getItem('auth_token');
+            if (!token) {
+                // No token, redirect immediately before any content loads
+                window.location.replace('/auth.html');
+            }
+        })();
+    </script>
+    
     <!-- Import Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -246,10 +258,127 @@
             gap: 0.75rem; /* Consistent gap */
         }
 
+        .top-nav-right {
+            gap: 0.5rem; /* Slightly tighter gap for right side */
+        }
+
         .top-nav-title {
             font-size: 1.1rem;
             font-weight: 600;
             margin-left: 0.5rem;
+        }
+
+        /* User Menu Dropdown */
+        .user-menu {
+            position: relative;
+            display: inline-block;
+        }
+
+        .user-menu-button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--color-button-bg);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            color: var(--color-text-primary);
+            font-weight: 500;
+        }
+
+        .user-menu-button:hover {
+            background: var(--color-button-hover-bg);
+            border-color: var(--color-accent);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-name {
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .user-menu-dropdown {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            right: 0;
+            background: var(--color-bg-sidebar);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            min-width: 200px;
+            z-index: 1000;
+            display: none;
+            overflow: hidden;
+        }
+
+        .user-menu-dropdown.show {
+            display: block;
+            animation: slideDown 0.2s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--color-text-primary);
+            text-decoration: none;
+            transition: background-color var(--transition-speed);
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        .user-menu-item:hover {
+            background: var(--color-button-hover-bg);
+        }
+
+        .user-menu-item i {
+            width: 1.2rem;
+            color: var(--color-icon);
+        }
+
+        .user-menu-item.logout {
+            color: #ef4444;
+            border-top: 1px solid var(--color-border);
+        }
+
+        .user-menu-item.logout i {
+            color: #ef4444;
+        }
+
+        .user-menu-item.logout:hover {
+            background: rgba(239, 68, 68, 0.1);
         }
 
         .toggle-sidebar, .theme-toggle { /* Group common styles */
@@ -272,11 +401,12 @@
         .nav-button {
             background-color: var(--color-button-bg);
             border: 1px solid var(--color-border);
-            padding: 0.5rem 1rem;
+            padding: 0.5rem 0.85rem;
             color: var(--color-text-secondary);
             cursor: pointer;
             border-radius: var(--border-radius);
             font-weight: 500;
+            font-size: 0.9rem;
             transition: background-color var(--transition-speed) ease-out,
                         color var(--transition-speed) ease-out,
                         border-color var(--transition-speed) ease-out,
@@ -286,6 +416,14 @@
             align-items: center;
             gap: 0.4rem;
             white-space: nowrap; /* Prevent text wrapping */
+        }
+
+        .nav-button span {
+            display: none; /* Hide text by default */
+        }
+
+        .nav-button:hover span {
+            display: inline; /* Show text on hover */
         }
 
         .nav-button:active {
@@ -517,14 +655,15 @@
             background-color: var(--color-bg-light); /* Use theme background */
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
             z-index: 200; /* Make sure it's on top */
-            padding: var(--base-padding);
+            padding: 3rem 2rem;
             text-align: center;
             opacity: 1;
             visibility: visible;
             transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+            overflow-y: auto; /* Enable vertical scrolling */
         }
 
         .welcome-screen-container.hidden {
@@ -535,11 +674,12 @@
 
         .welcome-content-box {
             background-color: var(--color-bg-sidebar); /* Use a contrasting bg like sidebar */
-            padding: calc(var(--base-padding) * 2.5);
+            padding: 3rem 4rem;
             border-radius: calc(var(--border-radius) * 2);
             box-shadow: var(--box-shadow-medium);
-            max-width: 600px;
-            width: 90%;
+            max-width: 1200px; /* Wider for landing page */
+            width: 95%;
+            margin: auto;
         }
 
         .welcome-content-box h1 {
@@ -574,6 +714,8 @@
             transition: background-color var(--transition-speed) ease-out, transform var(--transition-speed) ease-out;
             text-decoration: none;
             display: inline-block;
+            width: 100%;
+            text-align: left;
         }
 
         .profile-button-welcome:hover {
@@ -584,6 +726,176 @@
         .profile-button-welcome:active {
             transform: translateY(-1px);
         }
+        
+        /* Enhanced Welcome Screen Styles */
+        .demo-badge-welcome {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+            color: #111827;
+            padding: 0.5rem 1.25rem;
+            border-radius: 9999px;
+            font-weight: 700;
+            font-size: 0.875rem;
+            letter-spacing: 0.05em;
+            box-shadow: var(--box-shadow-medium);
+            z-index: 201;
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .logo-section-welcome {
+            margin-bottom: 2rem;
+        }
+        
+        .system-title-welcome {
+            font-size: 2.75rem !important;
+            font-weight: 800 !important;
+            margin-bottom: 0.5rem !important;
+            background: linear-gradient(135deg, var(--color-accent) 0%, #10b981 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+        
+        .system-subtitle-welcome {
+            font-size: 1.125rem;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+            margin-bottom: 0;
+        }
+        
+        .description-welcome {
+            font-size: 1.0625rem !important;
+            line-height: 1.8 !important;
+            margin-bottom: 2.5rem !important;
+            color: var(--color-text-primary) !important;
+            text-align: left;
+        }
+        
+        .feature-grid-welcome {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4 columns for desktop */
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        
+        .feature-card-welcome {
+            background: rgba(59, 130, 246, 0.05);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            text-align: center;
+            transition: all var(--transition-speed) ease;
+        }
+        
+        .feature-card-welcome:hover {
+            background: rgba(59, 130, 246, 0.1);
+            transform: translateY(-2px);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+        
+        .feature-icon-welcome {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-title-welcome {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+        
+        .profile-section-welcome {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(148, 163, 184, 0.1);
+        }
+        
+        .profile-label-welcome {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--color-text-secondary);
+            margin-bottom: 1.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .profile-button-welcome {
+            background: linear-gradient(135deg, var(--color-accent) 0%, #2563eb 100%);
+            color: var(--color-active-text);
+            border: none;
+            padding: 1.125rem 2rem;
+            font-size: 1.0625rem;
+            font-weight: 600;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--box-shadow-light);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .profile-button-welcome::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .profile-button-welcome:hover::before {
+            left: 100%;
+        }
+        
+        .profile-button-welcome:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--box-shadow-medium);
+        }
+        
+        .profile-button-icon-welcome {
+            font-size: 1.25rem;
+        }
+        
+        .footer-welcome {
+            margin-top: 2rem;
+            text-align: center;
+            color: var(--color-text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        @media (max-width: 1024px) {
+            .feature-grid-welcome {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .system-title-welcome {
+                font-size: 2rem !important;
+            }
+            
+            .welcome-content-box {
+                padding: 2rem;
+            }
+            
+            .feature-grid-welcome {
+                grid-template-columns: 1fr;
+            }
+        }
         /* ****** END: WELCOME SCREEN STYLES ****** */
 
 
@@ -593,18 +905,89 @@
         }
 
     </style>
+    
+    <!-- Tooltip Component CSS -->
+    <link rel="stylesheet" href="/components/tooltip.css">
 </head>
 <body>
     <!-- Class 'light-mode' will be added here by JS -->
     <div class="container">
         <div id="welcomeScreen" class="welcome-screen-container">
+            <div class="demo-badge-welcome">🚀 DEMO VERSION</div>
             <div class="welcome-content-box">
-                <h1>Welcome!</h1>
-                <p>Please select your profile to access the tailored dashboard experience.</p>
-                <div class="profile-buttons-welcome">
-                    <button class="profile-button-welcome" data-profile="technical">Technical Profile</button>
-                    <button class="profile-button-welcome" data-profile="staff">Staff Profile</button>
-                    <button class="profile-button-welcome" data-profile="dpp">DPP Profile</button>
+                <div class="logo-section-welcome">
+                    <h1 class="system-title-welcome">ENMS</h1>
+                    <p class="system-subtitle-welcome">Energy Monitoring & Digital Product Passport System</p>
+                </div>
+                
+                <p class="description-welcome">
+                    Experience next-generation manufacturing intelligence. ENMS delivers real-time energy tracking, 
+                    intelligent fleet management, and comprehensive Digital Product Passports for additive manufacturing. 
+                    Monitor every print, optimize every parameter, and transform your production data into actionable insights.
+                </p>
+                
+                <div class="feature-grid-welcome">
+                    <div class="feature-card-welcome">
+                        <div class="feature-icon-welcome">⚡</div>
+                        <div class="feature-title-welcome">Real-Time Energy Tracking</div>
+                    </div>
+                    <div class="feature-card-welcome">
+                        <div class="feature-icon-welcome">📊</div>
+                        <div class="feature-title-welcome">Smart Analytics</div>
+                    </div>
+                    <div class="feature-card-welcome">
+                        <div class="feature-icon-welcome">🎯</div>
+                        <div class="feature-title-welcome">Intelligent Optimization</div>
+                    </div>
+                    <div class="feature-card-welcome">
+                        <div class="feature-icon-welcome">📱</div>
+                        <div class="feature-title-welcome">Digital Passports</div>
+                    </div>
+                </div>
+                
+                <div class="profile-section-welcome">
+                    <div class="profile-label-welcome">
+                        Select Your Dashboard Profile
+                        <span class="tooltip-wrapper tooltip-inline">
+                            <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                            <span class="tooltip-content">Choose a profile that matches your role. Each profile shows relevant dashboards and tools for specific tasks.</span>
+                        </span>
+                    </div>
+                    <div class="profile-buttons-welcome">
+                        <div style="position: relative; display: flex; flex-direction: column; gap: 1rem; width: 100%;">
+                            <div style="position: relative;">
+                                <button class="profile-button-welcome" data-profile="technical">
+                                    <span>🔧 Technical Profile</span>
+                                </button>
+                                <span class="tooltip-wrapper" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%);">
+                                    <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                                    <span class="tooltip-content">For engineers and technicians. Access industrial systems, sensor data, device management, and Node-RED workflows.</span>
+                                </span>
+                            </div>
+                            <div style="position: relative;">
+                                <button class="profile-button-welcome" data-profile="staff">
+                                    <span>👥 Staff Profile</span>
+                                </button>
+                                <span class="tooltip-wrapper" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%);">
+                                    <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                                    <span class="tooltip-content">For managers and analysts. View fleet operations, performance comparisons, and interactive analysis tools.</span>
+                                </span>
+                            </div>
+                            <div style="position: relative;">
+                                <button class="profile-button-welcome" data-profile="dpp">
+                                    <span>📄 Digital Product Passport</span>
+                                </button>
+                                <span class="tooltip-wrapper" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%);">
+                                    <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                                    <span class="tooltip-content">For compliance and sustainability. Access digital product passports with lifecycle tracking and environmental metrics.</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="footer-welcome">
+                    <p>🌱 Sustainable Manufacturing • ⚙️ Industry 4.0 Ready • 🔒 Enterprise-Grade Security</p>
                 </div>
             </div>
         </div>
@@ -615,12 +998,11 @@
                 <span>Analytics</span>
             </div>
             <ul class="sidebar-nav">
-                <!-- Note: The first sidebar link 'dashboard' points to the OLD default.
-                     You might want to update this or remove the 'active' class initially -->
-                <li><a href="#" class="sidebar-link" data-target="dashboard"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a></li>
-                <li><a href="#" class="sidebar-link" data-target="reports"><i class="fa-solid fa-table-list"></i><span>Reports</span></a></li>
-                <li><a href="#" class="sidebar-link" data-target="settings"><i class="fa-solid fa-gear"></i><span>Settings</span></a></li>
                 <li><a href="#" class="sidebar-link" data-target="about"><i class="fa-solid fa-circle-info"></i><span>About</span></a></li>
+                <li><a href="#" class="sidebar-link" data-target="iso50001"><i class="fa-solid fa-certificate"></i><span>ISO 50001 Alignment</span></a></li>
+                <li><a href="#" class="sidebar-link" data-target="artistic"><i class="fa-solid fa-palette"></i><span>Artistic Elements</span></a></li>
+                <li><a href="#" class="sidebar-link" data-target="workshop"><i class="fa-solid fa-chalkboard-user"></i><span>Workshop Programme</span></a></li>
+                <li><a href="#" class="sidebar-link" data-target="contact"><i class="fa-solid fa-envelope"></i><span>Contact</span></a></li>
             </ul>
         </div>
 
@@ -635,34 +1017,111 @@
                     <span class="top-nav-title">ENMS Project</span>
                 </div>
                 <div class="top-nav-right">
-                    <!-- Theme Toggle Button -->
-                    <button id="themeToggle" class="theme-toggle" title="Toggle Light/Dark Mode">
-                        <i class="fa-solid fa-sun"></i> <!-- Icon for Light Mode -->
-                        <i class="fa-solid fa-moon"></i> <!-- Icon for Dark Mode -->
+                    <!-- Dashboard Buttons -->
+                    <button id="industrialHybridBtn" class="nav-button special-button" data-target="industrial-hybrid">
+                        <i class="fa-solid fa-industry"></i>
+                        <span>Industrial Hybrid Edge</span>
+                        <span class="tooltip-wrapper tooltip-bottom">
+                            <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                            <span class="tooltip-content">Real-time monitoring of hybrid edge computing systems. Combines on-premise and cloud data processing for industrial IoT devices.</span>
+                        </span>
                     </button>
-
-                        <!-- NEW: Change Profile Button -->
-                    <button id="changeProfileBtn" class="nav-button" title="Change Profile">
-                        <i class="fa-solid fa-right-from-bracket"></i> <!-- Example: Logout icon -->
-                        <span>Change Profile</span> <!-- Added span for text -->
+                    <button id="sensorExplorerBtn" class="nav-button" data-target="sensor-explorer">
+                        <i class="fa-solid fa-microchip"></i>
+                        <span>Sensor Explorer</span>
+                        <span class="tooltip-wrapper tooltip-bottom">
+                            <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                            <span class="tooltip-content">Explore and visualize sensor data from all connected devices. View trends, anomalies, and historical patterns across your sensor network.</span>
+                        </span>
                     </button>
-
-                    <!-- NEW: Industrial Hybrid Edge Button - Placed first -->
-                    <button id="industrialHybridBtn" class="nav-button special-button" data-target="industrial-hybrid"><i class="fa-solid fa-industry"></i> Industrial Hybrid Edge</button>
-                    <!-- ADD THIS NEW BUTTON -->
-                    <button id="sensorExplorerBtn" class="nav-button" data-target="sensor-explorer"><i class="fa-solid fa-microchip"></i> Sensor Explorer</button>
-                    <!-- ADD THIS NEW BUTTON -->
-		    <button id="deviceMgmtBtn" class="nav-button" data-target="device-management"><i class="fa-solid fa-server"></i> Device Management</button>
-		    <!-- NEW: Interactive Analysis Button -->
-                    <button id="interactiveAnalysisBtn" class="nav-button" data-target="interactive-analysis"><i class="fa-solid fa-wand-magic-sparkles"></i> Interactive Analysis</button> <!-- Used a magic wand icon -->
-                    <button id="dppBtn" class="nav-button" data-target="dpp"><i class="fa-solid fa-passport"></i> DPP</button> <!-- NEW DPP BUTTON -->
-                    <button id="nodeRed" class="nav-button" data-target="node-red"><i class="fa-solid fa-network-wired"></i> Node-RED</button>
-                    <button id="fleetOpsDashboard" class="nav-button" data-target="fleet-operations"><i class="fa-solid fa-sitemap"></i> Fleet Operations</button>
-                    <button id="perfCompDashboard" class="nav-button" data-target="performance-comparison"><i class="fa-solid fa-chart-simple"></i> Performance Comparison</button>
-                                        
+                    <button id="deviceMgmtBtn" class="nav-button" data-target="device-management">
+                        <i class="fa-solid fa-server"></i>
+                        <span>Device Management</span>
+                        <span class="tooltip-wrapper tooltip-bottom">
+                            <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                            <span class="tooltip-content">Manage IoT devices, configure settings, monitor status, and perform maintenance actions. Control device lifecycle and connectivity.</span>
+                        </span>
+                    </button>
+                    <button id="interactiveAnalysisBtn" class="nav-button" data-target="interactive-analysis">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>Interactive Analysis</span>
+                        <span class="tooltip-wrapper tooltip-bottom">
+                            <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                            <span class="tooltip-content">Advanced data analysis with custom charts, filters, and time ranges. Export insights and identify patterns in energy consumption.</span>
+                        </span>
+                    </button>
+                    <button id="dppBtn" class="nav-button" data-target="dpp">
+                        <i class="fa-solid fa-passport"></i>
+                        <span>DPP</span>
+                        <span class="tooltip-wrapper tooltip-bottom">
+                            <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                            <span class="tooltip-content">Digital Product Passports for circular economy. Track product lifecycle, sustainability metrics, and compliance with EU regulations.</span>
+                        </span>
+                    </button>
+                    <button id="nodeRed" class="nav-button" data-target="node-red">
+                        <i class="fa-solid fa-network-wired"></i>
+                        <span>Node-RED</span>
+                        <span class="tooltip-wrapper tooltip-bottom">
+                            <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                            <span class="tooltip-content">Low-code workflow automation and data integration. Build custom logic flows for device communication and data processing.</span>
+                        </span>
+                    </button>
+                    <button id="fleetOpsDashboard" class="nav-button" data-target="fleet-operations">
+                        <i class="fa-solid fa-sitemap"></i>
+                        <span>Fleet Operations</span>
+                        <span class="tooltip-wrapper tooltip-bottom">
+                            <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                            <span class="tooltip-content">Monitor entire fleet of manufacturing equipment. View aggregate metrics, identify underperforming assets, and optimize operations.</span>
+                        </span>
+                    </button>
+                    <button id="perfCompDashboard" class="nav-button" data-target="performance-comparison">
+                        <i class="fa-solid fa-chart-simple"></i>
+                        <span>Performance Comparison</span>
+                        <span class="tooltip-wrapper tooltip-bottom">
+                            <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                            <span class="tooltip-content">Compare machine performance side-by-side. Benchmark efficiency, identify best practices, and optimize resource allocation.</span>
+                        </span>
+                    </button>
+                    
+                    <!-- Divider -->
+                    <div style="width: 1px; height: 30px; background: var(--color-border); margin: 0 0.25rem;"></div>
+                    
                     <!-- Fullscreen Buttons -->
-                    <button id="enterFullScreen" class="nav-button" title="Enter Full Screen"><i class="fa-solid fa-expand"></i></button>
-                    <button id="exitFullScreen" class="nav-button" title="Exit Full Screen"><i class="fa-solid fa-compress"></i></button>
+                    <button id="enterFullScreen" class="nav-button" title="Enter Full Screen">
+                        <i class="fa-solid fa-expand"></i>
+                    </button>
+                    <button id="exitFullScreen" class="nav-button" title="Exit Full Screen">
+                        <i class="fa-solid fa-compress"></i>
+                    </button>
+
+                    <!-- User Menu Dropdown -->
+                    <div class="user-menu">
+                        <button class="user-menu-button" id="userMenuButton">
+                            <div class="user-avatar" id="userAvatar">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                            <span class="user-name" id="userNameDisplay"></span>
+                            <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem;"></i>
+                        </button>
+                        <div class="user-menu-dropdown" id="userMenuDropdown">
+                            <button class="user-menu-item" id="changeProfileBtn">
+                                <i class="fa-solid fa-user-gear"></i>
+                                <span>Change Profile</span>
+                                <span class="tooltip-wrapper tooltip-right">
+                                    <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                                    <span class="tooltip-content tooltip-small">Switch between Technical, Staff, and DPP profiles to access different dashboard views.</span>
+                                </span>
+                            </button>
+                            <button class="user-menu-item logout" id="logoutBtn">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                                <span>Logout</span>
+                                <span class="tooltip-wrapper tooltip-right">
+                                    <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                                    <span class="tooltip-content tooltip-small">Securely log out and return to the login screen. Your preferences will be saved.</span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -673,97 +1132,101 @@
                     <div class="spinner"></div>
                 </div>
 
-                <!-- Reports Placeholder -->
-                <div class="placeholder-content" id="reportsPlaceholder">
-                    <i class="fa-solid fa-table-list placeholder-icon"></i>
-                    <h2 class="placeholder-title">Reports Module</h2>
-                    <h3 class="placeholder-subtitle">Under Development</h3>
-                    <div class="code-comment">
-                        <pre>
-/**
- * TODO: Implement Reports Module
- *
- * @status: In Progress
- * @priority: High
- * @assignee: The Developer Who Needs More Coffee
- * @eta: "Two weeks" (Developer time: 2-6 months)
- *
- * Note: This feature is currently compiling. It's been
- * compiling for 3 weeks now. Please don't ask about it.
- */</pre>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar"></div>
-                    </div>
-                    <p>Error 418: I'm a teapot, not a reporting engine... yet.</p>
-                </div>
-
-
-                <!-- Settings Placeholder -->
-                <div class="placeholder-content" id="settingsPlaceholder">
-                    <i class="fa-solid fa-gear placeholder-icon fa-spin"></i>
-                    <h2 class="placeholder-title">Settings Panel</h2>
-                    <h3 class="placeholder-subtitle">Coming Soon</h3>
-                    <div class="code-comment">
-                        <pre>
-// Settings.js - Last modified: Never
-//
-// function initSettings() {
-//     throw new Error('NotImplementedError: Too busy fixing bugs that
-//     the previous developer said were "features"');
-// }
-//
-// console.log('Settings will be available after the heat death
-// of the universe, or next sprint, whichever comes first.');
-</pre>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar"></div>
-                    </div>
-                    <p>Settings are like good code comments - promised but rarely delivered.</p>
-                </div>
-
-                <!-- About Placeholder -->
-                <div class="placeholder-content" id="aboutPlaceholder">
-                    <i class="fa-solid fa-circle-info placeholder-icon"></i>
-                    <h2 class="placeholder-title">About This Dashboard</h2>
-                    <h3 class="placeholder-subtitle">Information Coming Soon</h3>
-                    <div class="code-comment">
-                        <pre>
-/*
- * 404 DEVELOPER NOT FOUND
- *
- * The developer responsible for this section is currently:
- * [ ] Debugging
- * [ ] In a meeting about why the project is delayed
- * [ ] Explaining why "it works on my machine"
- * [x] Questioning their career choices
- * [x] Drinking coffee and staring blankly at this code
- */</pre>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar"></div>
-                    </div>
-                    <p>This dashboard was made with ❤️, ☕, and a concerning amount of Stack Overflow.</p>
-                </div>
-
-                <!-- MODIFIED: src points to the new default dashboard -->
+                <!-- Iframe for content -->
                 <iframe id="contentIframe" src="about:blank" allowfullscreen></iframe>
             </div>
         </div>
     </div>
 
     <script>
+        // ====================================================================
+        // AUTHENTICATION SYSTEM
+        // ====================================================================
+        // Always use nginx proxy for API calls
+        const API_BASE = '/api';
+
+        // Check authentication before loading dashboard
+        async function checkAuthentication() {
+            const token = localStorage.getItem('auth_token');
+            
+            if (!token) {
+                // No token, redirect to auth page
+                console.log('[AUTH] No token found, redirecting to auth page');
+                window.location.href = '/auth.html';
+                return false;
+            }
+
+            try {
+                // Verify token with backend
+                const response = await fetch(`${API_BASE}/auth/check-session`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.valid) {
+                    // Token is valid, store user data
+                    localStorage.setItem('user_data', JSON.stringify(data.user));
+                    console.log('[AUTH] Session valid, user:', data.user.email);
+                    return true;
+                } else {
+                    // Token invalid, clear storage and redirect
+                    console.log('[AUTH] Invalid session, redirecting to auth page');
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user_data');
+                    window.location.href = '/auth.html';
+                    return false;
+                }
+            } catch (error) {
+                console.error('[AUTH] Session check failed:', error);
+                // On error, redirect to auth page
+                window.location.href = '/auth.html';
+                return false;
+            }
+        }
+
+        // Logout function
+        function logout() {
+            const token = localStorage.getItem('auth_token');
+            
+            if (token) {
+                // Call logout API
+                fetch(`${API_BASE}/auth/logout`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }).catch(err => console.error('Logout API error:', err));
+            }
+
+            // Clear local storage
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user_data');
+            
+            // Redirect to auth page
+            window.location.href = '/auth.html';
+        }
+
+        // Get current user info
+        function getCurrentUser() {
+            const userData = localStorage.getItem('user_data');
+            return userData ? JSON.parse(userData) : null;
+        }
+
+        // ====================================================================
+        // DASHBOARD CODE
+        // ====================================================================
+
         const sidebar = document.getElementById('sidebar');
         const toggleSidebarBtn = document.getElementById('toggleSidebar');
         const contentIframe = document.getElementById('contentIframe');
         const iframeContainer = document.getElementById('iframeContainer');
         const loadingIndicator = document.getElementById('loadingIndicator');
         const navButtons = document.querySelectorAll('.nav-button[data-target]'); 
-        const themeToggleBtn = document.getElementById('themeToggle');
         const sidebarLinks = document.querySelectorAll('.sidebar-link'); // Get sidebar links
-
-        const THEME_KEY = 'dashboard-theme'; // Key for localStorage
 
         const welcomeScreen = document.getElementById('welcomeScreen');
         const mainDashboardContent = document.getElementById('mainDashboardContent');
@@ -855,8 +1318,7 @@
         if (changeProfileBtn) {
         changeProfileBtn.style.display = 'inline-flex'; // Or your default display style for buttons
     }
-    // Also ensure other non-data-target buttons like theme toggle, fullscreen are visible
-    if (themeToggleBtn) themeToggleBtn.style.display = 'inline-block'; // or 'block' or 'flex'
+    // Also ensure other non-data-target buttons like fullscreen are visible
     if (enterFullScreenBtn) enterFullScreenBtn.style.display = 'inline-flex';
     // exitFullScreenBtn is handled by CSS based on fullscreen state
 
@@ -907,64 +1369,21 @@
             return url === 'about:blank';
         };
 
-        // --- Placeholder Management ---
-        const placeholders = {
-            'reports': document.getElementById('reportsPlaceholder'),
-            'settings': document.getElementById('settingsPlaceholder'),
-            'about': document.getElementById('aboutPlaceholder'),
-            //'dpp': document.getElementById('dppPlaceholder') // NEW
-        };
-
+        // --- Placeholder Management (Deprecated - using HTML pages now) ---
         const showPlaceholder = (target) => {
-            // Hide all placeholders first
-            Object.values(placeholders).forEach(placeholder => {
-                placeholder.classList.remove('active');
-            });
-
-            // Show the selected placeholder
-            if (placeholders[target]) {
-                placeholders[target].classList.add('active');
-                contentIframe.style.display = 'none';
-            }
+            // Placeholders removed - all content now loads via iframe
+            // This function is kept for compatibility but does nothing
         };
 
         const hidePlaceholders = () => {
-            // Hide all placeholders
-            Object.values(placeholders).forEach(placeholder => {
-                placeholder.classList.remove('active');
-            });
-
-            // Show the iframe
-            contentIframe.style.display = 'block';
+            // Placeholders removed - all content now loads via iframe
+            // This function is kept for compatibility but does nothing
         };
 
-        // --- Theme Management ---
-        const applyTheme = (theme) => {
-            if (theme === 'light') {
-                document.documentElement.classList.add('light-mode');
-                themeToggleBtn.title = "Switch to Dark Mode";
-            } else {
-                document.documentElement.classList.remove('light-mode');
-                themeToggleBtn.title = "Switch to Light Mode";
-            }
-            localStorage.setItem(THEME_KEY, theme); // Save preference
-        };
-
-        const toggleTheme = () => {
-            const currentThemeIsLight = document.documentElement.classList.contains('light-mode');
-            applyTheme(currentThemeIsLight ? 'dark' : 'light');
-        };
-
-        // --- Initialize Theme ---
+        // --- Initialize Light Mode (Default) ---
         const initializeTheme = () => {
-            const savedTheme = localStorage.getItem(THEME_KEY);
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-            if (savedTheme) {
-                applyTheme(savedTheme); // Use saved theme if available
-            } else {
-                 applyTheme('dark'); // Default to dark (as per original logic)
-            }
+            // Always use light mode
+            document.documentElement.classList.add('light-mode');
         };
 
         // --- Sidebar Toggle ---
@@ -972,11 +1391,26 @@
             sidebar.classList.toggle('closed');
         });
 
+        // --- User Menu Dropdown ---
+        const userMenuButton = document.getElementById('userMenuButton');
+        const userMenuDropdown = document.getElementById('userMenuDropdown');
+        
+        userMenuButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userMenuDropdown.classList.toggle('show');
+        });
 
-const GRAFANA_PORT = 3000;
-const NODERED_PORT = 1880;
-const grafanaBase = `${window.location.protocol}//${window.location.hostname}:${GRAFANA_PORT}`;
-const nodeRedBase = `${window.location.protocol}//${window.location.hostname}:${NODERED_PORT}`;
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!userMenuButton.contains(e.target) && !userMenuDropdown.contains(e.target)) {
+                userMenuDropdown.classList.remove('show');
+            }
+        });
+
+
+// Use external domains for demo Grafana and Node-RED
+const grafanaBase = "https://lauds-demo-grafana.intel50001.com";
+const nodeRedBase = "https://lauds-demo-nodered.intel50001.com";
 
 const contentSources = {
     // Staff Profile targets
@@ -992,11 +1426,13 @@ const contentSources = {
     'industrial-hybrid': `${grafanaBase}/d/de3xeh2upz400e/industrial-hybrid-edge-system?orgId=1&kiosk`,
     'sensor-explorer': `${grafanaBase}/d/cetamfgpx9mo0f/sensor-data-explorer?orgId=1&kiosk`,
     'device-management': 'device_management.html',
-    // Sidebar link targets
-    'dashboard': `${grafanaBase}/d/det3mvjccv6rkb/fleet-operations-and-machine?orgId=1&kiosk`,
-    'reports': "about:blank",
-    'settings': "about:blank",
-    'about': "about:blank"
+    
+    // Sidebar link targets (Information Pages)
+    'about': "about.html",
+    'iso50001': "iso50001.html",
+    'artistic': "artistic-elements.html",
+    'workshop': "workshop.html",
+    'contact': "contact.html"
 };
 
 
@@ -1018,17 +1454,6 @@ const contentSources = {
         const loadContent = (target) => {
             if (contentSources[target]) {
                 const targetUrl = contentSources[target];
-
-                // Check if this is a placeholder target (reports, settings, about)
-                if (placeholders[target]) {
-                    // Show the appropriate placeholder
-                    showPlaceholder(target);
-                    setActiveButton(target);
-                    return;
-                } else {
-                    // Hide all placeholders and show iframe
-                    hidePlaceholders();
-                }
 
                 // Check if the src is actually changing to avoid unnecessary reloads
                 if (contentIframe.getAttribute('src') !== targetUrl) {
@@ -1095,7 +1520,6 @@ const contentSources = {
         exitFullScreenBtn.addEventListener('click', closeFullScreen);
 
         // --- Event Listeners ---
-        themeToggleBtn.addEventListener('click', toggleTheme);
         // Event listeners for welcome screen profile buttons
         profileButtonsWelcome.forEach(button => {
         button.addEventListener('click', () => {
@@ -1111,9 +1535,53 @@ const contentSources = {
     });
 });
 
+        // --- Logout Button Event Listener ---
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to logout?')) {
+                    logout();
+                }
+            });
+        }
+
+        // --- Update User Display ---
+        function updateUserDisplay() {
+            const user = getCurrentUser();
+            const userDisplay = document.getElementById('userNameDisplay');
+            const userAvatar = document.getElementById('userAvatar');
+            
+            if (user && userDisplay) {
+                const fullName = user.full_name || user.email;
+                userDisplay.textContent = fullName;
+                
+                // Set avatar initials
+                if (userAvatar) {
+                    const names = fullName.split(' ');
+                    let initials = '';
+                    if (names.length >= 2) {
+                        initials = names[0].charAt(0) + names[names.length - 1].charAt(0);
+                    } else {
+                        initials = fullName.substring(0, 2);
+                    }
+                    userAvatar.textContent = initials.toUpperCase();
+                }
+            }
+        }
+
         // --- INITIALIZATION ON DOMCONTENTLOADED ---
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             console.log("[DEBUG] DOMContentLoaded event fired.");
+            
+            // Check authentication first
+            const isAuthenticated = await checkAuthentication();
+            if (!isAuthenticated) {
+                // checkAuthentication will handle redirect
+                return;
+            }
+            
+            // User is authenticated, proceed with dashboard initialization
+            updateUserDisplay();
             initializeTheme();
 
             // Crucially, decide to show welcome or dashboard BEFORE any iframe loading attempts for profiles
@@ -1143,5 +1611,8 @@ const contentSources = {
 
 
     </script>
+    
+    <!-- Tooltip Component JavaScript -->
+    <script src="/components/tooltip.js"></script>
 </body>
 </html>

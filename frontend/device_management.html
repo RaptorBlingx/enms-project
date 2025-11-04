@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Device Management</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/components/tooltip.css">
     <style>
         :root {
             --primary-bg-color: #f4f7fc;
@@ -158,22 +159,34 @@
 
     <div class="container">
         <div class="header">
-            <h1><i class="fa-solid fa-server"></i> Device Management</h1>
-            <button id="addDeviceBtn" class="btn btn-add"><i class="fa-solid fa-plus"></i> Add New Device</button>
+            <h1>
+                <i class="fa-solid fa-server"></i> Device Management
+                <span class="tooltip-wrapper tooltip-inline">
+                    <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                    <span class="tooltip-content">Manage all IoT devices, configure settings, and monitor connection status. Add, edit, or remove devices from your network.</span>
+                </span>
+            </h1>
+            <button id="addDeviceBtn" class="btn btn-add">
+                <i class="fa-solid fa-plus"></i> Add New Device
+                <span class="tooltip-wrapper" style="margin-left: 8px;">
+                    <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                    <span class="tooltip-content">Register a new device (printer, sensor, or IoT device) to start monitoring its data and performance.</span>
+                </span>
+            </button>
         </div>
         <div id="loader">Loading devices...</div>
         <div class="table-container">
             <table id="devicesTable" style="display:none;">
                 <thead>
                     <tr>
-                        <th>Friendly Name</th>
-                        <th>Device Model</th>
-                        <th>Device ID</th>
-                        <th>Location</th>
-                        <th>SimplyPrint ID</th>
-                        <th>API IP</th>
-                        <th>Shelly ID</th>
-                        <th>Actions</th>
+                        <th>Friendly Name <span class="tooltip-wrapper tooltip-inline tooltip-bottom"><i class="fa-solid fa-circle-info tooltip-icon"></i><span class="tooltip-content tooltip-small">Human-readable name for easy device identification</span></span></th>
+                        <th>Device Model <span class="tooltip-wrapper tooltip-inline tooltip-bottom"><i class="fa-solid fa-circle-info tooltip-icon"></i><span class="tooltip-content tooltip-small">Manufacturer model number or device type</span></span></th>
+                        <th>Device ID <span class="tooltip-wrapper tooltip-inline tooltip-bottom"><i class="fa-solid fa-circle-info tooltip-icon"></i><span class="tooltip-content tooltip-small">Unique identifier used in database and API calls</span></span></th>
+                        <th>Location <span class="tooltip-wrapper tooltip-inline tooltip-bottom"><i class="fa-solid fa-circle-info tooltip-icon"></i><span class="tooltip-content tooltip-small">Physical location or department where device is installed</span></span></th>
+                        <th>SimplyPrint ID <span class="tooltip-wrapper tooltip-inline tooltip-bottom"><i class="fa-solid fa-circle-info tooltip-icon"></i><span class="tooltip-content tooltip-small">External ID for SimplyPrint cloud integration (if applicable)</span></span></th>
+                        <th>API IP <span class="tooltip-wrapper tooltip-inline tooltip-bottom"><i class="fa-solid fa-circle-info tooltip-icon"></i><span class="tooltip-content tooltip-small">Network IP address for direct device communication</span></span></th>
+                        <th>Shelly ID <span class="tooltip-wrapper tooltip-inline tooltip-bottom"><i class="fa-solid fa-circle-info tooltip-icon"></i><span class="tooltip-content tooltip-small">Shelly smart plug ID for energy monitoring (if connected)</span></span></th>
+                        <th>Actions <span class="tooltip-wrapper tooltip-inline tooltip-bottom"><i class="fa-solid fa-circle-info tooltip-icon"></i><span class="tooltip-content tooltip-small">Edit device settings or remove from system</span></span></th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -194,26 +207,27 @@
                     <div class="device-type-selector">
                         <label><input type="radio" name="device_type" value="prusa" checked> Prusa Printer</label>
                         <label><input type="radio" name="device_type" value="simplyprint"> SimplyPrint Printer</label>
+                        <span class="tooltip-wrapper tooltip-inline"><i class="fa-solid fa-circle-info tooltip-icon"></i><span class="tooltip-content tooltip-small">Choose connection method: Prusa uses local API, SimplyPrint uses cloud service</span></span>
                     </div>
 
                     <div class="form-group">
-                        <label for="deviceId">Device ID (Primary Key) *</label>
+                        <label for="deviceId">Device ID (Primary Key) * <span class="tooltip-wrapper tooltip-inline"><i class="fa-solid fa-circle-info tooltip-icon"></i><span class="tooltip-content tooltip-small">Unique system identifier. Use lowercase with underscores. Cannot be changed after creation.</span></span></label>
                         <input type="text" id="deviceId" name="device_id" placeholder="prusa_mk4_main_floor_1" required>
                     </div>
                     <div class="form-group">
-                        <label for="deviceModel">Device Model *</label>
+                        <label for="deviceModel">Device Model * <span class="tooltip-wrapper tooltip-inline"><i class="fa-solid fa-circle-info tooltip-icon"></i><span class="tooltip-content tooltip-small">Manufacturer and model for tracking device specifications</span></span></label>
                         <input type="text" id="deviceModel" name="device_model" placeholder="Prusa i3 MK4" required>
                     </div>
                     <div class="form-group">
-                        <label for="friendlyName">Friendly Name</label>
+                        <label for="friendlyName">Friendly Name <span class="tooltip-wrapper tooltip-inline"><i class="fa-solid fa-circle-info tooltip-icon"></i><span class="tooltip-content tooltip-small">Display name shown in dashboards and reports</span></span></label>
                         <input type="text" id="friendlyName" name="friendly_name" placeholder="Prusa MK4 (Main Floor)">
                     </div>
                     <div class="form-group">
-                        <label for="location">Location</label>
+                        <label for="location">Location <span class="tooltip-wrapper tooltip-inline"><i class="fa-solid fa-circle-info tooltip-icon"></i><span class="tooltip-content tooltip-small">Physical location for asset tracking and maintenance</span></span></label>
                         <input type="text" id="location" name="location" placeholder="Main Factory Floor">
                     </div>
                     <div class="form-group">
-                        <label for="shellyId">Shelly ID</label>
+                        <label for="shellyId">Shelly ID <span class="tooltip-wrapper tooltip-inline"><i class="fa-solid fa-circle-info tooltip-icon"></i><span class="tooltip-content tooltip-small">Connect Shelly smart plug for real-time energy monitoring</span></span></label>
                         <input type="text" id="shellyId" name="shelly_id" placeholder="SPPS-11">
                     </div>
 
@@ -497,5 +511,6 @@
         // --- Initial Load ---
         document.addEventListener('DOMContentLoaded', fetchAndDisplayDevices);
     </script>
+    <script src="/components/tooltip.js"></script>
 </body>
 </html>

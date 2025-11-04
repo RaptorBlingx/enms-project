@@ -9,6 +9,7 @@
     <!-- Added modern font and icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/components/tooltip.css">
     <style>
         /* Modern CSS Reset & Variables */
         :root {
@@ -601,9 +602,21 @@
     </div>
 
     <div class="controls">
-        <h2>Analysis Configuration</h2>
+        <h2>
+            Analysis Configuration
+            <span class="tooltip-wrapper tooltip-inline">
+                <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                <span class="tooltip-content tooltip-small">Configure analysis parameters, select devices, time ranges, and metrics to visualize energy consumption patterns.</span>
+            </span>
+        </h2>
 
-        <label for="deviceSelect">Device</label>
+        <label for="deviceSelect">
+            Device
+            <span class="tooltip-wrapper tooltip-inline">
+                <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                <span class="tooltip-content tooltip-small">Select a printer or device to analyze its performance data</span>
+            </span>
+        </label>
         <select id="deviceSelect" name="deviceSelect">
             <option value="">Loading Devices...</option>
         </select>
@@ -616,6 +629,10 @@
                     <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
                 Time Range
+                <span class="tooltip-wrapper tooltip-inline">
+                    <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                    <span class="tooltip-content tooltip-small">Select data collection period: 1 hour for real-time, 7 days for trends, or All for complete history</span>
+                </span>
             </legend>
 
             <div class="time-range-selector">
@@ -1936,6 +1953,7 @@
 
         </script>
         <!-- End Script block -->
+        <script src="/components/tooltip.js"></script>
 </body>
 
 </html>
