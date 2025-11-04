@@ -117,7 +117,8 @@
         }
       ],
       "title": "Total Live Power",
-      "type": "stat"
+      "type": "stat",
+      "description": "Real-time total power consumption across all active devices in the factory. Measured in watts. Instant view of current energy demand for quick capacity monitoring."
     },
     {
       "datasource": {
@@ -244,7 +245,8 @@
         }
       ],
       "title": "Machine Status Overview",
-      "type": "gauge"
+      "type": "gauge",
+      "description": "Visual gauge showing operational status distribution of all machines. Color-coded: Blue (Printing), Green (Idle/Operational), Red (Error), Gray (Offline). Quick fleet health check."
     },
     {
       "collapsed": false,
@@ -257,7 +259,8 @@
       "id": 4,
       "panels": [],
       "title": "Factory Energy Consumption",
-      "type": "row"
+      "type": "row",
+      "description": "Historical energy usage over time for the entire factory floor. Track consumption patterns, identify peak usage periods, and monitor overall efficiency trends."
     },
     {
       "datasource": {
@@ -371,7 +374,8 @@
         }
       ],
       "title": "Factory Energy Consumption",
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "Historical energy usage over time for the entire factory floor. Track consumption patterns, identify peak usage periods, and monitor overall efficiency trends."
     },
     {
       "collapsed": false,
@@ -600,7 +604,8 @@
         }
       ],
       "title": "Sensor Timeline",
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "Time-series visualization of sensor readings from all connected devices. Monitor temperature, humidity, and other environmental factors affecting production quality."
     },
     {
       "datasource": {
@@ -736,7 +741,8 @@
         }
       ],
       "title": "Printer State Timeline",
-      "type": "state-timeline"
+      "type": "state-timeline",
+      "description": "Chronological state changes for each printer. Shows when devices started/stopped printing, went idle, or encountered errors. Essential for utilization analysis."
     },
     {
       "collapsed": false,
@@ -858,7 +864,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  filename       AS \"File\",\r\n  end_time       AS \"Completed At\",\r\n  to_char(make_interval(secs => duration_seconds), 'HH24:MI:SS') AS \"Duration\",\r\n  (session_energy_wh / 1000.0)::numeric(10,3) AS \"Energy (kWh)\",\r\n  filament_used_g AS \"Filament (g)\"\r\nFROM print_jobs\r\nWHERE\r\n  device_id = $device_id\r\n  AND status = 'done'\r\nORDER BY\r\n  \"Completed At\" DESC;\r\n",
+          "rawSql": "SELECT\r\n  filename       AS \"File\",\r\n  end_time       AS \"Completed At\",\r\n  to_char(make_interval(secs => duration_seconds), 'HH24:MI:SS') AS \"Duration\",\r\n  (session_energy_wh / 1000.0)::numeric(10,3) AS \"Energy (kWh)\",\r\n  filament_used_g AS \"Filament (g)\"\r\nFROM print_jobs\r\nWHERE\r\n  device_id = $device_id\r\n  AND status = 'completed'\r\nORDER BY\r\n  \"Completed At\" DESC;\r\n",
           "refId": "A",
           "sql": {
             "columns": [
@@ -880,7 +886,8 @@
         }
       ],
       "title": "Job History & DPP Logbook",
-      "type": "table"
+      "type": "table",
+      "description": "Complete table of all print jobs with timestamps, materials used, energy consumed, and Digital Product Passport links. Full traceability for compliance and auditing."
     }
   ],
   "preload": false,
@@ -922,7 +929,7 @@
         "label": "Machine",
         "name": "device_id",
         "options": [],
-        "query": "SELECT\n  friendly_name AS \"__text\",\n  device_id AS \"__value\"\nFROM devices\nWHERE\n  -- This condition links this variable to the $factory variable\n  location = '$factory'\n  AND device_id != 'environment'\nORDER BY friendly_name;",
+        "query": "SELECT\n  friendly_name AS \"__text\",\n  device_id AS \"__value\"\nFROM devices\nWHERE\n  location = '$factory'\n  AND device_id != 'environment'\nORDER BY friendly_name;",
         "refresh": 1,
         "regex": "",
         "sort": 1,

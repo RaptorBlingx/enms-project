@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 16,
+  "id": 1,
   "links": [],
   "panels": [
     {
@@ -68,6 +68,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -83,7 +84,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -122,11 +123,12 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.2.1",
       "targets": [
         {
           "datasource": {
@@ -136,7 +138,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  \"timestamp\" AS \"time\",\r\n  power_watts AS \"Power (W)\",\r\n  energy_today_kwh AS \"Energy Today (kWh)\"\r\nFROM energy_data\r\nWHERE $__timeFilter(\"timestamp\")\r\nORDER BY \"timestamp\"",
+          "rawSql": "SELECT\r\n  $__timeGroup(\"timestamp\", '10s') AS \"time\",\r\n  AVG(power_watts) AS \"Power (W)\",\r\n  AVG(energy_today_kwh) AS \"Energy Today (kWh)\"\r\nFROM energy_data\r\nWHERE device_id != 'environment' AND $__timeFilter(\"timestamp\")\r\nGROUP BY 1\r\nORDER BY 1",
           "refId": "A",
           "sql": {
             "columns": [
@@ -158,7 +160,8 @@
         }
       ],
       "title": "Power Usage",
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "Real-time power consumption monitoring from Shelly smart plugs. Shows kWh usage over time. Essential for energy auditing and cost allocation. Normal range: 0.1-0.5 kW for 3D printers."
     },
     {
       "datasource": {
@@ -194,6 +197,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -209,7 +213,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -248,11 +252,12 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.2.1",
       "targets": [
         {
           "datasource": {
@@ -262,7 +267,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  \"timestamp\" AS \"time\",\r\n  voltage AS \"Voltage\",\r\n  current_amps AS \"Current\"\r\nFROM energy_data\r\nWHERE $__timeFilter(\"timestamp\")\r\nORDER BY \"timestamp\"",
+          "rawSql": "SELECT\r\n  $__timeGroup(\"timestamp\", '10s') AS \"time\",\r\n  AVG(voltage) AS \"Voltage\",\r\n  AVG(current_amps) AS \"Current\"\r\nFROM energy_data\r\nWHERE device_id != 'environment' AND $__timeFilter(\"timestamp\")\r\nGROUP BY 1\r\nORDER BY 1",
           "refId": "A",
           "sql": {
             "columns": [
@@ -284,7 +289,8 @@
         }
       ],
       "title": "Power Usage",
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "Real-time power consumption monitoring from Shelly smart plugs. Shows kWh usage over time. Essential for energy auditing and cost allocation. Normal range: 0.1-0.5 kW for 3D printers."
     },
     {
       "collapsed": false,
@@ -315,7 +321,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -328,8 +334,8 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
-        "w": 6,
+        "h": 8,
+        "w": 5,
         "x": 0,
         "y": 10
       },
@@ -349,7 +355,7 @@
         "showThresholdMarkers": true,
         "sizing": "auto"
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.2.1",
       "targets": [
         {
           "datasource": {
@@ -359,7 +365,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT temperature_c FROM max6675_temperature_data ORDER BY \"timestamp\" DESC LIMIT 1\r\n",
+          "rawSql": "SELECT temperature_c \nFROM max6675_temperature_data \nWHERE device_id = 'ESP32_SensorHub_Raptor' \nORDER BY \"timestamp\" DESC LIMIT 1",
           "refId": "A",
           "sql": {
             "columns": [
@@ -381,14 +387,16 @@
         }
       ],
       "title": "Hotend Temp",
-      "type": "gauge"
+      "type": "gauge",
+      "hideFrom": null,
+      "description": "MAX6675 thermocouple readings of printer hotend temperature. Critical for print quality monitoring. Target range: 190-230\u00b0C for PLA, 230-260\u00b0C for ABS. Deviations indicate heater issues."
     },
     {
       "datasource": {
         "type": "grafana-postgresql-datasource",
         "uid": "aei784ojzbrpca"
       },
-      "description": "This instantly tells you if the device is physically moving.",
+      "description": "Root Mean Square vibration magnitude from MPU6050 accelerometer. Indicates mechanical stability. High values suggest loose belts, worn bearings, or improper leveling. Threshold: >0.5 g requires maintenance.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -400,7 +408,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -412,9 +420,9 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
-        "w": 18,
-        "x": 6,
+        "h": 8,
+        "w": 4,
+        "x": 5,
         "y": 10
       },
       "id": 7,
@@ -435,7 +443,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.2.1",
       "targets": [
         {
           "datasource": {
@@ -445,7 +453,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT moving_rms FROM printer_derived_status ORDER BY \"timestamp\" DESC LIMIT 1\r\n",
+          "rawSql": "SELECT \n  SQRT(\n    AVG(accel_x * accel_x + accel_y * accel_y + accel_z * accel_z)\n  ) as moving_rms\nFROM mpu6050_accelerometer_data\nWHERE device_id = 'ESP32_SensorHub_Raptor'\n  AND timestamp > NOW() - INTERVAL '5 minutes'\n",
           "refId": "A",
           "sql": {
             "columns": [
@@ -485,7 +493,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -498,10 +506,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 11,
-        "w": 6,
-        "x": 0,
-        "y": 20
+        "h": 8,
+        "w": 4,
+        "x": 9,
+        "y": 10
       },
       "id": 6,
       "options": {
@@ -519,7 +527,7 @@
         "showThresholdMarkers": true,
         "sizing": "auto"
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.2.1",
       "targets": [
         {
           "datasource": {
@@ -529,7 +537,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT power_watts FROM energy_data ORDER BY \"timestamp\" DESC LIMIT 1\r\n",
+          "rawSql": "SELECT power_watts FROM energy_data WHERE device_id != 'environment'\nORDER BY \"timestamp\" DESC LIMIT 1\r\n",
           "refId": "A",
           "sql": {
             "columns": [
@@ -551,14 +559,15 @@
         }
       ],
       "title": "Current Power Draw",
-      "type": "gauge"
+      "type": "gauge",
+      "description": "Instantaneous power consumption in Watts. Use to identify peak loads and compare device efficiency. Spike detection helps predict hardware failures before occurrence."
     },
     {
       "datasource": {
         "type": "grafana-postgresql-datasource",
         "uid": "aei784ojzbrpca"
       },
-      "description": "This will show both the latest temperature and humidity values in one panel.",
+      "description": "Environmental temperature and humidity from sensor array. Affects print quality and material behavior. Optimal printing environment: 20-25\u00b0C, 40-60% humidity.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -570,7 +579,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -582,10 +591,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 11,
-        "w": 18,
-        "x": 6,
-        "y": 20
+        "h": 8,
+        "w": 11,
+        "x": 13,
+        "y": 10
       },
       "id": 8,
       "options": {
@@ -605,7 +614,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.2.1",
       "targets": [
         {
           "datasource": {
@@ -615,7 +624,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT temperature_c, humidity_pct FROM dht22_data ORDER BY \"timestamp\" DESC LIMIT 1\r\n",
+          "rawSql": "SELECT \n  temperature_c as \"Temperature\",\n  humidity_pct as \"Humidity\"\nFROM dht22_data \nWHERE device_id = 'ESP32_SensorHub_Raptor' \nORDER BY \"timestamp\" DESC LIMIT 1",
           "refId": "A",
           "sql": {
             "columns": [
@@ -645,7 +654,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 31
+        "y": 18
       },
       "id": 3,
       "panels": [],
@@ -686,6 +695,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -700,7 +710,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -715,7 +726,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 32
+        "y": 19
       },
       "id": 1,
       "options": {
@@ -726,11 +737,12 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.2.1",
       "targets": [
         {
           "datasource": {
@@ -740,7 +752,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  \"timestamp\" AS \"time\",\r\n  accel_x,\r\n  accel_y,\r\n  accel_z\r\nFROM mpu6050_accelerometer_data\r\nWHERE $__timeFilter(\"timestamp\")\r\nORDER BY \"timestamp\"",
+          "rawSql": "SELECT\r\n  \"timestamp\" AS \"time\",\r\n  accel_x,\r\n  accel_y,\r\n  accel_z\r\nFROM mpu6050_accelerometer_data\r\nWHERE device_id = 'ESP32_SensorHub_Raptor' AND $__timeFilter(\"timestamp\")\r\nORDER BY \"timestamp\"",
           "refId": "A",
           "sql": {
             "columns": [
@@ -762,7 +774,8 @@
         }
       ],
       "title": "MPU6050 Accelerometer (X, Y, Z)",
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "3-axis acceleration measurements in g-force. Monitors print head movements and detects mechanical vibrations. Used for quality control and predictive maintenance. Z-axis should be near -1g when stationary."
     },
     {
       "datasource": {
@@ -798,6 +811,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -812,7 +826,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -827,7 +842,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 32
+        "y": 19
       },
       "id": 2,
       "options": {
@@ -838,11 +853,12 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.2.1",
       "targets": [
         {
           "datasource": {
@@ -852,7 +868,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  \"timestamp\" AS \"time\",\r\n  gyro_x,\r\n  gyro_y,\r\n  gyro_z\r\nFROM mpu6050_gyroscope_data\r\nWHERE $__timeFilter(\"timestamp\")\r\nORDER BY \"timestamp\"",
+          "rawSql": "SELECT\r\n  \"timestamp\" AS \"time\",\r\n  gyro_x,\r\n  gyro_y,\r\n  gyro_z\r\nFROM mpu6050_gyroscope_data\r\nWHERE device_id = 'ESP32_SensorHub_Raptor' AND $__timeFilter(\"timestamp\")\r\nORDER BY \"timestamp\"",
           "refId": "A",
           "sql": {
             "columns": [
@@ -874,7 +890,8 @@
         }
       ],
       "title": "MPU6050 Gyroscope (X, Y, Z)",
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "3-axis angular velocity in degrees/second. Detects rotation and sudden movements. High gyro readings during printing indicate mechanical instability or belt tension issues."
     },
     {
       "collapsed": false,
@@ -882,7 +899,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 42
+        "y": 29
       },
       "id": 9,
       "panels": [],
@@ -923,6 +940,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -937,7 +955,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -965,7 +984,7 @@
         "h": 13,
         "w": 24,
         "x": 0,
-        "y": 43
+        "y": 30
       },
       "id": 10,
       "options": {
@@ -976,181 +995,261 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.2.1",
       "targets": [
         {
           "datasource": {
             "type": "grafana-postgresql-datasource",
             "uid": "aei784ojzbrpca"
           },
-          "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT \"timestamp\" AS \"time\", temperature_c AS \"Hotend\" FROM max6675_temperature_data WHERE $__timeFilter(\"timestamp\")\r\n",
-          "refId": "A",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          }
-        },
-        {
-          "datasource": {
-            "type": "grafana-postgresql-datasource",
-            "uid": "aei784ojzbrpca"
-          },
-          "editorMode": "code",
-          "format": "table",
-          "hide": false,
-          "rawQuery": true,
-          "rawSql": "SELECT \"timestamp\" AS \"time\", temperature_c AS \"MPU6050\" FROM mpu6050_temperature_data WHERE $__timeFilter(\"timestamp\")\r\n",
-          "refId": "B",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          }
-        },
-        {
-          "datasource": {
-            "type": "grafana-postgresql-datasource",
-            "uid": "aei784ojzbrpca"
-          },
-          "editorMode": "code",
-          "format": "table",
-          "hide": false,
-          "rawQuery": true,
-          "rawSql": "SELECT \"timestamp\" AS \"time\", temperature_c AS \"Ambient\" FROM dht22_data WHERE $__timeFilter(\"timestamp\")\r\n",
-          "refId": "C",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          }
-        },
-        {
-          "datasource": {
-            "type": "grafana-postgresql-datasource",
-            "uid": "aei784ojzbrpca"
-          },
-          "editorMode": "code",
-          "format": "table",
-          "hide": false,
-          "rawQuery": true,
-          "rawSql": "SELECT \"timestamp\" AS \"time\", humidity_pct AS \"Humidity\" FROM dht22_data WHERE $__timeFilter(\"timestamp\")\r\n",
-          "refId": "D",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          }
+          "rawSql": "SELECT \n  $__timeGroup(\"timestamp\", '1m') AS \"time\",\n  AVG(temperature_c) AS \"Temperature (\u00b0C)\",\n  AVG(humidity_pct) AS \"Humidity (%)\"\nFROM dht22_data\nWHERE device_id = 'ESP32_SensorHub_Raptor'\n  AND $__timeFilter(\"timestamp\")\nGROUP BY 1\nORDER BY 1",
+          "refId": "A"
         }
       ],
       "title": "Temperatures & Humidity",
+      "type": "timeseries",
+      "description": "Combined environmental monitoring panel. Tracks ambient temperature, hotend temperature, and relative humidity. All three factors directly impact print adhesion and part dimensional accuracy."
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "aei784ojzbrpca"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "unit": "celsius"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 43
+      },
+      "id": 101,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "aei784ojzbrpca"
+          },
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  $__timeGroup(\"timestamp\", '1m') AS \"time\",\n  AVG(temperature_c) AS \"Hotend Temperature\"\nFROM max6675_temperature_data\nWHERE device_id = 'ESP32_SensorHub_Raptor'\n  AND $__timeFilter(\"timestamp\")\nGROUP BY 1\nORDER BY 1",
+          "refId": "A"
+        }
+      ],
+      "title": "MAX6675 - Hotend Temperature",
+      "type": "timeseries",
+      "description": "High-precision K-type thermocouple readings with 0.25\u00b0C resolution. Most accurate hotend temperature measurement. Use as ground truth for PID tuning and temperature calibration."
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "aei784ojzbrpca"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "unit": "accMS2"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 43
+      },
+      "id": 102,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "aei784ojzbrpca"
+          },
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  $__timeGroup(\"timestamp\", '1m') AS \"time\",\n  AVG(accel_x) AS \"Accel X\",\n  AVG(accel_y) AS \"Accel Y\",\n  AVG(accel_z) AS \"Accel Z\"\nFROM mpu6050_accelerometer_data\nWHERE device_id = 'ESP32_SensorHub_Raptor'\n  AND $__timeFilter(\"timestamp\")\nGROUP BY 1\nORDER BY 1",
+          "refId": "A"
+        }
+      ],
+      "title": "MPU6050 - Accelerometer (X, Y, Z)",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "aei784ojzbrpca"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "unit": "degree"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 51
+      },
+      "id": 103,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "aei784ojzbrpca"
+          },
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  $__timeGroup(\"timestamp\", '1m') AS \"time\",\n  AVG(gyro_x) AS \"Gyro X\",\n  AVG(gyro_y) AS \"Gyro Y\",\n  AVG(gyro_z) AS \"Gyro Z\"\nFROM mpu6050_gyroscope_data\nWHERE device_id = 'ESP32_SensorHub_Raptor'\n  AND $__timeFilter(\"timestamp\")\nGROUP BY 1\nORDER BY 1",
+          "refId": "A"
+        }
+      ],
+      "title": "MPU6050 - Gyroscope (X, Y, Z)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "aei784ojzbrpca"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "showPoints": "never"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Power"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "watt"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Voltage"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "volt"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 51
+      },
+      "id": 104,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "aei784ojzbrpca"
+          },
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  $__timeGroup(\"timestamp\", '1m') AS \"time\",\n  AVG(power_w) AS \"Power\",\n  AVG(voltage_v) AS \"Voltage\"\nFROM smartplug_data\nWHERE device_id = 'SmartPlug_3DPrinter_01'\n  AND $__timeFilter(\"timestamp\")\nGROUP BY 1\nORDER BY 1",
+          "refId": "A"
+        }
+      ],
+      "title": "Smart Plug - Power & Voltage",
+      "type": "timeseries",
+      "description": "Shelly plug metrics showing active power (W) and AC voltage (V). Monitor for voltage fluctuations that can affect print quality. Standard voltage: 110-120V (US) or 220-240V (EU)."
     }
   ],
   "preload": false,
-  "schemaVersion": 40,
+  "schemaVersion": 42,
   "tags": [],
   "templating": {
-    "list": [
-      {
-        "current": {
-          "text": "DHT22",
-          "value": "DHT22"
-        },
-        "description": "",
-        "label": "Select Sensor",
-        "name": "sensor",
-        "options": [
-          {
-            "selected": true,
-            "text": "DHT22",
-            "value": "DHT22"
-          },
-          {
-            "selected": false,
-            "text": "MPU6050_Accelerometer",
-            "value": "MPU6050_Accelerometer"
-          },
-          {
-            "selected": false,
-            "text": "MPU6050_Gyroscope",
-            "value": "MPU6050_Gyroscope"
-          },
-          {
-            "selected": false,
-            "text": "MPU6050_Temperature",
-            "value": "MPU6050_Temperature"
-          },
-          {
-            "selected": false,
-            "text": "MAX6675_Temperature",
-            "value": "MAX6675_Temperature"
-          },
-          {
-            "selected": false,
-            "text": "Smart_Plug_Energy",
-            "value": "Smart_Plug_Energy"
-          }
-        ],
-        "query": "DHT22, MPU6050_Accelerometer, MPU6050_Gyroscope, MPU6050_Temperature, MAX6675_Temperature, Smart_Plug_Energy",
-        "type": "custom"
-      }
-    ]
+    "list": []
   },
   "time": {
     "from": "now-6h",
@@ -1160,6 +1259,5 @@
   "timezone": "browser",
   "title": "Sensor Data Explorer",
   "uid": "cetamfgpx9mo0f",
-  "version": 19,
-  "weekStart": ""
+  "version": 4
 }

@@ -132,7 +132,8 @@
         }
       ],
       "title": "Panel Title",
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "Real-time energy consumption comparison across selected machines. Compare power usage patterns to identify efficient vs. inefficient devices. Updated every 5 seconds."
     },
     {
       "datasource": {
@@ -243,7 +244,8 @@
         }
       ],
       "title": "Total Energy Consumption Comparison",
-      "type": "barchart"
+      "type": "barchart",
+      "description": "Bar chart comparing total energy consumed by each machine over the selected time period. Higher bars indicate more energy usage. Use to identify high-consumption devices for optimization."
     },
     {
       "datasource": {
@@ -332,7 +334,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  d.friendly_name AS \"Machine\",\r\n  -- FIX: Use session_energy_wh and convert from Wh to kWh\r\n  SUM(pj.session_energy_wh / 1000.0) / NULLIF(SUM(pj.filament_used_g), 0) AS \"Efficiency (kWh/g)\"\r\nFROM\r\n  print_jobs AS pj\r\nJOIN\r\n  devices AS d ON pj.device_id = d.device_id\r\nWHERE\r\n  pj.status = 'done'\r\n  -- FIX: Check the correct column for valid data\r\n  AND pj.session_energy_wh > 0\r\n  AND pj.filament_used_g > 0\r\n  AND $__timeFilter(pj.end_time)\r\nGROUP BY\r\n  \"Machine\"\r\nORDER BY\r\n  \"Efficiency (kWh/g)\" ASC;",
+          "rawSql": "SELECT\r\n  d.friendly_name AS \"Machine\",\r\n  -- FIX: Use session_energy_wh and convert from Wh to kWh\r\n  SUM(pj.session_energy_wh / 1000.0) / NULLIF(SUM(pj.filament_used_g), 0) AS \"Efficiency (kWh/g)\"\r\nFROM\r\n  print_jobs AS pj\r\nJOIN\r\n  devices AS d ON pj.device_id = d.device_id\r\nWHERE\r\n  pj.status = 'completed'\r\n  -- FIX: Check the correct column for valid data\r\n  AND pj.session_energy_wh > 0\r\n  AND pj.filament_used_g > 0\r\n  AND $__timeFilter(pj.end_time)\r\nGROUP BY\r\n  \"Machine\"\r\nORDER BY\r\n  \"Efficiency (kWh/g)\" ASC;",
           "refId": "A",
           "sql": {
             "columns": [
@@ -354,7 +356,8 @@
         }
       ],
       "title": "Printing Efficiency (Energy per Gram)",
-      "type": "barchart"
+      "type": "barchart",
+      "description": "Energy efficiency metric showing kWh consumed per gram of material printed. Lower values indicate better efficiency. Industry benchmark: 0.05-0.15 kWh/g. Helps identify waste and optimize settings."
     }
   ],
   "preload": false,

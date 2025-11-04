@@ -26,7 +26,7 @@
         "type": "grafana-postgresql-datasource",
         "uid": "aei784ojzbrpca"
       },
-      "description": "This panel will show you the continuous moving_rms value. You'll use this to identify the \"floor\" (idle vibration) and the \"active\" levels.",
+      "description": "Root Mean Square of motion sensor data. Quantifies vibration intensity during machine operation. Higher RMS values indicate active printing or mechanical issues. Typical printing range: 0.2-0.8 g RMS.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -157,7 +157,7 @@
         "type": "grafana-postgresql-datasource",
         "uid": "aei784ojzbrpca"
       },
-      "description": "This shows you the effect of your current manual_mpu_threshold (which is stored alongside is_moving in the database, though not directly graphed here yet).",
+      "description": "Binary indicator showing whether machine is actively moving. Derived from accelerometer thresholds. Used for state detection and idle time calculation. Essential for utilization reporting and energy optimization.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -291,7 +291,7 @@
         "type": "grafana-postgresql-datasource",
         "uid": "aei784ojzbrpca"
       },
-      "description": "This allows you to see on the same timeline what threshold value was active when a particular is_moving status was determined. This is useful if you change the threshold in Node-RED and want to see its historical value.\n",
+      "description": "Dynamic threshold value for motion detection algorithm. Automatically adjusts based on sensor noise floor. Lower threshold = more sensitive motion detection. Values below 0.05 may trigger false positives.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -423,7 +423,7 @@
         "type": "grafana-postgresql-datasource",
         "uid": "aei784ojzbrpca"
       },
-      "description": "This panel is KEY. If you have distinct idle and active periods, you should see two \"humps\" in the histogram: one for low moving_rms values (idle) and one for higher moving_rms values (active). Your ideal threshold lies in the \"valley\" between these two humps.",
+      "description": "Statistical distribution of vibration levels over time. Shows frequency of different vibration intensities. Use to identify normal operating patterns and detect mechanical degradation. Bimodal distribution indicates distinct idle/active states.",
       "fieldConfig": {
         "defaults": {
           "color": {
