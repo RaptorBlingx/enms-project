@@ -29,3 +29,4 @@ backend/db_init/02_data.sql
 node-red/flows.json.backup
 node-red/flows_docker.json.bak
 node-red/.flows_docker.json.backup
+backend/models/*.joblib

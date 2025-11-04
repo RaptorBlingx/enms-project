@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workshop Programme - ENMS Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            padding: 3rem 2rem;
+            line-height: 1.6;
+            color: #2d3748;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
+            color: white;
+            padding: 3rem 2.5rem;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .header p { font-size: 1.1rem; opacity: 0.95; }
+        .content { padding: 3rem 2.5rem; }
+        .section { margin-bottom: 2.5rem; }
+        .section h2 {
+            font-size: 1.75rem;
+            color: #1976d2;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .section p {
+            font-size: 1.05rem;
+            color: #4a5568;
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+        .workshop-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #1976d2;
+        }
+        .workshop-card h3 {
+            color: #1976d2;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .workshop-card .meta {
+            display: flex;
+            gap: 2rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+        .workshop-card .meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .icon-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(25, 118, 210, 0.1);
+            border-radius: 10px;
+        }
+        .icon-badge i { font-size: 1.2rem; color: #1976d2; }
+        ul { margin-left: 1.5rem; }
+        ul li { margin-bottom: 0.5rem; color: #4a5568; }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 1rem;
+            transition: transform 0.3s;
+        }
+        .cta-button:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fa-solid fa-chalkboard-user"></i> Workshop Programme</h1>
+            <p>Training & Knowledge Transfer Sessions</p>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-bullseye"></i></span>
+                    Programme Overview
+                </h2>
+                <p>
+                    Our comprehensive workshop programme is designed to empower your team with the knowledge and skills needed to maximize the value of the ENMS platform. Through hands-on training, best practice sharing, and real-world case studies, participants gain practical expertise in energy management and Industry 4.0 technologies.
+                </p>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-calendar-days"></i></span>
+                    Available Workshops
+                </h2>
+
+                <div class="workshop-card">
+                    <h3><i class="fa-solid fa-graduation-cap"></i> ENMS Fundamentals (Half Day)</h3>
+                    <div class="meta">
+                        <span><i class="fa-solid fa-clock"></i> 4 hours</span>
+                        <span><i class="fa-solid fa-users"></i> Up to 15 participants</span>
+                        <span><i class="fa-solid fa-signal"></i> Beginner</span>
+                    </div>
+                    <p>
+                        Introduction to the ENMS platform, navigation, dashboard customization, and basic energy monitoring concepts. Perfect for new users and management staff.
+                    </p>
+                    <ul>
+                        <li>Platform overview and user interface</li>
+                        <li>Understanding energy dashboards</li>
+                        <li>Creating custom views</li>
+                        <li>Basic reporting and data export</li>
+                    </ul>
+                </div>
+
+                <div class="workshop-card">
+                    <h3><i class="fa-solid fa-chart-line"></i> Advanced Analytics & Optimization (Full Day)</h3>
+                    <div class="meta">
+                        <span><i class="fa-solid fa-clock"></i> 8 hours</span>
+                        <span><i class="fa-solid fa-users"></i> Up to 12 participants</span>
+                        <span><i class="fa-solid fa-signal"></i> Intermediate</span>
+                    </div>
+                    <p>
+                        Deep dive into data analysis, EnPI calculation, performance benchmarking, and energy optimization strategies.
+                    </p>
+                    <ul>
+                        <li>Energy Performance Indicators (EnPIs)</li>
+                        <li>Baseline establishment and normalization</li>
+                        <li>Statistical analysis and forecasting</li>
+                        <li>Identifying optimization opportunities</li>
+                        <li>Machine learning predictions</li>
+                    </ul>
+                </div>
+
+                <div class="workshop-card">
+                    <h3><i class="fa-solid fa-certificate"></i> ISO 50001 Implementation (2 Days)</h3>
+                    <div class="meta">
+                        <span><i class="fa-solid fa-clock"></i> 16 hours</span>
+                        <span><i class="fa-solid fa-users"></i> Up to 10 participants</span>
+                        <span><i class="fa-solid fa-signal"></i> Advanced</span>
+                    </div>
+                    <p>
+                        Comprehensive training on using the platform to meet ISO 50001 requirements, documentation, and certification preparation.
+                    </p>
+                    <ul>
+                        <li>ISO 50001 standard overview</li>
+                        <li>Energy review and planning</li>
+                        <li>Documentation requirements</li>
+                        <li>Internal audit preparation</li>
+                        <li>Management review processes</li>
+                    </ul>
+                </div>
+
+                <div class="workshop-card">
+                    <h3><i class="fa-solid fa-code"></i> Technical Integration Workshop (2 Days)</h3>
+                    <div class="meta">
+                        <span><i class="fa-solid fa-clock"></i> 16 hours</span>
+                        <span><i class="fa-solid fa-users"></i> Up to 8 participants</span>
+                        <span><i class="fa-solid fa-signal"></i> Technical</span>
+                    </div>
+                    <p>
+                        For IT staff and system integrators: IoT device integration, API usage, Node-RED workflow development, and system administration.
+                    </p>
+                    <ul>
+                        <li>MQTT and IoT protocols</li>
+                        <li>Device onboarding and configuration</li>
+                        <li>Node-RED flow development</li>
+                        <li>API integration and automation</li>
+                        <li>Database queries and custom dashboards</li>
+                    </ul>
+                </div>
+
+                <div class="workshop-card">
+                    <h3><i class="fa-solid fa-passport"></i> Digital Product Passport Masterclass (1 Day)</h3>
+                    <div class="meta">
+                        <span><i class="fa-solid fa-clock"></i> 8 hours</span>
+                        <span><i class="fa-solid fa-users"></i> Up to 12 participants</span>
+                        <span><i class="fa-solid fa-signal"></i> Intermediate</span>
+                    </div>
+                    <p>
+                        Learn to create, manage, and leverage digital product passports for sustainability reporting and compliance.
+                    </p>
+                    <ul>
+                        <li>DPP concepts and regulations</li>
+                        <li>Product lifecycle tracking</li>
+                        <li>Carbon footprint calculation</li>
+                        <li>ESG reporting</li>
+                        <li>Supply chain transparency</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-laptop-code"></i></span>
+                    Workshop Format
+                </h2>
+                <p>
+                    All workshops combine theoretical knowledge with hands-on practice:
+                </p>
+                <ul>
+                    <li><strong>Interactive Presentations:</strong> Engaging content with real-world examples</li>
+                    <li><strong>Live Demonstrations:</strong> Platform features demonstrated in real-time</li>
+                    <li><strong>Practical Exercises:</strong> Participants work with actual platform instances</li>
+                    <li><strong>Q&A Sessions:</strong> Dedicated time for addressing specific questions</li>
+                    <li><strong>Case Studies:</strong> Learn from successful implementations</li>
+                    <li><strong>Resource Materials:</strong> Comprehensive documentation and guides provided</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-building"></i></span>
+                    Delivery Options
+                </h2>
+                <ul>
+                    <li><strong>On-Site:</strong> Training conducted at your facility</li>
+                    <li><strong>Virtual:</strong> Live online sessions with full interactivity</li>
+                    <li><strong>Hybrid:</strong> Combination of on-site and remote participants</li>
+                    <li><strong>Self-Paced:</strong> Recorded modules with certification exams</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-award"></i></span>
+                    Certification
+                </h2>
+                <p>
+                    Participants who complete workshops receive:
+                </p>
+                <ul>
+                    <li>Official completion certificate</li>
+                    <li>Digital badge for LinkedIn profile</li>
+                    <li>Access to exclusive user community</li>
+                    <li>6 months of post-training email support</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-phone"></i></span>
+                    Book a Workshop
+                </h2>
+                <p>
+                    Ready to upskill your team? Contact us to discuss your training needs and schedule a workshop tailored to your organization.
+                </p>
+                <a href="#" class="cta-button" onclick="alert('Contact: mohamad.jarad@aartimuhendislik.com'); return false;">
+                    <i class="fa-solid fa-envelope"></i> Request Workshop Information
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

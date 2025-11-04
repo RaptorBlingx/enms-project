@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About ENMS Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 3rem 2rem;
+            line-height: 1.6;
+            color: #2d3748;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 2.5rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 3rem 2.5rem;
+        }
+
+        .section {
+            margin-bottom: 2.5rem;
+        }
+
+        .section h2 {
+            font-size: 1.75rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section h3 {
+            font-size: 1.3rem;
+            color: #4a5568;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .section p {
+            font-size: 1.05rem;
+            color: #4a5568;
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
+        }
+
+        .feature-card i {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h4 {
+            font-size: 1.1rem;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card p {
+            font-size: 0.95rem;
+            color: #718096;
+            margin: 0;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 4px solid #667eea;
+            margin: 1.5rem 0;
+        }
+
+        .highlight-box h3 {
+            margin-top: 0;
+        }
+
+        ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        ul li {
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+        }
+
+        .icon-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+        }
+
+        .icon-badge i {
+            font-size: 1.2rem;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚡ ENMS Demo Platform</h1>
+            <p>Energy Management & Digital Product Passport System</p>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-circle-info"></i></span>
+                    About This Platform
+                </h2>
+                <p>
+                    The <strong>ENMS (Energy Management System) Demo Platform</strong> is a comprehensive demonstration environment showcasing cutting-edge Industry 4.0 technologies for energy monitoring, sustainability tracking, and digital product passport implementation.
+                </p>
+                <p>
+                    This platform integrates real-time data collection, advanced analytics, and visualization tools to provide insights into manufacturing processes, energy consumption patterns, and environmental impact metrics.
+                </p>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-bullseye"></i></span>
+                    Our Mission
+                </h2>
+                <p>
+                    To empower organizations with intelligent, data-driven solutions that optimize energy efficiency, reduce carbon footprint, and enable transparent product lifecycle management in alignment with global sustainability goals and Industry 4.0 standards.
+                </p>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-star"></i></span>
+                    Key Features
+                </h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <h4>Real-Time Monitoring</h4>
+                        <p>Live energy consumption tracking across multiple devices and production lines with sub-second granularity.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fa-solid fa-passport"></i>
+                        <h4>Digital Product Passports</h4>
+                        <p>Complete product lifecycle documentation including energy usage, materials, and environmental impact.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fa-solid fa-brain"></i>
+                        <h4>AI-Powered Analytics</h4>
+                        <p>Machine learning algorithms for predictive maintenance and energy optimization recommendations.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fa-solid fa-leaf"></i>
+                        <h4>Sustainability Metrics</h4>
+                        <p>Comprehensive carbon footprint calculation and ESG reporting aligned with international standards.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <h4>Enterprise Security</h4>
+                        <p>Role-based access control, encrypted data transmission, and audit logging for compliance.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fa-solid fa-plug"></i>
+                        <h4>IoT Integration</h4>
+                        <p>Seamless connectivity with sensors, PLCs, and industrial equipment via MQTT, Modbus, and OPC UA.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-microchip"></i></span>
+                    Technology Stack
+                </h2>
+                <div class="highlight-box">
+                    <h3>Core Technologies</h3>
+                    <ul>
+                        <li><strong>Grafana:</strong> Advanced visualization and dashboarding</li>
+                        <li><strong>Node-RED:</strong> IoT workflow automation and data integration</li>
+                        <li><strong>TimescaleDB:</strong> Time-series database for high-performance data storage</li>
+                        <li><strong>Python & Flask:</strong> Backend API and machine learning services</li>
+                        <li><strong>PostgreSQL:</strong> Relational database for structured data</li>
+                        <li><strong>Mosquitto MQTT:</strong> Message broker for IoT device communication</li>
+                        <li><strong>Docker:</strong> Containerization for scalable deployment</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-users"></i></span>
+                    Target Users
+                </h2>
+                <p>This platform serves various stakeholders including:</p>
+                <ul>
+                    <li><strong>Energy Managers:</strong> Monitor and optimize energy consumption across facilities</li>
+                    <li><strong>Production Managers:</strong> Track manufacturing efficiency and equipment performance</li>
+                    <li><strong>Sustainability Officers:</strong> Generate ESG reports and track environmental KPIs</li>
+                    <li><strong>Quality Assurance:</strong> Access digital product passports and compliance documentation</li>
+                    <li><strong>IT Administrators:</strong> Manage system configuration and user access</li>
+                    <li><strong>Executive Leadership:</strong> Strategic insights through high-level dashboards</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-handshake"></i></span>
+                    Demo Environment
+                </h2>
+                <p>
+                    This is a fully functional demonstration environment with simulated data representing typical manufacturing scenarios. The system includes:
+                </p>
+                <ul>
+                    <li>Multiple 3D printer fleets with realistic energy consumption patterns</li>
+                    <li>Historical data covering various operational conditions</li>
+                    <li>Pre-configured dashboards for different user profiles (Staff, Technical, DPP)</li>
+                    <li>Sample digital product passports with complete lifecycle information</li>
+                    <li>Interactive analysis tools for data exploration</li>
+                </ul>
+                <p>
+                    <strong>Note:</strong> All data in this demo environment is simulated for demonstration purposes and does not represent actual production systems.
+                </p>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-rocket"></i></span>
+                    Getting Started
+                </h2>
+                <p>
+                    Explore the platform using the navigation menu on the left and the dashboard buttons in the top navigation bar. Each section provides different perspectives on energy management and sustainability metrics:
+                </p>
+                <ul>
+                    <li><strong>Fleet Operations:</strong> Overview of all connected devices and their status</li>
+                    <li><strong>Performance Comparison:</strong> Side-by-side analysis of equipment efficiency</li>
+                    <li><strong>Interactive Analysis:</strong> Deep-dive into historical trends and patterns</li>
+                    <li><strong>Digital Product Passport (DPP):</strong> Product-specific sustainability documentation</li>
+                    <li><strong>Node-RED:</strong> Configure IoT workflows and data pipelines</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

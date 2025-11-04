@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>ENMS Demo - Login & Registration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .auth-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            padding: 40px 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .auth-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .auth-header p {
+            font-size: 1rem;
+            opacity: 0.95;
+        }
+
+        .demo-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        .auth-tabs {
+            display: flex;
+            background: #f1f5f9;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 18px;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .tab-button.active {
+            color: #3b82f6;
+            background: white;
+        }
+
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #3b82f6;
+        }
+
+        .auth-content {
+            padding: 40px 50px;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #334155;
+            font-size: 0.95rem;
+        }
+
+        .required {
+            color: #ef4444;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        input.error, select.error {
+            border-color: #ef4444;
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 6px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .password-field {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            padding: 4px;
+            font-size: 1.1rem;
+        }
+
+        .toggle-password:hover {
+            color: #3b82f6;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .submit-button:active {
+            transform: translateY(0);
+        }
+
+        .submit-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .submit-button.loading .spinner {
+            display: block;
+        }
+
+        .submit-button.loading .button-text {
+            display: none;
+        }
+
+        .alert {
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+        }
+
+        .alert.show {
+            display: flex;
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #6ee7b7;
+        }
+
+        .alert.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .alert.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+
+        .help-text {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 6px;
+        }
+
+        .password-strength {
+            margin-top: 8px;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .password-strength.show {
+            display: block;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 0;
+            transition: all 0.3s;
+        }
+
+        .password-strength.weak .password-strength-bar {
+            width: 33%;
+            background: #ef4444;
+        }
+
+        .password-strength.medium .password-strength-bar {
+            width: 66%;
+            background: #f59e0b;
+        }
+
+        .password-strength.strong .password-strength-bar {
+            width: 100%;
+            background: #10b981;
+        }
+
+        .features-list {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .features-list h3 {
+            font-size: 0.95rem;
+            color: #334155;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .feature-item i {
+            color: #3b82f6;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 640px) {
+            .auth-header {
+                padding: 30px 20px;
+            }
+
+            .auth-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .auth-content {
+                padding: 30px 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <h1>⚡ ENMS Demo</h1>
+            <p>Energy Monitoring & Digital Product Passport System</p>
+            <div class="demo-badge">🚀 DEMO VERSION</div>
+        </div>
+
+        <div class="auth-tabs">
+            <button class="tab-button active" data-tab="login">
+                <i class="fa-solid fa-right-to-bracket"></i> Login
+            </button>
+            <button class="tab-button" data-tab="signup">
+                <i class="fa-solid fa-user-plus"></i> Sign Up
+            </button>
+        </div>
+
+        <div class="auth-content">
+            <!-- Alerts -->
+            <div id="alert" class="alert">
+                <i class="fa-solid fa-circle-check"></i>
+                <span id="alert-message"></span>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" class="form-section active" autocomplete="on">
+                <div class="form-group">
+                    <label>Email Address <span class="required">*</span></label>
+                    <input type="email" id="login-email" name="email" autocomplete="email username" required placeholder="your.email@company.com">
+                    <div class="error-message" id="login-email-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Password <span class="required">*</span></label>
+                    <div class="password-field">
+                        <input type="password" id="login-password" name="password" autocomplete="current-password" required placeholder="Enter your password">
+                        <button type="button" class="toggle-password" data-target="login-password">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="error-message" id="login-password-error"></div>
+                </div>
+
+                <button type="submit" class="submit-button" id="login-button">
+                    <div class="spinner"></div>
+                    <span class="button-text">
+                        <i class="fa-solid fa-right-to-bracket"></i> Sign In
+                    </span>
+                </button>
+
+                <div style="text-align: center; margin-top: 16px;">
+                    <a href="#" id="forgot-password-link" style="color: #3b82f6; text-decoration: none; font-size: 0.9rem; font-weight: 500;">
+                        <i class="fa-solid fa-key"></i> Forgot Password?
+                    </a>
+                </div>
+
+                <div class="features-list">
+                    <h3>What you'll get:</h3>
+                    <div class="feature-item">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Real-time energy monitoring</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Digital Product Passports</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Smart analytics & insights</span>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Signup Form -->
+            <form id="signup-form" class="form-section" autocomplete="on">
+                <div class="form-group">
+                    <label>Organization Name <span class="required">*</span></label>
+                    <input type="text" id="signup-organization" name="organization" autocomplete="organization" required placeholder="Your Company Name">
+                    <div class="error-message" id="signup-organization-error"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Full Name <span class="required">*</span></label>
+                        <input type="text" id="signup-fullname" name="name" autocomplete="name" required placeholder="John Doe">
+                        <div class="error-message" id="signup-fullname-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Position <span class="required">*</span></label>
+                        <input type="text" id="signup-position" name="job-title" autocomplete="organization-title" required placeholder="Your Role">
+                        <div class="error-message" id="signup-position-error"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address <span class="required">*</span></label>
+                    <input type="email" id="signup-email" name="email" autocomplete="email" required placeholder="your.email@company.com">
+                    <div class="help-text">We'll send a verification link to this email</div>
+                    <div class="error-message" id="signup-email-error"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Mobile Number <span class="required">*</span></label>
+                        <input type="tel" id="signup-mobile" name="tel" autocomplete="tel" required placeholder="+1 234 567 8900">
+                        <div class="error-message" id="signup-mobile-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Country <span class="required">*</span></label>
+                        <select id="signup-country" required>
+                            <option value="">Select Country</option>
+                            <option value="Afghanistan">Afghanistan</option>
+                            <option value="Albania">Albania</option>
+                            <option value="Algeria">Algeria</option>
+                            <option value="Argentina">Argentina</option>
+                            <option value="Australia">Australia</option>
+                            <option value="Austria">Austria</option>
+                            <option value="Bangladesh">Bangladesh</option>
+                            <option value="Belgium">Belgium</option>
+                            <option value="Brazil">Brazil</option>
+                            <option value="Bulgaria">Bulgaria</option>
+                            <option value="Canada">Canada</option>
+                            <option value="Chile">Chile</option>
+                            <option value="China">China</option>
+                            <option value="Colombia">Colombia</option>
+                            <option value="Croatia">Croatia</option>
+                            <option value="Czech Republic">Czech Republic</option>
+                            <option value="Denmark">Denmark</option>
+                            <option value="Egypt">Egypt</option>
+                            <option value="Estonia">Estonia</option>
+                            <option value="Finland">Finland</option>
+                            <option value="France">France</option>
+                            <option value="Germany">Germany</option>
+                            <option value="Greece">Greece</option>
+                            <option value="Hong Kong">Hong Kong</option>
+                            <option value="Hungary">Hungary</option>
+                            <option value="Iceland">Iceland</option>
+                            <option value="India">India</option>
+                            <option value="Indonesia">Indonesia</option>
+                            <option value="Iran">Iran</option>
+                            <option value="Iraq">Iraq</option>
+                            <option value="Ireland">Ireland</option>
+                            <option value="Israel">Israel</option>
+                            <option value="Italy">Italy</option>
+                            <option value="Japan">Japan</option>
+                            <option value="Jordan">Jordan</option>
+                            <option value="Kazakhstan">Kazakhstan</option>
+                            <option value="Kenya">Kenya</option>
+                            <option value="Kuwait">Kuwait</option>
+                            <option value="Latvia">Latvia</option>
+                            <option value="Lebanon">Lebanon</option>
+                            <option value="Libya">Libya</option>
+                            <option value="Lithuania">Lithuania</option>
+                            <option value="Luxembourg">Luxembourg</option>
+                            <option value="Malaysia">Malaysia</option>
+                            <option value="Mexico">Mexico</option>
+                            <option value="Morocco">Morocco</option>
+                            <option value="Netherlands">Netherlands</option>
+                            <option value="New Zealand">New Zealand</option>
+                            <option value="Nigeria">Nigeria</option>
+                            <option value="Norway">Norway</option>
+                            <option value="Oman">Oman</option>
+                            <option value="Pakistan">Pakistan</option>
+                            <option value="Palestine">Palestine</option>
+                            <option value="Peru">Peru</option>
+                            <option value="Philippines">Philippines</option>
+                            <option value="Poland">Poland</option>
+                            <option value="Portugal">Portugal</option>
+                            <option value="Qatar">Qatar</option>
+                            <option value="Romania">Romania</option>
+                            <option value="Russia">Russia</option>
+                            <option value="Saudi Arabia">Saudi Arabia</option>
+                            <option value="Serbia">Serbia</option>
+                            <option value="Singapore">Singapore</option>
+                            <option value="Slovakia">Slovakia</option>
+                            <option value="Slovenia">Slovenia</option>
+                            <option value="South Africa">South Africa</option>
+                            <option value="South Korea">South Korea</option>
+                            <option value="Spain">Spain</option>
+                            <option value="Sweden">Sweden</option>
+                            <option value="Switzerland">Switzerland</option>
+                            <option value="Syria">Syria</option>
+                            <option value="Taiwan">Taiwan</option>
+                            <option value="Thailand">Thailand</option>
+                            <option value="Tunisia">Tunisia</option>
+                            <option value="Turkey">Turkey</option>
+                            <option value="Ukraine">Ukraine</option>
+                            <option value="United Arab Emirates">United Arab Emirates</option>
+                            <option value="United Kingdom">United Kingdom</option>
+                            <option value="United States">United States</option>
+                            <option value="Vietnam">Vietnam</option>
+                            <option value="Yemen">Yemen</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <div class="error-message" id="signup-country-error"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Password <span class="required">*</span></label>
+                    <div class="password-field">
+                        <input type="password" id="signup-password" name="new-password" autocomplete="new-password" required placeholder="Create a strong password">
+                        <button type="button" class="toggle-password" data-target="signup-password">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="help-text">Minimum 8 characters</div>
+                    <div class="password-strength" id="password-strength">
+                        <div class="password-strength-bar"></div>
+                    </div>
+                    <div class="error-message" id="signup-password-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Confirm Password <span class="required">*</span></label>
+                    <div class="password-field">
+                        <input type="password" id="signup-confirm-password" name="new-password-confirm" autocomplete="new-password" required placeholder="Re-enter your password">
+                        <button type="button" class="toggle-password" data-target="signup-confirm-password">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="error-message" id="signup-confirm-password-error"></div>
+                </div>
+
+                <!-- Message container for signup form -->
+                <div id="signup-alert" class="alert" style="margin-top: 20px;">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span id="signup-alert-message"></span>
+                </div>
+
+                <button type="submit" class="submit-button" id="signup-button">
+                    <div class="spinner"></div>
+                    <span class="button-text">
+                        <i class="fa-solid fa-user-plus"></i> Create Account
+                    </span>
+                </button>
+            </form>
+
+            <!-- Forgot Password Form -->
+            <form id="forgot-password-form" class="form-section" autocomplete="on">
+                <div class="form-group">
+                    <label>Email Address <span class="required">*</span></label>
+                    <input type="email" id="forgot-email" name="email" autocomplete="email" required placeholder="your.email@company.com">
+                    <div class="help-text">We'll send you a password reset link</div>
+                    <div class="error-message" id="forgot-email-error"></div>
+                </div>
+
+                <button type="submit" class="submit-button" id="forgot-button">
+                    <div class="spinner"></div>
+                    <span class="button-text">
+                        <i class="fa-solid fa-paper-plane"></i> Send Reset Link
+                    </span>
+                </button>
+
+                <div style="text-align: center; margin-top: 16px;">
+                    <a href="#" id="back-to-login-link" style="color: #64748b; text-decoration: none; font-size: 0.9rem; font-weight: 500;">
+                        <i class="fa-solid fa-arrow-left"></i> Back to Login
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Always use the nginx proxy for API calls
+        const API_BASE = '/api';
+
+        // Tab switching
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const tab = button.dataset.tab;
+                
+                // Update active tab
+                document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                button.classList.add('active');
+                
+                // Update active form
+                document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
+                document.getElementById(`${tab}-form`).classList.add('active');
+                
+                // Clear alerts
+                hideAlert();
+                hideSignupAlert();
+            });
+        });
+
+        // Forgot password link
+        document.getElementById('forgot-password-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Hide all forms
+            document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
+            
+            // Show forgot password form
+            document.getElementById('forgot-password-form').classList.add('active');
+            
+            // Deactivate tabs
+            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            
+            // Clear alerts
+            hideAlert();
+            hideSignupAlert();
+        });
+
+        // Back to login link
+        document.getElementById('back-to-login-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Show login form
+            document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
+            document.getElementById('login-form').classList.add('active');
+            
+            // Activate login tab
+            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            document.querySelector('[data-tab="login"]').classList.add('active');
+            
+            // Clear alerts
+            hideAlert();
+            hideSignupAlert();
+        });
+
+        // Password visibility toggle
+        document.querySelectorAll('.toggle-password').forEach(button => {
+            button.addEventListener('click', () => {
+                const targetId = button.dataset.target;
+                const input = document.getElementById(targetId);
+                const icon = button.querySelector('i');
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        });
+
+        // Password strength indicator
+        const signupPassword = document.getElementById('signup-password');
+        const strengthIndicator = document.getElementById('password-strength');
+
+        signupPassword.addEventListener('input', () => {
+            const password = signupPassword.value;
+            let strength = 0;
+
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+            if (password.match(/[0-9]/)) strength++;
+            if (password.match(/[^a-zA-Z0-9]/)) strength++;
+
+            strengthIndicator.classList.remove('weak', 'medium', 'strong');
+            
+            if (password.length > 0) {
+                strengthIndicator.classList.add('show');
+                if (strength <= 2) {
+                    strengthIndicator.classList.add('weak');
+                } else if (strength === 3) {
+                    strengthIndicator.classList.add('medium');
+                } else {
+                    strengthIndicator.classList.add('strong');
+                }
+            } else {
+                strengthIndicator.classList.remove('show');
+            }
+        });
+
+        // Alert functions
+        function showAlert(message, type = 'info') {
+            const alert = document.getElementById('alert');
+            const alertMessage = document.getElementById('alert-message');
+            const icon = alert.querySelector('i');
+            
+            alert.className = 'alert show ' + type;
+            alertMessage.textContent = message;
+            
+            // Update icon
+            icon.className = 'fa-solid ';
+            if (type === 'success') {
+                icon.className += 'fa-circle-check';
+            } else if (type === 'error') {
+                icon.className += 'fa-circle-exclamation';
+            } else {
+                icon.className += 'fa-circle-info';
+            }
+        }
+
+        function hideAlert() {
+            document.getElementById('alert').classList.remove('show');
+        }
+
+        // Signup alert functions (appears near the Create Account button)
+        function showSignupAlert(message, type = 'info') {
+            const alert = document.getElementById('signup-alert');
+            const alertMessage = document.getElementById('signup-alert-message');
+            const icon = alert.querySelector('i');
+            
+            alert.className = 'alert show ' + type;
+            alertMessage.textContent = message;
+            
+            // Update icon
+            icon.className = 'fa-solid ';
+            if (type === 'success') {
+                icon.className += 'fa-circle-check';
+            } else if (type === 'error') {
+                icon.className += 'fa-circle-exclamation';
+            } else {
+                icon.className += 'fa-circle-info';
+            }
+        }
+
+        function hideSignupAlert() {
+            document.getElementById('signup-alert').classList.remove('show');
+        }
+
+        // Form submission handlers
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideAlert();
+            
+            const button = document.getElementById('login-button');
+            button.classList.add('loading');
+            button.disabled = true;
+            
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            
+            console.log('[LOGIN] Attempting login for:', email);
+            console.log('[LOGIN] API endpoint:', `${API_BASE}/auth/login`);
+            console.log('[LOGIN] Request payload:', JSON.stringify({ email, password: '***' }));
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    },
+                    cache: 'no-store',
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                console.log('[LOGIN] HTTP Status:', response.status, '| OK:', response.ok, '| Data:', JSON.stringify(data));
+                
+                // Check both HTTP status and response success field
+                if (response.ok && data.success) {
+                    console.log('[LOGIN] Success! Storing token...');
+                    // Store token
+                    localStorage.setItem('auth_token', data.token);
+                    localStorage.setItem('user_data', JSON.stringify(data.user));
+                    
+                    showAlert('Login successful! Redirecting...', 'success');
+                    
+                    // Redirect to dashboard
+                    setTimeout(() => {
+                        window.location.href = '/index.html';
+                    }, 1500);
+                } else {
+                    // Show specific error message from API
+                    const errorMsg = data.error || data.message || 'Login failed. Please check your credentials.';
+                    console.error('[LOGIN] Failed - Status:', response.status, '| Error:', errorMsg);
+                    showAlert(errorMsg, 'error');
+                }
+            } catch (error) {
+                console.error('[LOGIN] Exception:', error.message, error);
+                showAlert('Network error. Please check your connection and try again.', 'error');
+            } finally {
+                button.classList.remove('loading');
+                button.disabled = false;
+            }
+        });
+
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideAlert();
+            hideSignupAlert();
+            
+            // Validate passwords match
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-confirm-password').value;
+            
+            if (password !== confirmPassword) {
+                showSignupAlert('Passwords do not match', 'error');
+                return;
+            }
+
+            // Validate mobile number
+            const mobile = document.getElementById('signup-mobile').value.trim();
+            if (!mobile) {
+                showSignupAlert('Mobile number is required', 'error');
+                return;
+            }
+            
+            const button = document.getElementById('signup-button');
+            button.classList.add('loading');
+            button.disabled = true;
+            
+            const formData = {
+                email: document.getElementById('signup-email').value.trim(),
+                password: password,
+                organization: document.getElementById('signup-organization').value.trim(),
+                full_name: document.getElementById('signup-fullname').value.trim(),
+                position: document.getElementById('signup-position').value.trim(),
+                mobile: mobile,
+                country: document.getElementById('signup-country').value
+            };
+            
+            console.log('[SIGNUP] Registration data:', JSON.stringify(formData, null, 2));
+            console.log('[SIGNUP] API endpoint:', `${API_BASE}/auth/register`);
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    },
+                    cache: 'no-store',
+                    body: JSON.stringify(formData)
+                });
+                
+                console.log('[SIGNUP] HTTP Status:', response.status, '| OK:', response.ok);
+                
+                const data = await response.json();
+                console.log('[SIGNUP] Response data:', JSON.stringify(data));
+                
+                // Check both HTTP status and response success field
+                if (response.ok && data.success) {
+                    console.log('[SIGNUP] Registration successful!');
+                    showSignupAlert('✅ Registration successful! Please check your email to verify your account before signing in.', 'success');
+                    
+                    // Clear form after 4 seconds
+                    setTimeout(() => {
+                        document.getElementById('signup-form').reset();
+                        // Switch to login tab
+                        document.querySelector('[data-tab="login"]').click();
+                    }, 4000);
+                } else {
+                    // Show specific error message from API
+                    const errorMsg = data.error || data.message || 'Registration failed. Please check your information.';
+                    console.error('[SIGNUP] Failed - Status:', response.status, '| Error:', errorMsg);
+                    showSignupAlert(errorMsg, 'error');
+                }
+            } catch (error) {
+                console.error('[SIGNUP] Exception:', error.message, error);
+                showSignupAlert('Network error. Please check your connection and try again.', 'error');
+            } finally {
+                button.classList.remove('loading');
+                button.disabled = false;
+            }
+        });
+
+        // Forgot password form handler
+        document.getElementById('forgot-password-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideAlert();
+            hideSignupAlert();
+            
+            const button = document.getElementById('forgot-button');
+            button.classList.add('loading');
+            button.disabled = true;
+            
+            const email = document.getElementById('forgot-email').value.trim();
+            
+            console.log('[FORGOT-PASSWORD] Requesting password reset for:', email);
+            console.log('[FORGOT-PASSWORD] API endpoint:', `${API_BASE}/auth/forgot-password`);
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/forgot-password`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    },
+                    cache: 'no-store',
+                    body: JSON.stringify({ email })
+                });
+                
+                const data = await response.json();
+                console.log('[FORGOT-PASSWORD] HTTP Status:', response.status, '| Data:', JSON.stringify(data));
+                
+                if (response.ok && data.success) {
+                    console.log('[FORGOT-PASSWORD] Reset email sent!');
+                    showAlert('Password reset link sent! Please check your email.', 'success');
+                    
+                    // Clear form
+                    document.getElementById('forgot-password-form').reset();
+                    
+                    // Switch to login after 3 seconds
+                    setTimeout(() => {
+                        document.getElementById('back-to-login-link').click();
+                    }, 3000);
+                } else {
+                    const errorMsg = data.error || data.message || 'Failed to send reset link. Please try again.';
+                    console.error('[FORGOT-PASSWORD] Failed - Error:', errorMsg);
+                    showAlert(errorMsg, 'error');
+                }
+            } catch (error) {
+                console.error('[FORGOT-PASSWORD] Exception:', error.message, error);
+                showAlert('Network error. Please check your connection and try again.', 'error');
+            } finally {
+                button.classList.remove('loading');
+                button.disabled = false;
+            }
+        });
+
+        // Check if already logged in
+        window.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('auth_token');
+            if (token) {
+                // Verify token is still valid
+                fetch(`${API_BASE}/auth/check-session`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.valid) {
+                        // Already logged in, redirect
+                        window.location.href = '/index.html';
+                    }
+                })
+                .catch(error => console.error('Session check error:', error));
+            }
+        });
+    </script>
+</body>
+</html>

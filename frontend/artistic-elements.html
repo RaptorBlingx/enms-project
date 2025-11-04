@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artistic Elements - ENMS Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+            padding: 3rem 2rem;
+            line-height: 1.6;
+            color: #2d3748;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #c2185b 0%, #880e4f 100%);
+            color: white;
+            padding: 3rem 2.5rem;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .header p { font-size: 1.1rem; opacity: 0.95; }
+        .content { padding: 3rem 2.5rem; }
+        .section { margin-bottom: 2.5rem; }
+        .section h2 {
+            font-size: 1.75rem;
+            color: #c2185b;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .section p {
+            font-size: 1.05rem;
+            color: #4a5568;
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        .gallery-item {
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        .gallery-item:hover { transform: translateY(-5px); }
+        .gallery-item i {
+            font-size: 3rem;
+            color: #c2185b;
+            margin-bottom: 1rem;
+        }
+        .gallery-item h3 {
+            font-size: 1.1rem;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+        .icon-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(194, 24, 91, 0.1);
+            border-radius: 10px;
+        }
+        .icon-badge i { font-size: 1.2rem; color: #c2185b; }
+        ul { margin-left: 1.5rem; }
+        ul li { margin-bottom: 0.5rem; color: #4a5568; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fa-solid fa-palette"></i> Artistic Elements</h1>
+            <p>Design Philosophy & Visual Identity</p>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-paintbrush"></i></span>
+                    Design Philosophy
+                </h2>
+                <p>
+                    The ENMS Demo Platform embodies a design philosophy that balances <strong>functionality with aesthetics</strong>, creating an immersive experience that engages users while delivering powerful insights. Our visual identity reflects the intersection of technology, sustainability, and human-centered design.
+                </p>
+                <p>
+                    Every element—from color schemes to typography—is intentionally crafted to support cognitive understanding, reduce visual fatigue, and inspire action towards energy efficiency goals.
+                </p>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-swatchbook"></i></span>
+                    Color Psychology
+                </h2>
+                <div class="gallery">
+                    <div class="gallery-item">
+                        <i class="fa-solid fa-leaf" style="color: #00897b;"></i>
+                        <h3>Eco-Green Palette</h3>
+                        <p>Represents sustainability, growth, and environmental consciousness in our energy management theme.</p>
+                    </div>
+                    <div class="gallery-item">
+                        <i class="fa-solid fa-bolt" style="color: #3b82f6;"></i>
+                        <h3>Electric Blue</h3>
+                        <p>Symbolizes energy, technology, and innovation—core elements of our digital platform.</p>
+                    </div>
+                    <div class="gallery-item">
+                        <i class="fa-solid fa-sun" style="color: #f59e0b;"></i>
+                        <h3>Warm Accents</h3>
+                        <p>Highlight important metrics and call-to-action elements to guide user attention.</p>
+                    </div>
+                    <div class="gallery-item">
+                        <i class="fa-solid fa-moon" style="color: #6b7280;"></i>
+                        <h3>Dark Mode Elegance</h3>
+                        <p>Reduces eye strain for extended monitoring sessions with sophisticated dark themes.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-font"></i></span>
+                    Typography & Readability
+                </h2>
+                <p>
+                    We utilize the <strong>Inter font family</strong>—a carefully crafted typeface designed for screen readability. Its balanced proportions and clear letterforms ensure that critical energy data remains legible at all sizes, from detailed tables to at-a-glance dashboard headers.
+                </p>
+                <ul>
+                    <li><strong>Hierarchy:</strong> Clear visual hierarchy guides users through complex information</li>
+                    <li><strong>Contrast:</strong> Optimal contrast ratios meet WCAG accessibility standards</li>
+                    <li><strong>Spacing:</strong> Generous line height and letter spacing improve readability</li>
+                    <li><strong>Consistency:</strong> Unified type scale across all platform interfaces</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-icons"></i></span>
+                    Iconography System
+                </h2>
+                <p>
+                    Our comprehensive icon set from Font Awesome provides intuitive visual cues that transcend language barriers. Icons are strategically employed to:
+                </p>
+                <ul>
+                    <li>Reduce cognitive load by providing instant recognition</li>
+                    <li>Create visual consistency across different modules</li>
+                    <li>Support navigation and wayfinding within the platform</li>
+                    <li>Communicate status and alerts at a glance</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-chart-pie"></i></span>
+                    Data Visualization Principles
+                </h2>
+                <p>
+                    Our visualization approach prioritizes <strong>clarity over complexity</strong>. We employ:
+                </p>
+                <ul>
+                    <li><strong>Gradients:</strong> Create depth and visual interest while maintaining professionalism</li>
+                    <li><strong>Rounded Corners:</strong> Soften the interface, making it more approachable</li>
+                    <li><strong>Shadows & Elevation:</strong> Establish visual hierarchy and interactivity cues</li>
+                    <li><strong>Animation:</strong> Smooth transitions provide feedback and enhance user experience</li>
+                    <li><strong>Whitespace:</strong> Strategic use of negative space prevents information overload</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-mobile-screen"></i></span>
+                    Responsive Design
+                </h2>
+                <p>
+                    Artistic elements adapt seamlessly across devices—from large dashboard monitors to mobile phones. Our fluid grid system and flexible components ensure that beauty and functionality coexist regardless of screen size.
+                </p>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-hands-holding-heart"></i></span>
+                    Human-Centered Approach
+                </h2>
+                <p>
+                    Beyond pixels and code, our artistic vision centers on the <strong>human experience</strong>. We believe that beautifully designed tools inspire engagement, foster understanding, and ultimately drive meaningful action toward energy efficiency and sustainability goals.
+                </p>
+                <p>
+                    Every gradient, every transition, every carefully chosen color serves a purpose: to make energy management not just functional, but delightful.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

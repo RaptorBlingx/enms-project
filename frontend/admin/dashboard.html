@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENMS Demo - Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background: #f1f5f9;
+            color: #334155;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .stat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .content-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .content-card-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .search-bar {
+            position: relative;
+            max-width: 400px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .search-bar i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f8fafc;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        .pagination button {
+            padding: 8px 16px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: #f8fafc;
+            border-color: #3b82f6;
+        }
+
+        .pagination button.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f1f5f9;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>⚡ ENMS Admin Dashboard</h1>
+                <p style="opacity: 0.9; margin-top: 8px;">User Management & Analytics</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="refreshData()">
+                    <i class="fa-solid fa-rotate"></i> Refresh
+                </button>
+                <button class="btn btn-primary" onclick="exportUsers()">
+                    <i class="fa-solid fa-download"></i> Export CSV
+                </button>
+                <button class="btn btn-secondary" onclick="goToDashboard()">
+                    <i class="fa-solid fa-arrow-left"></i> Back
+                </button>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid" id="stats-grid">
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-value" id="total-users">-</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                    <div class="stat-icon" style="background: #dbeafe; color: #3b82f6;">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-value" id="verified-users">-</div>
+                        <div class="stat-label">Verified Users</div>
+                    </div>
+                    <div class="stat-icon" style="background: #d1fae5; color: #10b981;">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-value" id="new-today">-</div>
+                        <div class="stat-label">New Today</div>
+                    </div>
+                    <div class="stat-icon" style="background: #fef3c7; color: #f59e0b;">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-value" id="active-7days">-</div>
+                        <div class="stat-label">Active (7 days)</div>
+                    </div>
+                    <div class="stat-icon" style="background: #e9d5ff; color: #9333ea;">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="content-card">
+            <div class="content-card-header">
+                <h2>Registered Users</h2>
+                <div class="search-bar">
+                    <input type="text" id="search-input" placeholder="Search users..." onkeyup="searchUsers()">
+                    <i class="fa-solid fa-search"></i>
+                </div>
+            </div>
+
+            <div id="table-container">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading users...</p>
+                </div>
+            </div>
+
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <script>
+        // Always use nginx proxy for API calls
+        const API_BASE = '/api';
+
+        let currentPage = 1;
+        let searchQuery = '';
+        const usersPerPage = 20;
+
+        // Check admin authentication
+        async function checkAdminAuth() {
+            const token = localStorage.getItem('auth_token');
+            
+            if (!token) {
+                alert('Please login first');
+                window.location.href = '/auth.html';
+                return false;
+            }
+
+            const user = JSON.parse(localStorage.getItem('user_data') || '{}');
+            if (user.role !== 'admin') {
+                alert('Admin access required');
+                window.location.href = '/index.html';
+                return false;
+            }
+
+            return true;
+        }
+
+        // Fetch statistics
+        async function fetchStats() {
+            const token = localStorage.getItem('auth_token');
+
+            try {
+                const response = await fetch(`${API_BASE}/admin/stats`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const stats = data.stats;
+                    document.getElementById('total-users').textContent = stats.total_users || 0;
+                    document.getElementById('verified-users').textContent = stats.verified_users || 0;
+                    document.getElementById('new-today').textContent = stats.new_today || 0;
+                    document.getElementById('active-7days').textContent = stats.active_7_days || 0;
+                }
+            } catch (error) {
+                console.error('Error fetching stats:', error);
+            }
+        }
+
+        // Fetch users
+        async function fetchUsers() {
+            const token = localStorage.getItem('auth_token');
+            const container = document.getElementById('table-container');
+
+            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading users...</p></div>';
+
+            try {
+                const response = await fetch(
+                    `${API_BASE}/admin/users?page=${currentPage}&limit=${usersPerPage}&search=${encodeURIComponent(searchQuery)}`,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    }
+                );
+
+                const data = await response.json();
+
+                if (data.success) {
+                    renderUsersTable(data.users);
+                    renderPagination(data.pagination);
+                } else {
+                    container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-exclamation-circle"></i><p>Failed to load users</p></div>';
+                }
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-exclamation-circle"></i><p>Error loading users</p></div>';
+            }
+        }
+
+        // Render users table
+        function renderUsersTable(users) {
+            const container = document.getElementById('table-container');
+
+            if (users.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-users"></i><p>No users found</p></div>';
+                return;
+            }
+
+            const html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Mobile</th>
+                            <th>Organization</th>
+                            <th>Country</th>
+                            <th>Status</th>
+                            <th>Role</th>
+                            <th>Created</th>
+                            <th>Last Login</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${users.map(user => `
+                            <tr>
+                                <td>#${user.id}</td>
+                                <td><strong>${user.full_name}</strong><br><small>${user.position}</small></td>
+                                <td>${user.email}</td>
+                                <td>${user.mobile || '<span style="color: #94a3b8;">-</span>'}</td>
+                                <td>${user.organization}</td>
+                                <td>${user.country}</td>
+                                <td>
+                                    ${user.email_verified 
+                                        ? '<span class="badge badge-success"><i class="fa-solid fa-check"></i> Verified</span>'
+                                        : '<span class="badge badge-warning"><i class="fa-solid fa-clock"></i> Pending</span>'}
+                                    ${!user.is_active ? '<span class="badge badge-danger">Inactive</span>' : ''}
+                                </td>
+                                <td>
+                                    <span class="badge ${user.role === 'admin' ? 'badge-info' : 'badge-success'}">
+                                        ${user.role === 'admin' ? '<i class="fa-solid fa-crown"></i>' : ''} ${user.role}
+                                    </span>
+                                </td>
+                                <td>${formatDate(user.created_at)}</td>
+                                <td>${user.last_login ? formatDate(user.last_login) : '<span style="color: #94a3b8;">Never</span>'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // Render pagination
+        function renderPagination(pagination) {
+            const container = document.getElementById('pagination');
+            const { page, pages, total } = pagination;
+
+            if (pages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = `
+                <button onclick="goToPage(${page - 1})" ${page === 1 ? 'disabled' : ''}>
+                    <i class="fa-solid fa-chevron-left"></i> Previous
+                </button>
+            `;
+
+            // Show page numbers
+            for (let i = 1; i <= pages; i++) {
+                if (i === 1 || i === pages || (i >= page - 2 && i <= page + 2)) {
+                    html += `<button onclick="goToPage(${i})" class="${i === page ? 'active' : ''}">${i}</button>`;
+                } else if (i === page - 3 || i === page + 3) {
+                    html += `<button disabled>...</button>`;
+                }
+            }
+
+            html += `
+                <button onclick="goToPage(${page + 1})" ${page === pages ? 'disabled' : ''}>
+                    Next <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // Go to page
+        function goToPage(page) {
+            currentPage = page;
+            fetchUsers();
+        }
+
+        // Search users
+        let searchTimeout;
+        function searchUsers() {
+            clearTimeout(searchTimeout);
+            searchQuery = document.getElementById('search-input').value;
+            
+            searchTimeout = setTimeout(() => {
+                currentPage = 1;
+                fetchUsers();
+            }, 500);
+        }
+
+        // Export users
+        async function exportUsers() {
+            const token = localStorage.getItem('auth_token');
+
+            try {
+                const response = await fetch(`${API_BASE}/admin/export-users`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `enms_users_${new Date().toISOString().split('T')[0]}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Export error:', error);
+                alert('Failed to export users');
+            }
+        }
+
+        // Refresh data
+        function refreshData() {
+            fetchStats();
+            fetchUsers();
+        }
+
+        // Go back to dashboard
+        function goToDashboard() {
+            window.location.href = '/index.html';
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+            if (days === 0) return 'Today';
+            if (days === 1) return 'Yesterday';
+            if (days < 7) return `${days} days ago`;
+            
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', async () => {
+            const isAdmin = await checkAdminAuth();
+            if (isAdmin) {
+                fetchStats();
+                fetchUsers();
+            }
+        });
+    </script>
+</body>
+</html>

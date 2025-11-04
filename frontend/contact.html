@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - ENMS Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+            padding: 3rem 2rem;
+            line-height: 1.6;
+            color: #2d3748;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #5e35b1 0%, #4527a0 100%);
+            color: white;
+            padding: 3rem 2.5rem;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .header p { font-size: 1.1rem; opacity: 0.95; }
+        .content { padding: 3rem 2.5rem; }
+        .section { margin-bottom: 2.5rem; }
+        .section h2 {
+            font-size: 1.75rem;
+            color: #5e35b1;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .section p {
+            font-size: 1.05rem;
+            color: #4a5568;
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        .contact-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s;
+        }
+        .contact-card:hover {
+            border-color: #5e35b1;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(94, 53, 177, 0.15);
+        }
+        .contact-card i {
+            font-size: 2.5rem;
+            color: #5e35b1;
+            margin-bottom: 1rem;
+        }
+        .contact-card h3 {
+            font-size: 1.2rem;
+            color: #2d3748;
+            margin-bottom: 0.75rem;
+        }
+        .contact-card a {
+            color: #5e35b1;
+            text-decoration: none;
+            font-weight: 600;
+            word-break: break-all;
+        }
+        .contact-card a:hover {
+            text-decoration: underline;
+        }
+        .icon-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(94, 53, 177, 0.1);
+            border-radius: 10px;
+        }
+        .icon-badge i { font-size: 1.2rem; color: #5e35b1; }
+        .info-box {
+            background: linear-gradient(135deg, #5e35b115 0%, #4527a015 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 4px solid #5e35b1;
+            margin: 1.5rem 0;
+        }
+        .support-hours {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .support-hours h4 {
+            color: #5e35b1;
+            margin-bottom: 1rem;
+        }
+        .support-hours ul {
+            list-style: none;
+            padding: 0;
+        }
+        .support-hours li {
+            padding: 0.5rem 0;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .support-hours li:last-child {
+            border-bottom: none;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #5e35b1 0%, #4527a0 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 1rem;
+            transition: transform 0.3s;
+        }
+        .cta-button:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fa-solid fa-envelope"></i> Contact Us</h1>
+            <p>We're here to help with your ENMS journey</p>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-headset"></i></span>
+                    Get in Touch
+                </h2>
+                <p>
+                    Whether you have questions about the platform, need technical support, or want to discuss implementation for your organization, our team is ready to assist you.
+                </p>
+            </div>
+
+            <div class="section">
+                <div class="contact-grid">
+                    <div class="contact-card">
+                        <i class="fa-solid fa-envelope"></i>
+                        <h3>Email</h3>
+                        <p>General Inquiries</p>
+                        <a href="mailto:mohamad.jarad@aartimuhendislik.com">mohamad.jarad@aartimuhendislik.com</a>
+                    </div>
+
+                    <div class="contact-card">
+                        <i class="fa-solid fa-life-ring"></i>
+                        <h3>Technical Support</h3>
+                        <p>Platform Assistance</p>
+                        <a href="mailto:mohamad.jarad@aartimuhendislik.com">mohamad.jarad@aartimuhendislik.com</a>
+                    </div>
+
+                    <div class="contact-card">
+                        <i class="fa-solid fa-building"></i>
+                        <h3>Business Development</h3>
+                        <p>Partnerships & Sales</p>
+                        <a href="mailto:mohamad.jarad@aartimuhendislik.com">mohamad.jarad@aartimuhendislik.com</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-clock"></i></span>
+                    Support Hours
+                </h2>
+                <div class="support-hours">
+                    <h4><i class="fa-solid fa-calendar"></i> Availability</h4>
+                    <ul>
+                        <li><span>Monday - Friday</span> <strong>9:00 AM - 6:00 PM (CET)</strong></li>
+                        <li><span>Saturday</span> <strong>10:00 AM - 2:00 PM (CET)</strong></li>
+                        <li><span>Sunday</span> <strong>Closed</strong></li>
+                        <li><span>Emergency Support</span> <strong>24/7 (Enterprise Plan)</strong></li>
+                    </ul>
+                </div>
+                <div class="info-box">
+                    <p><strong><i class="fa-solid fa-circle-info"></i> Note:</strong> Response times may vary based on inquiry volume. Enterprise customers receive priority support with guaranteed response times.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-map-location-dot"></i></span>
+                    Office Location
+                </h2>
+                <div class="info-box">
+                    <h3 style="color: #5e35b1; margin-bottom: 0.75rem;">Aarti Mühendislik</h3>
+                    <p style="margin-bottom: 0.5rem;">
+                        <i class="fa-solid fa-location-dot" style="color: #5e35b1; margin-right: 0.5rem;"></i>
+                        <strong>Address:</strong> Turkey
+                    </p>
+                    <p style="margin-bottom: 0.5rem;">
+                        <i class="fa-solid fa-globe" style="color: #5e35b1; margin-right: 0.5rem;"></i>
+                        <strong>Website:</strong> <a href="https://aartimuhendislik.com" target="_blank">aartimuhendislik.com</a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-comments"></i></span>
+                    Frequently Asked Questions
+                </h2>
+                <p>
+                    Before reaching out, you might find answers to common questions in our documentation:
+                </p>
+                <ul style="margin-left: 1.5rem; margin-top: 1rem;">
+                    <li>Platform navigation and features</li>
+                    <li>User account management</li>
+                    <li>Data interpretation guides</li>
+                    <li>Integration documentation</li>
+                    <li>Troubleshooting common issues</li>
+                </ul>
+                <p style="margin-top: 1rem;">
+                    Visit the <strong>About</strong> and <strong>Workshop Programme</strong> sections in the left menu for more information.
+                </p>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-paper-plane"></i></span>
+                    Quick Contact
+                </h2>
+                <p>
+                    Ready to get started or have a specific question? Send us a message and we'll get back to you as soon as possible.
+                </p>
+                <a href="mailto:mohamad.jarad@aartimuhendislik.com?subject=ENMS Demo Inquiry" class="cta-button">
+                    <i class="fa-solid fa-envelope"></i> Send Message
+                </a>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-shield-halved"></i></span>
+                    Privacy & Security
+                </h2>
+                <p>
+                    We take your privacy seriously. All communications are encrypted and your information is never shared with third parties. For more details, please refer to our Privacy Policy.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

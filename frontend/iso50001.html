@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISO 50001 Alignment - ENMS Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+            padding: 3rem 2rem;
+            line-height: 1.6;
+            color: #2d3748;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #00897b 0%, #00695c 100%);
+            color: white;
+            padding: 3rem 2.5rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 3rem 2.5rem;
+        }
+
+        .section {
+            margin-bottom: 2.5rem;
+        }
+
+        .section h2 {
+            font-size: 1.75rem;
+            color: #00897b;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section h3 {
+            font-size: 1.3rem;
+            color: #00695c;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .section p {
+            font-size: 1.05rem;
+            color: #4a5568;
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        .requirements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .requirement-card {
+            background: #f1f8f7;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 4px solid #00897b;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .requirement-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 137, 123, 0.15);
+        }
+
+        .requirement-card .number {
+            background: #00897b;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .requirement-card h4 {
+            font-size: 1.1rem;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .requirement-card p {
+            font-size: 0.95rem;
+            color: #718096;
+            margin: 0;
+        }
+
+        .compliance-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #c8e6c9;
+            color: #2e7d32;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #00897b15 0%, #00695c15 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 4px solid #00897b;
+            margin: 1.5rem 0;
+        }
+
+        .highlight-box h3 {
+            margin-top: 0;
+        }
+
+        ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        ul li {
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+        }
+
+        .icon-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 137, 123, 0.1);
+            border-radius: 10px;
+        }
+
+        .icon-badge i {
+            font-size: 1.2rem;
+            color: #00897b;
+        }
+
+        .pdca-cycle {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .pdca-item {
+            background: white;
+            border: 2px solid #00897b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .pdca-item h4 {
+            color: #00897b;
+            font-size: 1.3rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .pdca-item i {
+            font-size: 2.5rem;
+            color: #00897b;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fa-solid fa-certificate"></i> ISO 50001 Alignment</h1>
+            <p>Energy Management System Standards Compliance</p>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-certificate"></i></span>
+                    What is ISO 50001?
+                </h2>
+                <p>
+                    <strong>ISO 50001:2018</strong> is an international standard that specifies requirements for establishing, implementing, maintaining, and improving an energy management system (EnMS). The purpose is to enable organizations to follow a systematic approach in achieving continual improvement of energy performance, including energy efficiency, energy use, and energy consumption.
+                </p>
+                <p>
+                    This ENMS Demo Platform is designed to support organizations in meeting ISO 50001 requirements by providing comprehensive tools for energy monitoring, analysis, and reporting.
+                </p>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-check-circle"></i></span>
+                    Platform Compliance Features
+                </h2>
+                <div class="requirements-grid">
+                    <div class="requirement-card">
+                        <div class="number">4.1</div>
+                        <h4>Understanding the Organization</h4>
+                        <p>Comprehensive dashboards provide insights into organizational energy context and significant energy uses (SEUs).</p>
+                    </div>
+                    <div class="requirement-card">
+                        <div class="number">4.2</div>
+                        <h4>Understanding Stakeholder Needs</h4>
+                        <p>Multi-profile support (Staff, Technical, DPP) addresses different stakeholder requirements and perspectives.</p>
+                    </div>
+                    <div class="requirement-card">
+                        <div class="number">6.2</div>
+                        <h4>Energy Objectives & Planning</h4>
+                        <p>Performance comparison tools enable setting and tracking energy objectives with measurable targets.</p>
+                    </div>
+                    <div class="requirement-card">
+                        <div class="number">6.3</div>
+                        <h4>Energy Baseline & EnPIs</h4>
+                        <p>Historical data analysis establishes energy baselines and Energy Performance Indicators (EnPIs).</p>
+                    </div>
+                    <div class="requirement-card">
+                        <div class="number">9.1</div>
+                        <h4>Monitoring & Measurement</h4>
+                        <p>Real-time monitoring of energy consumption across all equipment with sub-second granularity.</p>
+                    </div>
+                    <div class="requirement-card">
+                        <div class="number">9.3</div>
+                        <h4>Management Review</h4>
+                        <p>Comprehensive reporting tools provide data for management review and decision-making.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-rotate"></i></span>
+                    Plan-Do-Check-Act (PDCA) Cycle
+                </h2>
+                <p>
+                    ISO 50001 is based on the continuous improvement framework known as the PDCA cycle. Our platform supports each phase:
+                </p>
+                <div class="pdca-cycle">
+                    <div class="pdca-item">
+                        <i class="fa-solid fa-clipboard-list"></i>
+                        <h4>Plan</h4>
+                        <p>Define energy baseline, objectives, and action plans using historical analysis and performance metrics.</p>
+                    </div>
+                    <div class="pdca-item">
+                        <i class="fa-solid fa-play"></i>
+                        <h4>Do</h4>
+                        <p>Implement energy management actions with real-time monitoring and automated data collection.</p>
+                    </div>
+                    <div class="pdca-item">
+                        <i class="fa-solid fa-magnifying-glass-chart"></i>
+                        <h4>Check</h4>
+                        <p>Analyze results through interactive dashboards, EnPI tracking, and performance comparisons.</p>
+                    </div>
+                    <div class="pdca-item">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        <h4>Act</h4>
+                        <p>Take corrective actions based on insights and continue the improvement cycle with ML predictions.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-chart-line"></i></span>
+                    Energy Performance Indicators (EnPIs)
+                </h2>
+                <p>
+                    The platform automatically calculates and tracks multiple EnPIs required by ISO 50001:
+                </p>
+                <div class="highlight-box">
+                    <h3>Supported EnPIs</h3>
+                    <ul>
+                        <li><strong>Total Energy Consumption:</strong> Absolute energy use over time (kWh)</li>
+                        <li><strong>Specific Energy Consumption (SEC):</strong> Energy per unit of production (kWh/unit)</li>
+                        <li><strong>Energy Intensity:</strong> Energy use normalized by production volume or hours</li>
+                        <li><strong>Peak Demand:</strong> Maximum power draw during operations (kW)</li>
+                        <li><strong>Load Factor:</strong> Ratio of average to peak energy demand</li>
+                        <li><strong>Energy Cost per Unit:</strong> Financial energy performance indicator ($/unit)</li>
+                        <li><strong>Carbon Intensity:</strong> CO₂ emissions per unit of production (kgCO₂e/unit)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-file-lines"></i></span>
+                    Documentation & Records
+                </h2>
+                <p>
+                    ISO 50001 requires maintaining documented information. The platform provides:
+                </p>
+                <ul>
+                    <li><strong>Energy Reviews:</strong> Historical data for conducting mandatory energy reviews</li>
+                    <li><strong>Audit Logs:</strong> Complete traceability of system changes and user actions</li>
+                    <li><strong>Digital Product Passports:</strong> Product-level energy consumption documentation</li>
+                    <li><strong>Performance Reports:</strong> Exportable reports for compliance verification</li>
+                    <li><strong>Action Plans:</strong> Track improvement initiatives and their outcomes</li>
+                    <li><strong>Calibration Records:</strong> Sensor and measurement equipment verification</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-users-gear"></i></span>
+                    Competence & Awareness (Clause 7.2 & 7.3)
+                </h2>
+                <p>
+                    The platform supports organizational competence and awareness requirements through:
+                </p>
+                <ul>
+                    <li><strong>Role-Based Access:</strong> Different user profiles ensure appropriate access levels</li>
+                    <li><strong>Interactive Training:</strong> Workshop programme module for user education</li>
+                    <li><strong>Visual Dashboards:</strong> Easy-to-understand visualizations for non-technical staff</li>
+                    <li><strong>Alert Systems:</strong> Automated notifications for energy anomalies and opportunities</li>
+                    <li><strong>Best Practice Sharing:</strong> Document successful energy efficiency measures</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-award"></i></span>
+                    Implementation Benefits
+                </h2>
+                <div class="highlight-box">
+                    <h3>Achieving ISO 50001 Certification with ENMS Platform</h3>
+                    <p>
+                        Organizations using this platform gain significant advantages in achieving and maintaining ISO 50001 certification:
+                    </p>
+                    <ul>
+                        <li><strong>Reduced Manual Effort:</strong> Automated data collection eliminates manual logging</li>
+                        <li><strong>Compliance Confidence:</strong> Built-in adherence to standard requirements</li>
+                        <li><strong>Audit Readiness:</strong> Always-available documentation and evidence</li>
+                        <li><strong>Continuous Improvement:</strong> Real-time insights drive ongoing optimization</li>
+                        <li><strong>Cost Savings:</strong> Typical 10-20% energy reduction within first year</li>
+                        <li><strong>Competitive Advantage:</strong> Demonstrate environmental commitment to stakeholders</li>
+                    </ul>
+                </div>
+                <div class="compliance-badge">
+                    <i class="fa-solid fa-check-circle"></i>
+                    <span>ISO 50001:2018 Ready</span>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <span class="icon-badge"><i class="fa-solid fa-book"></i></span>
+                    Additional Resources
+                </h2>
+                <p>
+                    For more information about ISO 50001 and energy management best practices:
+                </p>
+                <ul>
+                    <li><a href="https://www.iso.org/iso-50001-energy-management.html" target="_blank">ISO 50001 Official Page</a></li>
+                    <li><a href="https://www.iea.org/" target="_blank">International Energy Agency (IEA)</a></li>
+                    <li><a href="https://energy.gov/" target="_blank">U.S. Department of Energy</a></li>
+                    <li>Contact our support team for implementation guidance</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
