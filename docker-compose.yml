@@ -63,7 +63,7 @@ services:
     container_name: enms_mosquitto
     restart: unless-stopped
     ports:
-      - "1883:1883"
+      - "1884:1883"
     volumes:
       - mosquitto_config:/mosquitto/config
       - mosquitto_data:/mosquitto/data
@@ -78,7 +78,7 @@ services:
     container_name: enms_nodered
     restart: unless-stopped
     ports:
-      - "1880:1880"
+      - "1882:1880"
     volumes:
       # This is the correct, simple way to persist all user data
       - ./node-red:/data
@@ -172,7 +172,7 @@ services:
     container_name: enms_web_server
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "8090:80"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./frontend:/usr/share/nginx/html
