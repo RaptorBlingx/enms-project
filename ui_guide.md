@@ -760,7 +760,6 @@ The ENMS system automatically generates comprehensive **Digital Product Passport
 **Header Section**:
 - Company logo and branding (customizable)
 - "Digital Product Passport" title
-- Unique Job ID and QR code (future: blockchain verification)
 
 **Manufacturing Summary**:
 - **Printer**: Model, serial number, friendly name
@@ -797,7 +796,6 @@ The ENMS system automatically generates comprehensive **Digital Product Passport
 **Visual Elements**:
 - **3D Thumbnail**: Preview of the printed object
 - **Energy Plant**: Final growth stage image
-- **QR Code**: Links to online verification or full data export
 
 ### Use Cases
 
