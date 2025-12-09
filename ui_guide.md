@@ -75,7 +75,7 @@ The Technical Profile is designed for engineers, developers, and system administ
 
 ### 1.1. Node-RED
 
-*   **Description:** This tab provides direct access to the Node-RED flow editor running at `http://localhost:1880`. It is the primary tool for modifying data ingestion logic, creating new automation flows, and debugging the data pipeline. Node-RED orchestrates all data movement in the system—from MQTT subscriptions to API polling, data transformation, database insertion, and even hosting custom API endpoints like `/api/analyze`.
+*   **Description:** This tab provides direct access to the Node-RED flow editor running at `http://localhost:1882`. It is the primary tool for modifying data ingestion logic, creating new automation flows, and debugging the data pipeline. Node-RED orchestrates all data movement in the system—from MQTT subscriptions to API polling, data transformation, database insertion, and even hosting custom API endpoints like `/api/analyze`.
     
 *   **Key Features:**
     *   **Visual Programming**: Drag-and-drop interface for creating data flows
@@ -362,7 +362,7 @@ A key feature of the "Recent Print Jobs" table on this dashboard is the ability 
     3. Executes statistical analysis (correlation, phase detection) and ML model inference
     4. Returns formatted JSON results to the frontend
     
-*   **For Complete Documentation**: See the [Definitive Guide to Interactive Analysis](./INTERACTIVE&ANALYSIS_GUIDE.md) for detailed technical architecture and step-by-step user instructions.
+*   **For Complete Documentation**: See the [Definitive Guide to Interactive Analysis](./INTERACTIVE_ANALYSIS_GUIDE.md) for detailed technical architecture and step-by-step user instructions.
     
 *   **Screenshot:**
     ![Interactive Analysis Results](docs/Interactice%20Analysis.png)
@@ -535,7 +535,7 @@ The system includes **four distinct plant types**, each with its own unique arti
 - **File Location**: `/artistic-resources/plants/potato/potato_stage_01.png` through `potato_stage_21.png`
 
 *   **Screenshot:**
-    ![Potato Plant Collage](docs/potato-collage.png)
+    ![Potato Plant Collage](docs/genirc-collage.png)
     
 #### **B. Corn (Maize)**
 - **Stages**: 8
@@ -549,7 +549,7 @@ The system includes **four distinct plant types**, each with its own unique arti
 - **File Location**: `/artistic-resources/plants/corn_2/corn_2_stage_01.png` through `corn_2_stage_12.png`
 
 *   **Screenshot:**
-    ![Corn 2 Collage](docs/corn-collage.png)
+    ![Corn 2 Collage](docs/potato-collage.png)
 
 #### **D. Corn 3**
 - **Stages**: 7
@@ -913,12 +913,12 @@ The ENMS system automatically generates comprehensive **Digital Product Passport
 
 | Service | URL | Profile Access |
 |---------|-----|----------------|
-| Main UI | `http://localhost/` | All |
-| Node-RED | `http://localhost:1880` | Technical |
+| Main UI | `http://localhost:8090/` | All |
+| Node-RED | `http://localhost:1882` | Technical |
 | Grafana | `http://localhost:3000` | Technical, Staff |
-| Python API | `http://localhost/api/dpp_summary` | Backend (programmatic) |
-| DPP Reports | `http://localhost/dpp_reports/*.pdf` | All (via download links) |
-| G-code Previews | `http://localhost/gcode_previews/*.png` | All (embedded in UI) |
+| Python API | `http://localhost:8090/api/dpp_summary` | Backend (programmatic) |
+| DPP Reports | `http://localhost:8090/dpp_reports/*.pdf` | All (via download links) |
+| G-code Previews | `http://localhost:8090/gcode_previews/*.png` | All (embedded in UI) |
 
 ### User Profile Quick Guide
 
