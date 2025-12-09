@@ -55,7 +55,8 @@ When you first access the ENMS system, you are greeted by a **Welcome Screen** t
 - **Staff Profile**: For operations managers and factory staff
 - **DPP Profile**: For executives, quality assurance, and client-facing presentations
 
-[TODO: Screenshot needed - Welcome screen with profile selection buttons]
+*   **Screenshot:**
+    ![Industrial Hybrid Edge Dashboard](docs/welcome-page.png)
 
 ---
 
@@ -491,13 +492,20 @@ One of the most unique features of the ENMS platform is the **Energy Plant Visua
 
 **The Problem**: Raw energy numbers (kWh, Watts) are abstract and difficult for non-technical audiences to contextualize. Is 0.5 kWh a lot or a little? How does today's consumption compare to yesterday?
 
-**The Solution**: The system uses **plant growth as a visual metaphor** for cumulative energy consumption. Just as a plant grows from a seedling to full maturity by consuming nutrients and sunlight, the "energy plant" grows as a printer consumes electricity.
+**The Solution**: The system uses **plant growth and decline as a visual metaphor** for cumulative energy consumption and environmental impact. The visualization has two phases:
+
+1. **Growth Phase (Low Energy)**: As the printer consumes small amounts of energy, the plant grows from seed to healthy maturity—representing sustainable, efficient operation.
+2. **Decline Phase (High Energy)**: As energy consumption increases beyond optimal levels, the plant begins to **wilt, brown, and eventually die**—representing the negative environmental impact of excessive energy use.
+
+**The Message**: Operators can literally "see" when their energy consumption is "killing the planet" through the dying plant imagery. This creates powerful visual feedback to encourage energy efficiency.
 
 **Key Design Principles**:
-- **Intuitive**: Everyone understands plant growth—no technical knowledge required
-- **Gamified**: Creates engagement and emotional connection to energy efficiency
-- **Sustainable Messaging**: Reinforces that energy consumption has environmental impact
+- **Intuitive**: Everyone understands plant growth AND death—no technical knowledge required
+- **Gamified**: Creates engagement and emotional connection to energy efficiency ("keep the plant healthy!")
+- **Powerful Messaging**: Wilting/dying plants provide visceral reminder of environmental consequences
+- **Sustainable Messaging**: Reinforces that excessive energy consumption has environmental impact
 - **Scalable**: Plant imagery works across cultures and languages
+- **Honest**: Doesn't sugarcoat high consumption—shows the real impact
 
 ### How It Works
 
@@ -511,60 +519,86 @@ Each printer has a cumulative energy counter that tracks total kWh consumed over
 | 0.003 - 0.006 | Stage 2 | Sprout emerging |
 | 0.006 - 0.010 | Stage 3-7 | Seedling with first leaves |
 | 0.010 - 0.100 | Stage 8-11 | Juvenile plant, growing height |
-| 0.100 - 1.000 | Stage 12-16 | Mature plant, full foliage |
-| 1.000 - 3.000+ | Stage 17-21 | Flowering / fruiting / maximum growth |
+| 0.100 - 1.000 | Stage 12-16 | Mature plant, full foliage (peak health) |
+| 1.000 - 3.000+ | Stage 17-21 | **Plant wilting and dying** (high energy consumption) |
+
+**Important**: The later stages (17-21) deliberately show the plant **wilting, browning, and eventually dying**. This symbolizes **excessive energy consumption** and its negative environmental impact. The metaphor is: just as over-consuming resources kills a plant, high energy usage harms the environment.
 
 **Technical Note**: The exact thresholds are defined in `python-api/dpp_simulator.py` in the `PLANT_THRESHOLDS` array. The system uses a modulo operation for very high energy values, allowing the plant to "cycle" back to stage 1 and grow again—creating an endless growth metaphor.
 
 **2. Plant Type Selection:**
 
-The system includes **four distinct plant types**, each with its own unique artistic style and number of growth stages:
+The system includes **four distinct plant types**, each representing the **source material of the filament** (bio-based or plant-derived polymers). Each plant type has its own unique artistic style and number of growth stages:
 
 #### **A. Generic Plant** (Default)
 - **Stages**: 21 (most granular progression)
+- **Represents**: Generic bio-based polymer source (default/fallback)
 - **Visual Style**: Abstract, stylized plant suitable for any industrial context
+- **Growth to Decline**: Stages 1-15 show healthy growth, stages 16-21 show gradual wilting and death
 - **Use Case**: Default for all printers unless manually assigned a specific plant type
 - **File Location**: `/artistic-resources/plants/generic_plant/generic_plant_stage_01.png` through `generic_plant_stage_21.png`
 
-[TODO: Screenshot needed - Example of Generic Plant at different stages]
+[TODO: Screenshot needed - Example of Generic Plant at different stages showing growth and wilting]
 
 #### **B. Corn (Maize)**
 - **Stages**: 8
-- **Visual Style**: Realistic corn plant from seed to mature stalk with cobs
-- **Symbolism**: Fast growth, high productivity (suitable for high-output printers)
-- **Use Case**: Assign to printers with frequent, high-volume production
+- **Represents**: Corn-based PLA (polylactic acid) filament source material
+- **Visual Style**: Realistic corn plant from seed to mature stalk, then decline
+- **Growth to Decline**: Stages 1-5 show healthy growth, stages 6-8 show wilting/dying plant
+- **Symbolism**: Represents corn-derived bioplastic commonly used in 3D printing
+- **Use Case**: Assign to printers primarily using PLA filament
 - **File Location**: `/artistic-resources/plants/corn/corn_stage_01.png` through `corn_stage_08.png`
 
-[TODO: Screenshot needed - Corn plant growth progression]
+[TODO: Screenshot needed - Corn plant progression from growth to wilting]
 
 #### **C. Sunflower**
 - **Stages**: 7
-- **Visual Style**: Sunflower from seed to full bloom with yellow petals
-- **Symbolism**: Bright, positive imagery (suitable for public-facing displays)
-- **Use Case**: Ideal for demonstration printers or client-facing installations
+- **Represents**: Sunflower-based or other plant oil-derived filament materials
+- **Visual Style**: Sunflower from seed to full bloom, then decline
+- **Growth to Decline**: Stages 1-4 show healthy growth and blooming, stages 5-7 show wilting petals and dying plant
+- **Symbolism**: Represents plant oil-based polymers and bio-composites
+- **Use Case**: Ideal for printers using specialty bio-composite filaments
 - **File Location**: `/artistic-resources/plants/sunflower/sunflower_stage_01.png` through `sunflower_stage_07.png`
 
-[TODO: Screenshot needed - Sunflower growth progression]
+[TODO: Screenshot needed - Sunflower progression from bloom to wilting]
 
-#### **D. Tomato**
+#### **D. Potato**
 - **Stages**: 12
-- **Visual Style**: Tomato plant from seedling to vine with red fruits
-- **Symbolism**: Fruitful production, tangible output (mirrors physical parts created)
-- **Use Case**: Great for food/agricultural industry contexts or educational settings
-- **File Location**: `/artistic-resources/plants/tomato/tomato_stage_01.png` through `tomato_stage_12.png`
+- **Represents**: Potato starch-based bioplastic filament source material
+- **Visual Style**: Potato plant from seedling to mature foliage, then decline
+- **Growth to Decline**: Stages 1-8 show healthy growth, stages 9-12 show progressive wilting and plant death
+- **Symbolism**: Represents potato starch-derived polymers used in biodegradable filaments
+- **Use Case**: Assign to printers using starch-based or biodegradable filament materials
+- **File Location**: `/artistic-resources/plants/potato/potato_stage_01.png` through `potato_stage_12.png`
 
-[TODO: Screenshot needed - Tomato plant growth progression]
+[TODO: Screenshot needed - Potato plant progression from growth to wilting]
 
 **3. Assignment & Configuration:**
 
-Plant types are assigned per printer in the **devices table** in PostgreSQL:
+Plant types are assigned per printer in the **devices table** in PostgreSQL based on the **filament material** typically used:
 
 ```sql
--- Example: Assign sunflower to a specific printer
+-- Example: Assign corn plant to a PLA printer (corn-based filament)
+UPDATE devices 
+SET plant_type = 'corn' 
+WHERE device_id = 'PrusaMK4-1';
+
+-- Example: Assign potato plant to a biodegradable filament printer
+UPDATE devices 
+SET plant_type = 'potato'
+WHERE device_id = 'Ender3-2';
+
+-- Example: Assign sunflower to specialty bio-composite printer
 UPDATE devices 
 SET plant_type = 'sunflower' 
-WHERE device_id = 'PrusaMK4-1';
+WHERE device_id = 'PrusaMini-3';
 ```
+
+**Recommended Mapping**:
+- **'corn'**: For printers using standard PLA (polylactic acid from corn)
+- **'potato'**: For biodegradable or starch-based filaments
+- **'sunflower'**: For specialty bio-composites or plant oil-based materials
+- **'generic_plant'**: Default for mixed-use printers or non-bio materials
 
 This can be done via the Device Management interface or directly in the database.
 
@@ -600,7 +634,7 @@ function getPlantImageSrc(plantType, plantStage) {
         maxStagesForDisplay = 8;
     } else if (plantTypeClean === 'sunflower') {
         maxStagesForDisplay = 7;
-    } else if (plantTypeClean === 'tomato') {
+    } else if (plantTypeClean === 'potato') {
         maxStagesForDisplay = 12;
     }
     
@@ -658,10 +692,13 @@ def get_plant_stage(kwh):
 Edit `PLANT_THRESHOLDS` array in `python-api/dpp_simulator.py` and `python-api/pdf_service.py` to change how quickly plants grow relative to energy consumption.
 
 **Use Cases for Custom Plants:**
-- **Automotive Industry**: Use car assembly imagery (parts → finished vehicle)
-- **Construction**: Building construction stages (foundation → completed structure)
-- **Technology**: Circuit board assembly (bare board → fully populated)
+- **Automotive Industry**: Use car assembly imagery (parts → finished vehicle → rusted/scrapped car)
+- **Construction**: Building construction stages (foundation → completed structure → demolition/decay)
+- **Technology**: Circuit board assembly (bare board → fully populated → broken/corroded)
 - **Seasonal Themes**: Holiday-specific imagery for marketing events
+- **Other Filament Sources**: Create plants for hemp, algae, bamboo, or other bio-based materials
+
+**Important**: Always include a **decline/negative phase** in later stages to maintain the sustainability message that excessive consumption has consequences.
 
 ### Educational Value
 
@@ -669,18 +706,28 @@ The Energy Plant visualization serves multiple purposes beyond aesthetics:
 
 **Sustainability Awareness:**
 - Makes abstract energy consumption tangible and memorable
-- Encourages operators to think about energy efficiency
-- Creates friendly competition between shifts to "grow the healthiest plants"
+- **Wilting/dying plants create emotional impact**: Operators don't want to "kill" their plant
+- Encourages operators to think about energy efficiency in a visceral way
+- Creates friendly competition between shifts to "keep the plants alive and healthy"
+- Provides immediate, honest feedback: "Your energy usage is harming the environment"
 
 **Client Communication:**
-- Easy to explain to non-technical stakeholders
-- Visually impressive in client presentations
-- Demonstrates commitment to sustainability tracking
+- Easy to explain to non-technical stakeholders: "See how the plant dies when we use too much energy?"
+- Visually impressive and memorable in client presentations
+- Demonstrates commitment to honest sustainability tracking (not greenwashing)
+- Shows clients you're serious about minimizing environmental impact
 
 **Team Engagement:**
 - Gamification creates emotional investment in efficiency
+- **Negative feedback (dying plant) is more motivating than positive alone**
 - Visual feedback is more engaging than raw numbers
 - Can track "plant health" over time as a team KPI
+- Operators take pride in maintaining "healthy" plants (low energy jobs)
+
+**Behavioral Psychology:**
+- **Loss aversion**: People are more motivated to prevent plant death than to achieve growth
+- Immediate visual consequences create behavioral change
+- Associates high energy use with negative outcome (death) at a subconscious level
 
 ---
 

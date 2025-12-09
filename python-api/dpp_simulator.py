@@ -23,7 +23,7 @@ from datetime import datetime, timedelta, timezone
 ACTIVE_POWER_THRESHOLD = 5.0
 DATA_FRESHNESS_THRESHOLD_MINUTES = 15
 
-PLANT_TYPES = ["generic_plant", "corn", "sunflower", "tomato"]
+PLANT_TYPES = ["generic_plant", "corn", "sunflower", "potato"]
 
 # --- Helper function for plant stage ---
 #PLANT_THRESHOLDS = [0.01, 0.018, 0.021, 0.022, 0.024, 0.027, 0.030, 0.04, 0.045, 0.05, 0.06, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.5, 3.0]

@@ -64,6 +64,12 @@ def get_plant_image_src(plant_type, kwh_for_plant):
     if plant_type_clean == 'corn':
         max_stages = 8
         plant_folder = "corn"
+    elif plant_type_clean == 'sunflower':
+        max_stages = 7
+        plant_folder = "sunflower"
+    elif plant_type_clean == 'potato':
+        max_stages = 12
+        plant_folder = "potato"
     stage = min(stage, max_stages)
     stage_padded = str(stage).zfill(2)
     image_path = os.path.join(ART_ROOT, "plants", plant_folder, f"{plant_folder}_stage_{stage_padded}.png")
