@@ -362,10 +362,10 @@ A key feature of the "Recent Print Jobs" table on this dashboard is the ability 
     3. Executes statistical analysis (correlation, phase detection) and ML model inference
     4. Returns formatted JSON results to the frontend
     
-*   **For Complete Documentation**: See the [Definitive Guide to Interactive Analysis](./INTERACTIVE_ANALYSIS_GUIDE.md) for detailed technical architecture and step-by-step user instructions.
+*   **For Complete Documentation**: See the [Definitive Guide to Interactive Analysis](./INTERACTIVE&ANALYSIS_GUIDE.md) for detailed technical architecture and step-by-step user instructions.
     
 *   **Screenshot:**
-    ![Interactive Analysis Results](docs/Interactice Analysis.png)
+    ![Interactive Analysis Results](docs/Interactice&Analysis.png)
 
 ---
     
