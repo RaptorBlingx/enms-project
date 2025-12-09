@@ -45,6 +45,9 @@ The Human-Centric EnMS platform is an IoT-based, real-time energy monitoring and
 ```bash
 # Clone from Gitlab
 git clone https://gitlab.com/lauds/enms-project.git
+cd enms-project
+```
+
 ---
 
 ## Software Documentation
