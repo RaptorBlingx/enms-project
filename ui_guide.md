@@ -60,8 +60,6 @@ When you first access the ENMS system, you are greeted by a **Welcome Screen** t
 
 ---
 
----
-
 ## User Profiles
 
 ## 1. Technical Profile
