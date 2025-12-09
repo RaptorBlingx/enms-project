@@ -174,7 +174,7 @@ The Technical Profile is designed for engineers, developers, and system administ
 *   **Screenshot:**
     ![Device Management CRUD Interface](docs/Device%20Managment.png)
 
----
+
 
 ---
 
@@ -535,8 +535,9 @@ The system includes **four distinct plant types**, each representing the **sourc
 - **Use Case**: Default for all printers unless manually assigned a specific plant type
 - **File Location**: `/artistic-resources/plants/generic_plant/generic_plant_stage_01.png` through `generic_plant_stage_21.png`
 
-[TODO: Screenshot needed - Example of Generic Plant at different stages showing growth and wilting]
-
+*   **Screenshot:**
+    ![Generic Plant Collage](docs/genirc-collage.png)
+    
 #### **B. Corn (Maize)**
 - **Stages**: 8
 - **Represents**: Corn-based PLA (polylactic acid) filament source material
@@ -546,7 +547,8 @@ The system includes **four distinct plant types**, each representing the **sourc
 - **Use Case**: Assign to printers primarily using PLA filament
 - **File Location**: `/artistic-resources/plants/corn/corn_stage_01.png` through `corn_stage_08.png`
 
-[TODO: Screenshot needed - Corn plant progression from growth to wilting]
+*   **Screenshot:**
+    ![Corn Collage](docs/corn-collage.png)
 
 #### **C. Sunflower**
 - **Stages**: 7
@@ -557,7 +559,8 @@ The system includes **four distinct plant types**, each representing the **sourc
 - **Use Case**: Ideal for printers using specialty bio-composite filaments
 - **File Location**: `/artistic-resources/plants/sunflower/sunflower_stage_01.png` through `sunflower_stage_07.png`
 
-[TODO: Screenshot needed - Sunflower progression from bloom to wilting]
+*   **Screenshot:**
+    ![Sunflower Collage](docs/sunflower-collage.png)
 
 #### **D. Potato**
 - **Stages**: 12
@@ -568,7 +571,8 @@ The system includes **four distinct plant types**, each representing the **sourc
 - **Use Case**: Assign to printers using starch-based or biodegradable filament materials
 - **File Location**: `/artistic-resources/plants/potato/potato_stage_01.png` through `potato_stage_12.png`
 
-[TODO: Screenshot needed - Potato plant progression from growth to wilting]
+*   **Screenshot:**
+    ![Potato Collage](docs/potato-collage.png)
 
 **3. Assignment & Configuration:**
 
