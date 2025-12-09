@@ -471,6 +471,9 @@ The DPP view provides **two locations** to download PDF reports:
 *   **3D Thumbnail**: Embedded preview image extracted from G-code file
 *   **QR Code**: (Future feature) Links to full manufacturing data in blockchain or audit system
 
+*   **Screenshot:**
+    ![PDF Report Sample](docs/pdf-report-sample.png)
+
 **Backend Process**: When you click download, the system:
 1. Queries PostgreSQL for complete job data (joining `print_jobs`, `devices`, and `printer_status` tables)
 2. Selects the appropriate plant image based on energy consumption and printer's `plant_type`
@@ -525,81 +528,61 @@ Each printer has a cumulative energy counter that tracks total kWh consumed over
 
 **2. Plant Type Selection:**
 
-The system includes **four distinct plant types**, each representing the **source material of the filament** (bio-based or plant-derived polymers). Each plant type has its own unique artistic style and number of growth stages:
+The system includes **four distinct plant types**, each with its own unique artistic style and number of growth stages:
 
-#### **A. Generic Plant** (Default)
+#### **A. Potato**
 - **Stages**: 21 (most granular progression)
-- **Represents**: Generic bio-based polymer source (default/fallback)
-- **Visual Style**: Abstract, stylized plant suitable for any industrial context
-- **Growth to Decline**: Stages 1-15 show healthy growth, stages 16-21 show gradual wilting and death
-- **Use Case**: Default for all printers unless manually assigned a specific plant type
-- **File Location**: `/artistic-resources/plants/generic_plant/generic_plant_stage_01.png` through `generic_plant_stage_21.png`
+- **File Location**: `/artistic-resources/plants/potato/potato_stage_01.png` through `potato_stage_21.png`
 
 *   **Screenshot:**
-    ![Generic Plant Collage](docs/genirc-collage.png)
+    ![Potato Plant Collage](docs/potato-collage.png)
     
 #### **B. Corn (Maize)**
 - **Stages**: 8
-- **Represents**: Corn-based PLA (polylactic acid) filament source material
-- **Visual Style**: Realistic corn plant from seed to mature stalk, then decline
-- **Growth to Decline**: Stages 1-5 show healthy growth, stages 6-8 show wilting/dying plant
-- **Symbolism**: Represents corn-derived bioplastic commonly used in 3D printing
-- **Use Case**: Assign to printers primarily using PLA filament
 - **File Location**: `/artistic-resources/plants/corn/corn_stage_01.png` through `corn_stage_08.png`
 
 *   **Screenshot:**
     ![Corn Collage](docs/corn-collage.png)
 
-#### **C. Sunflower**
-- **Stages**: 7
-- **Represents**: Sunflower-based or other plant oil-derived filament materials
-- **Visual Style**: Sunflower from seed to full bloom, then decline
-- **Growth to Decline**: Stages 1-4 show healthy growth and blooming, stages 5-7 show wilting petals and dying plant
-- **Symbolism**: Represents plant oil-based polymers and bio-composites
-- **Use Case**: Ideal for printers using specialty bio-composite filaments
-- **File Location**: `/artistic-resources/plants/sunflower/sunflower_stage_01.png` through `sunflower_stage_07.png`
-
-*   **Screenshot:**
-    ![Sunflower Collage](docs/sunflower-collage.png)
-
-#### **D. Potato**
+#### **C. Corn 2**
 - **Stages**: 12
-- **Represents**: Potato starch-based bioplastic filament source material
-- **Visual Style**: Potato plant from seedling to mature foliage, then decline
-- **Growth to Decline**: Stages 1-8 show healthy growth, stages 9-12 show progressive wilting and plant death
-- **Symbolism**: Represents potato starch-derived polymers used in biodegradable filaments
-- **Use Case**: Assign to printers using starch-based or biodegradable filament materials
-- **File Location**: `/artistic-resources/plants/potato/potato_stage_01.png` through `potato_stage_12.png`
+- **File Location**: `/artistic-resources/plants/corn_2/corn_2_stage_01.png` through `corn_2_stage_12.png`
 
 *   **Screenshot:**
-    ![Potato Collage](docs/potato-collage.png)
+    ![Corn 2 Collage](docs/corn-collage.png)
+
+#### **D. Corn 3**
+- **Stages**: 7
+- **File Location**: `/artistic-resources/plants/corn_3/corn_3_stage_01.png` through `corn_3_stage_07.png`
+
+*   **Screenshot:**
+    ![Corn 3 Collage](docs/sunflower-collage.png)
 
 **3. Assignment & Configuration:**
 
-Plant types are assigned per printer in the **devices table** in PostgreSQL based on the **filament material** typically used:
+Plant types are assigned per printer in the **devices table** in PostgreSQL:
 
 ```sql
--- Example: Assign corn plant to a PLA printer (corn-based filament)
+-- Example: Assign corn plant type
 UPDATE devices 
 SET plant_type = 'corn' 
 WHERE device_id = 'PrusaMK4-1';
 
--- Example: Assign potato plant to a biodegradable filament printer
+-- Example: Assign corn_2 plant type
 UPDATE devices 
-SET plant_type = 'potato'
+SET plant_type = 'corn_2'
 WHERE device_id = 'Ender3-2';
 
--- Example: Assign sunflower to specialty bio-composite printer
+-- Example: Assign corn_3 plant type
 UPDATE devices 
-SET plant_type = 'sunflower' 
+SET plant_type = 'corn_3' 
 WHERE device_id = 'PrusaMini-3';
-```
 
-**Recommended Mapping**:
-- **'corn'**: For printers using standard PLA (polylactic acid from corn)
-- **'potato'**: For biodegradable or starch-based filaments
-- **'sunflower'**: For specialty bio-composites or plant oil-based materials
-- **'generic_plant'**: Default for mixed-use printers or non-bio materials
+-- Example: Assign potato plant type (default)
+UPDATE devices 
+SET plant_type = 'potato' 
+WHERE device_id = 'Printer-4';
+```
 
 This can be done via the Device Management interface or directly in the database.
 
@@ -626,17 +609,17 @@ This can be done via the Device Management interface or directly in the database
 **Frontend (JavaScript):**
 ```javascript
 function getPlantImageSrc(plantType, plantStage) {
-    const plantTypeClean = plantType ? plantType.toLowerCase() : 'generic_plant';
+    const plantTypeClean = plantType ? plantType.toLowerCase() : 'potato';
     let stage = parseInt(plantStage);
-    let maxStagesForDisplay = 21; // Default for generic_plant
+    let maxStagesForDisplay = 21; // Default for potato
     
     // Adjust for specific plant types
     if (plantTypeClean === 'corn') {
         maxStagesForDisplay = 8;
-    } else if (plantTypeClean === 'sunflower') {
-        maxStagesForDisplay = 7;
-    } else if (plantTypeClean === 'potato') {
+    } else if (plantTypeClean === 'corn_2') {
         maxStagesForDisplay = 12;
+    } else if (plantTypeClean === 'corn_3') {
+        maxStagesForDisplay = 7;
     }
     
     // Ensure stage is within valid range
@@ -692,43 +675,25 @@ def get_plant_stage(kwh):
 
 Edit `PLANT_THRESHOLDS` array in `python-api/dpp_simulator.py` and `python-api/pdf_service.py` to change how quickly plants grow relative to energy consumption.
 
-**Use Cases for Custom Plants:**
-- **Automotive Industry**: Use car assembly imagery (parts → finished vehicle → rusted/scrapped car)
-- **Construction**: Building construction stages (foundation → completed structure → demolition/decay)
-- **Technology**: Circuit board assembly (bare board → fully populated → broken/corroded)
-- **Seasonal Themes**: Holiday-specific imagery for marketing events
-- **Other Filament Sources**: Create plants for hemp, algae, bamboo, or other bio-based materials
-
-**Important**: Always include a **decline/negative phase** in later stages to maintain the sustainability message that excessive consumption has consequences.
-
 ### Educational Value
 
 The Energy Plant visualization serves multiple purposes beyond aesthetics:
 
 **Sustainability Awareness:**
 - Makes abstract energy consumption tangible and memorable
-- **Wilting/dying plants create emotional impact**: Operators don't want to "kill" their plant
-- Encourages operators to think about energy efficiency in a visceral way
-- Creates friendly competition between shifts to "keep the plants alive and healthy"
-- Provides immediate, honest feedback: "Your energy usage is harming the environment"
+- Encourages operators to think about energy efficiency
+- Creates friendly competition between shifts
+- Provides immediate feedback on energy usage
 
 **Client Communication:**
-- Easy to explain to non-technical stakeholders: "See how the plant dies when we use too much energy?"
+- Easy to explain to non-technical stakeholders
 - Visually impressive and memorable in client presentations
-- Demonstrates commitment to honest sustainability tracking (not greenwashing)
-- Shows clients you're serious about minimizing environmental impact
+- Demonstrates commitment to sustainability tracking
 
 **Team Engagement:**
 - Gamification creates emotional investment in efficiency
-- **Negative feedback (dying plant) is more motivating than positive alone**
 - Visual feedback is more engaging than raw numbers
-- Can track "plant health" over time as a team KPI
-- Operators take pride in maintaining "healthy" plants (low energy jobs)
-
-**Behavioral Psychology:**
-- **Loss aversion**: People are more motivated to prevent plant death than to achieve growth
-- Immediate visual consequences create behavioral change
-- Associates high energy use with negative outcome (death) at a subconscious level
+- Can track progress over time as a team KPI
 
 ---
 

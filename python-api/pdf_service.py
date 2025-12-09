@@ -57,19 +57,19 @@ def get_plant_stage(kwh):
 def get_plant_image_src(plant_type, kwh_for_plant):
     # This path is where the artistic-resources will be mounted inside this container
     ART_ROOT = "/app/artistic-resources"
-    plant_type_clean = (plant_type or 'generic_plant').lower()
+    plant_type_clean = (plant_type or 'potato').lower()
     stage = get_plant_stage(kwh_for_plant)
     max_stages = 21
-    plant_folder = "generic_plant"
+    plant_folder = "potato"
     if plant_type_clean == 'corn':
         max_stages = 8
         plant_folder = "corn"
-    elif plant_type_clean == 'sunflower':
-        max_stages = 7
-        plant_folder = "sunflower"
-    elif plant_type_clean == 'potato':
+    elif plant_type_clean == 'corn_2':
         max_stages = 12
-        plant_folder = "potato"
+        plant_folder = "corn_2"
+    elif plant_type_clean == 'corn_3':
+        max_stages = 7
+        plant_folder = "corn_3"
     stage = min(stage, max_stages)
     stage_padded = str(stage).zfill(2)
     image_path = os.path.join(ART_ROOT, "plants", plant_folder, f"{plant_folder}_stage_{stage_padded}.png")
