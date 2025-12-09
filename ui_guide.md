@@ -469,7 +469,6 @@ The DPP view provides **two locations** to download PDF reports:
 *   **Temperature Profile**: Nozzle and bed temperatures used during print
 *   **Visual Certificate**: **Energy Plant Image** - the artistic visualization showing energy consumption stage (see next section)
 *   **3D Thumbnail**: Embedded preview image extracted from G-code file
-*   **QR Code**: (Future feature) Links to full manufacturing data in blockchain or audit system
 
 *   **Screenshot:**
     ![PDF Report Sample](docs/pdf-report-sample.png)
